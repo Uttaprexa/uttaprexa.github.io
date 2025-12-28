@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uttapreksha Patel - ML Engineer & Computer Vision Specialist</title>
+    <meta name="description" content="ML Engineer specializing in Computer Vision and MLOps. Building production systems that create real impact.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #c084fc;
+            --secondary: #f472b6;
+            --accent: #8b5cf6;
+            --dark: #0f172a;
+            --darker: #0a0e1a;
+            --light: #e2e8f0;
+            --gray: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+            color: white;
+            background: linear-gradient(135deg, var(--darker) 0%, #1e1b4b 50%, var(--darker) 100%);
+            line-height: 1.6;
+        }
+
+        #neuralCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .content {
+            position: relative;
+            z-index: 10;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            backdrop-filter: blur(16px);
+            background: rgba(15, 23, 42, 0.7);
+            border-bottom: 1px solid rgba(192, 132, 252, 0.1);
+            z-index: 100;
+            transition: all 0.3s;
+        }
+
+        nav.scrolled {
+            background: rgba(15, 23, 42, 0.95);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .cta-btn {
+            padding: 0.6rem 1.5rem;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(192, 132, 252, 0.3);
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            padding-top: 100px;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% auto;
+            animation: gradient 4s linear infinite;
+        }
+
+        @keyframes gradient {
+            to { background-position: 200% center; }
+        }
+
+        .hero-text .tagline {
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .hero-text .description {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(192, 132, 252, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(192, 132, 252, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .hero-visual {
+            position: relative;
+        }
+
+        .profile-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 2.5rem;
+            border: 1px solid rgba(192, 132, 252, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .profile-avatar {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            padding: 5px;
+            animation: pulse 3s infinite;
+        }
+
+        .profile-avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            font-weight: 900;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        .profile-info {
+            text-align: center;
+        }
+
+        .profile-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-info p {
+            color: var(--primary);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(192, 132, 252, 0.15);
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+        }
+
+        .social-btn:hover {
+            background: rgba(192, 132, 252, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(192, 132, 252, 0.2);
+        }
+
+        .section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.6);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .about-text {
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.9;
+        }
+
+        .about-text p {
+            margin-bottom: 1.5rem;
+        }
+
+        .about-text strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .about-highlights {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 2rem;
+            border: 1px solid rgba(192, 132, 252, 0.2);
+        }
+
+        .highlight-item {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .highlight-content h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+            color: var(--primary);
+        }
+
+        .highlight-content p {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 2.5rem;
+            border: 1px solid rgba(192, 132, 252, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+
+        .project-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .project-card:hover {
+            border-color: rgba(192, 132, 252, 0.5);
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1.5rem;
+        }
+
+        .project-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .project-status {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .project-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .project-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .project-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tech-tag {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            background: rgba(192, 132, 252, 0.15);
+            color: var(--primary);
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .project-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .project-link:hover {
+            color: var(--secondary);
+            gap: 0.8rem;
+        }
+
+        .timeline {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent), var(--secondary));
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            grid-column: 2;
+        }
+
+        .timeline-item:nth-child(even) .timeline-date {
+            grid-column: 1;
+            text-align: right;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            transform: translateX(-50%);
+            box-shadow: 0 0 0 6px rgba(192, 132, 252, 0.2);
+        }
+
+        .timeline-content {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(192, 132, 252, 0.2);
+        }
+
+        .timeline-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        .timeline-content .company {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .timeline-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .timeline-content li {
+            padding-left: 1.5rem;
+            margin-bottom: 0.8rem;
+            position: relative;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        .timeline-content li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .timeline-date {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .skill-category {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(192, 132, 252, 0.2);
+        }
+
+        .skill-category h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .skill-item {
+            padding: 0.5rem 1rem;
+            background: rgba(192, 132, 252, 0.1);
+            border: 1px solid rgba(192, 132, 252, 0.2);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s;
+        }
+
+        .skill-item:hover {
+            background: rgba(192, 132, 252, 0.2);
+            border-color: rgba(192, 132, 252, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .education-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 2rem;
+        }
+
+        .education-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 2.5rem;
+            border: 1px solid rgba(192, 132, 252, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .education-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            border-radius: 0 0 0 100%;
+            opacity: 0.1;
+        }
+
+        .degree {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        .university {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .gpa {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .coursework {
+            margin-top: 1.5rem;
+        }
+
+        .coursework h4 {
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .coursework-list {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .contact-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .contact-text {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 3rem;
+            line-height: 1.8;
+        }
+
+        .contact-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .contact-method {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(192, 132, 252, 0.2);
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .contact-method:hover {
+            border-color: rgba(192, 132, 252, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 1rem;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .contact-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.3rem;
+        }
+
+        .contact-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        footer {
+            border-top: 1px solid rgba(192, 132, 252, 0.2);
+            backdrop-filter: blur(20px);
+            background: rgba(15, 23, 42, 0.7);
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        footer p {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-tagline {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-item {
+                grid-template-columns: 1fr;
+                gap: 0;
+                padding-left: 60px;
+            }
+
+            .timeline-item:nth-child(even) .timeline-content,
+            .timeline-item:nth-child(even) .timeline-date {
+                grid-column: 1;
+                text-align: left;
+            }
+
+            .timeline-dot {
+                left: 20px;
+            }
+
+            .timeline-date {
+                justify-content: flex-start;
+                margin-bottom: 1rem;
+            }
+
+            .education-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .cta-btn {
+                display: none;
+            }
+
+            .hero-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 4rem 1.5rem;
+            }
+
+            .contact-methods {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="neuralCanvas"></canvas>
+    
+    <div class="content">
+        <nav id="navbar">
+            <div class="nav-container">
+                <div class="logo">UP</div>
+                <div class="nav-links">
+                    <a href="#about">About</a>
+                    <a href="#projects">Projects</a>
+                    <a href="#experience">Experience</a>
+                    <a href="#skills">Skills</a>
+                    <a href="#contact" class="cta-btn">Get in Touch</a>
+                </div>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Building ML Systems That People Actually Use</h1>
+                    <p class="tagline">Not models in notebooks. Production systems that create real impact.</p>
+                    <p class="description">
+                        Hi, I'm <strong>Uttapreksha Patel</strong> 👋 Master's student in Electrical and Computer Engineering at Northeastern University (GPA: 3.9), specializing in Machine Learning, Computer Vision, and MLOps.
+                    </p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">50K+</span>
+                            <span class="stat-label">Data Points/Month</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">95.2%</span>
+                            <span class="stat-label">Model Accuracy</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">3.9</span>
+                            <span class="stat-label">GPA</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-visual">
+                    <div class="profile-card">
+                        <div class="profile-avatar">
+                            <div class="profile-avatar-inner">UP</div>
+                        </div>
+                        <div class="profile-info">
+                            <h3>Uttapreksha Patel</h3>
+                            <p>ML Engineer | Research Assistant @ NEU</p>
+                            <div class="social-links">
+                                <a href="https://github.com/Uttaprexa" target="_blank" class="social-btn" title="GitHub">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                    </svg>
+                                </a>
+                                <a href="https://www.linkedin.com/in/uttapreksha-patel/" target="_blank" class="social-btn" title="LinkedIn">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                                    </svg>
+                                </a>
+                                <a href="mailto:patel.utt@northeastern.edu" class="social-btn" title="Email">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                        <polyline points="22,6 12,13 2,6"/>
+                                    </svg>
+                                </a>
+                                <a href="tel:+16179619251" class="social-btn" title="Phone">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="section">
+            <div class="section-header">
+                <h2 class="section-title">About Me</h2>
+                <p class="section-subtitle">Building production ML systems that create measurable impact</p>
+            </div>
+            
+            <div class="about-content">
+                <div class="about-text">
+                    <p>
+                        <strong>What drives me? Impact.</strong> I got into this field because data and ML can genuinely make people's lives better. Whether it's saving analysts 34 hours a week, helping manufacturers maintain compliance, or giving honest feedback to improve presentations—I care about building things that matter.
+                    </p>
+                    <p>
+                        <strong>My style: Collaborative.</strong> I'm a people person. The best solutions come from working together and learning from different perspectives. My technical skills are strong (Python, TensorFlow, PyTorch, Docker, AWS, GCP), but what I value most is translating between technical complexity and human needs.
+                    </p>
+                    <p>
+                        Production ML is different from research ML. It's about <strong>reliability, monitoring, and continuous improvement</strong>. Building real systems taught me this. I believe in being honest about what I don't know and learning quickly.
+                    </p>
+                    <p>
+                        Currently a Research Assistant at Northeastern working on data pipelines and ML deployments on AWS, while completing my Master's in Electrical and Computer Engineering with a 3.9 GPA.
+                    </p>
+                </div>
+
+                <div class="about-highlights">
+                    <div class="highlight-item">
+                        <div class="highlight-icon">🎯</div>
+                        <div class="highlight-content">
+                            <h4>Impact-Driven</h4>
+                            <p>Built systems processing 50K+ data points monthly with 95.2% accuracy, saving teams 34+ hours weekly</p>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <div class="highlight-icon">🤝</div>
+                        <div class="highlight-content">
+                            <h4>Team Player</h4>
+                            <p>IEEE Workshop Coordinator, mentoring peers and building tools to solve collective problems</p>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <div class="highlight-icon">🚀</div>
+                        <div class="highlight-content">
+                            <h4>Production Focus</h4>
+                            <p>Not prototypes—building reliable, monitored ML systems that work in the real world</p>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <div class="highlight-icon">📈</div>
+                        <div class="highlight-content">
+                            <h4>Always Learning</h4>
+                            <p>Turned fear of public speaking into a strength, continuously growing technical and soft skills</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="section">
+            <div class="section-header">
+                <h2 class="section-title">Featured Projects</h2>
+                <p class="section-subtitle">Production ML systems solving real-world problems</p>
+            </div>
+            
+            <div class="projects-grid">
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                                <line x1="12" y1="22.08" x2="12" y2="12"/>
+                            </svg>
+                        </div>
+                        <div class="project-status">In Production</div>
+                    </div>
+                    <h3 class="project-title">AI-Powered Portfolio Data Management</h3>
+                    <p class="project-description">
+                        End-to-end automated system extracting and cleaning portfolio data from Crunchbase, PitchBook, and company websites using GPT-4 API. Designed PostgreSQL data warehouse with star schema and Apache Airflow DAGs for daily ETL processes.
+                    </p>
+                    <div class="project-metrics">
+                        <div class="metric">
+                            <span class="metric-value">50K+</span>
+                            <span class="metric-label">Data Points/Month</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">95.2%</span>
+                            <span class="metric-label">Accuracy</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">85%</span>
+                            <span class="metric-label">Time Saved</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">15+</span>
+                            <span class="metric-label">Quality Checks</span>
+                        </div>
+                    </div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">GPT-4 API</span>
+                        <span class="tech-tag">PostgreSQL</span>
+                        <span class="tech-tag">Apache Airflow</span>
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">Tableau</span>
+                        <span class="tech-tag">ETL</span>
+                    </div>
+                    <span class="project-link">View Details →</span>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10 9 9 9 8 9"/>
+                            </svg>
+                        </div>
+                        <div class="project-status">Completed</div>
+                    </div>
+                    <h3 class="project-title">LLM-Powered Compliance Documentation</h3>
+                    <p class="project-description">
+                        Fine-tuned GPT-4 to automatically generate Standard Operating Procedures (SOPs) for medical device manufacturing. Implemented RAG architecture with FAISS, integrating FDA guidelines and ISO 13485 standards. Developed production Flask web service with authentication.
+                    </p>
+                    <div class="project-metrics">
+                        <div class="metric">
+                            <span class="metric-value">91%</span>
+                            <span class="metric-label">Compliance Score</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">5K+</span>
+                            <span class="metric-label">Documents Processed</span>
+                        </div>
+                    </div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">GPT-4</span>
+                        <span class="tech-tag">RAG</span>
+                        <span class="tech-tag">FAISS</span>
+                        <span class="tech-tag">Flask</span>
+                        <span class="tech-tag">NLP</span>
+                        <span class="tech-tag">FDA/ISO Standards</span>
+                    </div>
+                    <span class="project-link">Learn More →</span>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                            </svg>
+                        </div>
+                        <div class="project-status">Active</div>
+                    </div>
+                    <h3 class="project-title">Healthcare Knowledge Retrieval System</h3>
+                    <p class="project-description">
+                        RAG-based system assisting healthcare professionals in retrieving and understanding medical information. Utilized Elasticsearch and FAISS for document retrieval, leveraged HuggingFace Transformers (GPT-2, T5) for context-aware response generation.
+                    </p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">RAG</span>
+                        <span class="tech-tag">Elasticsearch</span>
+                        <span class="tech-tag">FAISS</span>
+                        <span class="tech-tag">HuggingFace</span>
+                        <span class="tech-tag">Docker</span>
+                        <span class="tech-tag">Flask</span>
+                    </div>
+                    <span class="project-link">Explore →</span>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <circle cx="12" cy="12" r="3"/>
+                                <line x1="12" y1="2" x2="12" y2="9"/>
+                                <line x1="12" y1="15" x2="12" y2="22"/>
+                            </svg>
+                        </div>
+                        <div class="project-status">Research</div>
+                    </div>
+                    <h3 class="project-title">VLM-Based Approaches Analysis</h3>
+                    <p class="project-description">
+                        Advanced Computer Vision course project analyzing Vision-Language Models for Activity Classification and Action Segmentation applications. Comprehensive evaluation of state-of-the-art VLM architectures.
+                    </p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Computer Vision</span>
+                        <span class="tech-tag">VLM</span>
+                        <span class="tech-tag">PyTorch</span>
+                        <span class="tech-tag">Deep Learning</span>
+                    </div>
+                    <a href="https://github.com/Uttaprexa/Analyzing-VLM-Based-Approaches-for-AC-AS" class="project-link" target="_blank">View on GitHub →</a>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                                <line x1="8" y1="21" x2="16" y2="21"/>
+                                <line x1="12" y1="17" x2="12" y2="21"/>
+                            </svg>
+                        </div>
+                        <div class="project-status">MLOps</div>
+                    </div>
+                    <h3 class="project-title">MLOps Pipeline Suite</h3>
+                    <p class="project-description">
+                        Complete MLOps workflow covering Docker containerization, Snorkel data labeling, ML logging systems, and deployment pipelines. Built production-ready infrastructure for ML model lifecycle management.
+                    </p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Docker</span>
+                        <span class="tech-tag">Snorkel</span>
+                        <span class="tech-tag">MLOps</span>
+                        <span class="tech-tag">CI/CD</span>
+                        <span class="tech-tag">Monitoring</span>
+                    </div>
+                    <a href="https://github.com/Uttaprexa/MLOps-Labs" class="project-link" target="_blank">View on GitHub →</a>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="16 18 22 12 16 6"/>
+                                <polyline points="8 6 2 12 8 18"/>
+                            </svg>
+                        </div>
+                        <div class="project-status">Production</div>
+                    </div>
+                    <h3 class="project-title">API Automation Testing Framework</h3>
+                    <p class="project-description">
+                        Comprehensive API testing framework developed during Python internship. Automated testing for Spectra's API and UI components using Python, Pytest, and PyCharm, optimizing testing processes and accelerating issue detection.
+                    </p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">Pytest</span>
+                        <span class="tech-tag">API Testing</span>
+                        <span class="tech-tag">Automation</span>
+                        <span class="tech-tag">CI/CD</span>
+                    </div>
+                    <a href="https://github.com/Uttaprexa/api-automation-testing" class="project-link" target="_blank">View on GitHub →</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="experience" class="section">
+            <div class="section-header">
+                <h2 class="section-title">Professional Experience</h2>
+                <p class="section-subtitle">Building production systems and conducting cutting-edge research</p>
+            </div>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">Feb 2025 - Present</div>
+                    <div class="timeline-content">
+                        <h3>Research Assistant</h3>
+                        <span class="company">Northeastern University, Boston, MA</span>
+                        <ul>
+                            <li>Engineer data collection pipeline using Darshan and LDMS on AWS with I/O benchmarks (IOR, VPIC), creating automated job scorecards and Python visualizations to analyze distributed system performance</li>
+                            <li>Deploy containerized ML workloads (miniGAN) via Docker on AWS, generating large-scale test datasets and building monitoring scripts to track and visualize performance metrics</li>
+                            <li>Collaborate on data-driven optimization strategies for distributed systems</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">Dec 2023 - Apr 2024</div>
+                    <div class="timeline-content">
+                        <h3>Python Development Intern</h3>
+                        <span class="company">TecUnique Pvt Ltd, Vadodara, India</span>
+                        <ul>
+                            <li>Developed and implemented an automated testing framework using Python, Pytest, and PyCharm to validate Spectra's API and UI components</li>
+                            <li>Created comprehensive test cases for key entities, improving test coverage by 40% and efficiency</li>
+                            <li>Generated detailed test reports with visualizations, enhancing visibility into test results and facilitating 50% quicker resolution of issues</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="section">
+            <div class="section-header">
+                <h2 class="section-title">Technical Arsenal</h2>
+                <p class="section-subtitle">Production-ready skills across the ML stack</p>
+            </div>
+            
+            <div class="skills-container">
+                <div class="skill-category">
+                    <h3>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="16 18 22 12 16 6"/>
+                            <polyline points="8 6 2 12 8 18"/>
+                        </svg>
+                        Programming & Analysis
+                    </h3>
+                    <div class="skill-list">
+                        <span class="skill-item">Python</span>
+                        <span class="skill-item">Pandas</span>
+                        <span class="skill-item">NumPy</span>
+                        <span class="skill-item">Scikit-learn</span>
+                        <span class="skill-item">C/C++</span>
+                        <span class="skill-item">R</span>
+                        <span class="skill-item">SQL</span>
+                        <span class="skill-item">Java</span>
+                        <span class="skill-item">JavaScript</span>
+                        <span class="skill-item">MATLAB</span>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        Machine Learning & AI
+                    </h3>
+                    <div class="skill-list">
+                        <span class="skill-item">Deep Learning</span>
+                        <span class="skill-item">CNNs</span>
+                        <span class="skill-item">RNNs</span>
+                        <span class="skill-item">LLMs</span>
+                        <span class="skill-item">Langchain</span>
+                        <span class="skill-item">TensorFlow</span>
+                        <span class="skill-item">PyTorch</span>
+                        <span class="skill-item">Keras</span>
+                        <span class="skill-item">HuggingFace</span>
+                        <span class="skill-item">Model Training</span>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                        </svg>
+                        MLOps & Deployment
+                    </h3>
+                    <div class="skill-list">
+                        <span class="skill-item">Docker</span>
+                        <span class="skill-item">AWS (EC2, S3)</span>
+                        <span class="skill-item">Google Cloud Platform</span>
+                        <span class="skill-item">Apache Spark</span>
+                        <span class="skill-item">Apache Airflow</span>
+                        <span class="skill-item">Azure AI</span>
+                        <span class="skill-item">CI/CD Pipelines</span>
+                        <span class="skill-item">Git/GitHub</span>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        </svg>
+                        NLP & Text Mining
+                    </h3>
+                    <div class="skill-list">
+                        <span class="skill-item">Transformers</span>
+                        <span class="skill-item">Named Entity Recognition</span>
+                        <span class="skill-item">Text Classification</span>
+                        <span class="skill-item">Information Retrieval</span>
+                        <span class="skill-item">RAG</span>
+                        <span class="skill-item">Prompt Engineering</span>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <path d="M3 9h18"/>
+                            <path d="M9 21V9"/>
+                        </svg>
+                        Data Management & Tools
+                    </h3>
+                    <div class="skill-list">
+                        <span class="skill-item">PostgreSQL</span>
+                        <span class="skill-item">MongoDB</span>
+                        <span class="skill-item">Snowflake</span>
+                        <span class="skill-item">Tableau</span>
+                        <span class="skill-item">Power BI</span>
+                        <span class="skill-item">Looker</span>
+                        <span class="skill-item">ETL Pipelines</span>
+                        <span class="skill-item">Data Warehousing</span>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v20M2 12h20"/>
+                            <path d="M5 12a7 7 0 0 1 14 0"/>
+                        </svg>
+                        AI/ML APIs & Tools
+                    </h3>
+                    <div class="skill-list">
+                        <span class="skill-item">ChatGPT API</span>
+                        <span class="skill-item">Claude API</span>
+                        <span class="skill-item">OpenAI Codex</span>
+                        <span class="skill-item">Flask</span>
+                        <span class="skill-item">API Development</span>
+                        <span class="skill-item">Jupyter</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="education" class="section">
+            <div class="section-header">
+                <h2 class="section-title">Education</h2>
+                <p class="section-subtitle">Strong academic foundation in ML and Computer Engineering</p>
+            </div>
+            
+            <div class="education-grid">
+                <div class="education-card">
+                    <h3 class="degree">Master of Science</h3>
+                    <p class="university">Northeastern University, Boston, MA</p>
+                    <span class="gpa">GPA: 3.9/4.0</span>
+                    <p style="color: var(--primary); margin-bottom: 1rem;">Electrical and Computer Engineering | Expected May 2026</p>
+                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;"><strong>Concentration:</strong> Computer Vision, Machine Learning, and Algorithms</p>
+                    <div class="coursework">
+                        <h4>Relevant Coursework:</h4>
+                        <p class="coursework-list">
+                            Machine Learning Operations (MLOps), Advanced Computer Vision, Advanced Machine Learning, High Performance Computing, Introduction to ML and Pattern Recognition, Fundamentals of Computer Engineering
+                        </p>
+                    </div>
+                    <div class="coursework">
+                        <h4>Leadership:</h4>
+                        <p class="coursework-list">
+                            IEEE Workshop Coordinator (Spring 2025), Global Student Mentee (GSM Program – Fall 2024)
+                        </p>
+                    </div>
+                </div>
+
+                <div class="education-card">
+                    <h3 class="degree">Bachelor of Engineering</h3>
+                    <p class="university">G H Patel College of Engineering (CVM University)</p>
+                    <span class="gpa">GPA: 3.7/4.0</span>
+                    <p style="color: var(--primary); margin-bottom: 1rem;">Electronics and Communication Engineering | May 2024</p>
+                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;"><strong>Location:</strong> Anand, India</p>
+                    <div class="coursework">
+                        <h4>Relevant Coursework:</h4>
+                        <p class="coursework-list">
+                            Digital Image Processing, Information Theory and Coding, IoT and Applications, Python for Engineers
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="section">
+            <div class="section-header">
+                <h2 class="section-title">Let's Build Something Together</h2>
+                <p class="section-subtitle">Open to Data Science, ML Engineering, and MLOps opportunities</p>
+            </div>
+            
+            <div class="contact-content">
+                <p class="contact-text">
+                    Looking for roles where I can work on problems that create real value, collaborate with mission-driven teams, build production systems (not prototypes), and continue learning and growing. If you're building something that matters, let's connect!
+                </p>
+                
+                <div class="contact-methods">
+                    <a href="mailto:patel.utt@northeastern.edu" class="contact-method">
+                        <div class="contact-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                        </div>
+                        <div class="contact-label">Email</div>
+                        <div class="contact-value">patel.utt@northeastern.edu</div>
+                    </a>
+
+                    <a href="tel:+16179619251" class="contact-method">
+                        <div class="contact-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                            </svg>
+                        </div>
+                        <div class="contact-label">Phone</div>
+                        <div class="contact-value">(617) 961-9251</div>
+                    </a>
+
+                    <a href="https://www.linkedin.com/in/uttapreksha-patel/" target="_blank" class="contact-method">
+                        <div class="contact-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                            </svg>
+                        </div>
+                        <div class="contact-label">LinkedIn</div>
+                        <div class="contact-value">Connect with me</div>
+                    </a>
+
+                    <a href="https://github.com/Uttaprexa" target="_blank" class="contact-method">
+                        <div class="contact-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </div>
+                        <div class="contact-label">GitHub</div>
+                        <div class="contact-value">View my code</div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>© 2025 Uttapreksha Patel. Built with passion and production-ready code.</p>
+            <p class="footer-tagline">Exploring the intersection of AI, Vision, and Real-World Impact</p>
+            <p style="margin-top: 1rem; color: rgba(255,255,255,0.4); font-size: 0.9rem;">Boston, MA | Available for opportunities</p>
+        </footer>
+    </div>
+
+    <script>
+        // Neural Network Background Animation
+        const canvas = document.getElementById('neuralCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const particleCount = 100;
+        const connectionDistance = 120;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.4;
+                this.vy = (Math.random() - 0.5) * 0.4;
+                this.radius = Math.random() * 1.5 + 0.5;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(192, 132, 252, 0.5)';
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(10, 14, 26, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < connectionDistance) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(192, 132, 252, ${0.2 * (1 - distance / connectionDistance)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('.section, .project-card, .timeline-item, .education-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
