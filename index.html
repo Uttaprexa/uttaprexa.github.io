@@ -386,7 +386,6 @@
             padding: 2.5rem;
             border: 1px solid rgba(192, 132, 252, 0.2);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
             position: relative;
             overflow: hidden;
         }
@@ -594,7 +593,7 @@
         }
 
         .timeline-content li::before {
-            content: '→';
+            content: '•';
             position: absolute;
             left: 0;
             color: var(--primary);
@@ -800,6 +799,180 @@
             font-size: 1.1rem;
         }
 
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 3rem;
+            max-width: 900px;
+            width: 100%;
+            border: 2px solid rgba(192, 132, 252, 0.3);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(192, 132, 252, 0.2);
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .modal-close:hover {
+            background: rgba(192, 132, 252, 0.4);
+            transform: rotate(90deg);
+        }
+
+        .modal-header {
+            margin-bottom: 2rem;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .modal-section {
+            margin-bottom: 2rem;
+        }
+
+        .modal-section h3 {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-section p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .modal-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .modal-section li {
+            padding-left: 1.5rem;
+            margin-bottom: 0.8rem;
+            position: relative;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .modal-section li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .modal-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-metric {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(192, 132, 252, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(192, 132, 252, 0.2);
+        }
+
+        .modal-metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-metric-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .modal-tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 1rem;
+        }
+
+        .modal-tech-item {
+            padding: 0.5rem 1rem;
+            background: rgba(192, 132, 252, 0.15);
+            color: var(--primary);
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
         @media (max-width: 1024px) {
             .hero-content {
                 grid-template-columns: 1fr;
@@ -866,6 +1039,19 @@
             .contact-methods {
                 grid-template-columns: 1fr;
             }
+
+            .modal-content {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
+
+            .modal-metrics {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -908,7 +1094,7 @@
                             <span class="stat-label">GPA</span>
                         </div>
                     </div>
-                    <a href="https://github.com/Uttaprexa/uttaprexa.github.io/blob/main/resumeu.pdf" download class="cta-btn" style="display: inline-block; margin-top: 2rem;">
+                    <a href="https://uttaprexa.github.io/resume.pdf" download class="cta-btn" style="display: inline-block; margin-top: 2rem;">
                         📄 Download Resume
                     </a>
                 </div>
@@ -1016,137 +1202,6 @@
                     <div class="project-header">
                         <div class="project-icon">
                             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-                                <line x1="12" y1="22.08" x2="12" y2="12"/>
-                            </svg>
-                        </div>
-                        <div class="project-status">In Production</div>
-                    </div>
-                    <h3 class="project-title">AI-Powered Portfolio Data Management</h3>
-                    <p class="project-description">
-                        End-to-end automated system extracting and cleaning portfolio data from Crunchbase, PitchBook, and company websites using GPT-4 API. Designed PostgreSQL data warehouse with star schema and Apache Airflow DAGs for daily ETL processes.
-                    </p>
-                    <div class="project-metrics">
-                        <div class="metric">
-                            <span class="metric-value">50K+</span>
-                            <span class="metric-label">Data Points/Month</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value">95.2%</span>
-                            <span class="metric-label">Accuracy</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value">85%</span>
-                            <span class="metric-label">Time Saved</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value">15+</span>
-                            <span class="metric-label">Quality Checks</span>
-                        </div>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">GPT-4 API</span>
-                        <span class="tech-tag">PostgreSQL</span>
-                        <span class="tech-tag">Apache Airflow</span>
-                        <span class="tech-tag">Python</span>
-                        <span class="tech-tag">Tableau</span>
-                        <span class="tech-tag">ETL</span>
-                    </div>
-                    <span class="project-link">View Details →</span>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                                <line x1="16" y1="13" x2="8" y2="13"/>
-                                <line x1="16" y1="17" x2="8" y2="17"/>
-                                <polyline points="10 9 9 9 8 9"/>
-                            </svg>
-                        </div>
-                        <div class="project-status">Completed</div>
-                    </div>
-                    <h3 class="project-title">LLM-Powered Compliance Documentation</h3>
-                    <p class="project-description">
-                        Fine-tuned GPT-4 to automatically generate Standard Operating Procedures (SOPs) for medical device manufacturing. Implemented RAG architecture with FAISS, integrating FDA guidelines and ISO 13485 standards. Developed production Flask web service with authentication.
-                    </p>
-                    <div class="project-metrics">
-                        <div class="metric">
-                            <span class="metric-value">91%</span>
-                            <span class="metric-label">Compliance Score</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value">5K+</span>
-                            <span class="metric-label">Documents Processed</span>
-                        </div>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">GPT-4</span>
-                        <span class="tech-tag">RAG</span>
-                        <span class="tech-tag">FAISS</span>
-                        <span class="tech-tag">Flask</span>
-                        <span class="tech-tag">NLP</span>
-                        <span class="tech-tag">FDA/ISO Standards</span>
-                    </div>
-                    <span class="project-link">Learn More →</span>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                            </svg>
-                        </div>
-                        <div class="project-status">Active</div>
-                    </div>
-                    <h3 class="project-title">Healthcare Knowledge Retrieval System</h3>
-                    <p class="project-description">
-                        RAG-based system assisting healthcare professionals in retrieving and understanding medical information. Utilized Elasticsearch and FAISS for document retrieval, leveraged HuggingFace Transformers (GPT-2, T5) for context-aware response generation.
-                    </p>
-                    <div class="tech-tags">
-                        <span class="tech-tag">RAG</span>
-                        <span class="tech-tag">Elasticsearch</span>
-                        <span class="tech-tag">FAISS</span>
-                        <span class="tech-tag">HuggingFace</span>
-                        <span class="tech-tag">Docker</span>
-                        <span class="tech-tag">Flask</span>
-                    </div>
-                    <span class="project-link">Explore →</span>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <circle cx="12" cy="12" r="3"/>
-                                <line x1="12" y1="2" x2="12" y2="9"/>
-                                <line x1="12" y1="15" x2="12" y2="22"/>
-                            </svg>
-                        </div>
-                        <div class="project-status">Research</div>
-                    </div>
-                    <h3 class="project-title">VLM-Based Approaches Analysis</h3>
-                    <p class="project-description">
-                        Advanced Computer Vision course project analyzing Vision-Language Models for Activity Classification and Action Segmentation applications. Comprehensive evaluation of state-of-the-art VLM architectures.
-                    </p>
-                    <div class="tech-tags">
-                        <span class="tech-tag">Computer Vision</span>
-                        <span class="tech-tag">VLM</span>
-                        <span class="tech-tag">PyTorch</span>
-                        <span class="tech-tag">Deep Learning</span>
-                    </div>
-                    <a href="https://github.com/Uttaprexa/Analyzing-VLM-Based-Approaches-for-AC-AS" class="project-link" target="_blank">View on GitHub →</a>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M23 7l-7 5 7 5V7z"/>
                                 <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
                             </svg>
@@ -1183,6 +1238,138 @@
                     <div class="project-header">
                         <div class="project-icon">
                             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <circle cx="12" cy="12" r="3"/>
+                                <line x1="12" y1="2" x2="12" y2="9"/>
+                                <line x1="12" y1="15" x2="12" y2="22"/>
+                            </svg>
+                        </div>
+                        <div class="project-status">Research</div>
+                    </div>
+                    <h3 class="project-title">VLM-Based Approaches Analysis</h3>
+                    <p class="project-description">
+                        Advanced Computer Vision course project analyzing Vision-Language Models for Activity Classification and Action Segmentation applications. Comprehensive evaluation of state-of-the-art VLM architectures for understanding complex video sequences and temporal relationships.
+                    </p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Computer Vision</span>
+                        <span class="tech-tag">VLM</span>
+                        <span class="tech-tag">PyTorch</span>
+                        <span class="tech-tag">Deep Learning</span>
+                        <span class="tech-tag">Action Recognition</span>
+                    </div>
+                    <a href="https://github.com/Uttaprexa/Analyzing-VLM-Based-Approaches-for-AC-AS" class="project-link" target="_blank">View on GitHub →</a>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                                <line x1="12" y1="22.08" x2="12" y2="12"/>
+                            </svg>
+                        </div>
+                        <div class="project-status">In Production</div>
+                    </div>
+                    <h3 class="project-title">AI-Powered Portfolio Data Management</h3>
+                    <p class="project-description">
+                        End-to-end automated system extracting and cleaning portfolio data from Crunchbase, PitchBook, and company websites using GPT-4 API. Designed PostgreSQL data warehouse with star schema and Apache Airflow DAGs for daily ETL processes. Created comprehensive data validation framework with real-time monitoring.
+                    </p>
+                    <div class="project-metrics">
+                        <div class="metric">
+                            <span class="metric-value">50K+</span>
+                            <span class="metric-label">Data Points/Month</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">95.2%</span>
+                            <span class="metric-label">Accuracy</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">85%</span>
+                            <span class="metric-label">Time Saved</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">15+</span>
+                            <span class="metric-label">Quality Checks</span>
+                        </div>
+                    </div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">GPT-4 API</span>
+                        <span class="tech-tag">PostgreSQL</span>
+                        <span class="tech-tag">Apache Airflow</span>
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">Tableau</span>
+                        <span class="tech-tag">ETL</span>
+                    </div>
+                    <a href="#" class="project-link" onclick="openModal('portfolio-modal'); return false;">Learn More →</a>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10 9 9 9 8 9"/>
+                            </svg>
+                        </div>
+                        <div class="project-status">Completed</div>
+                    </div>
+                    <h3 class="project-title">LLM-Powered Compliance Documentation</h3>
+                    <p class="project-description">
+                        Fine-tuned GPT-4 to automatically generate Standard Operating Procedures (SOPs) for medical device manufacturing. Implemented RAG architecture with FAISS, integrating FDA guidelines and ISO 13485 standards. Developed production Flask web service with authentication for quality management system integration.
+                    </p>
+                    <div class="project-metrics">
+                        <div class="metric">
+                            <span class="metric-value">91%</span>
+                            <span class="metric-label">Compliance Score</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">5K+</span>
+                            <span class="metric-label">Documents Processed</span>
+                        </div>
+                    </div>
+                    <div class="tech-tags">
+                        <span class="tech-tag">GPT-4</span>
+                        <span class="tech-tag">RAG</span>
+                        <span class="tech-tag">FAISS</span>
+                        <span class="tech-tag">Flask</span>
+                        <span class="tech-tag">NLP</span>
+                        <span class="tech-tag">FDA/ISO Standards</span>
+                    </div>
+                    <a href="#" class="project-link" onclick="openModal('compliance-modal'); return false;">Learn More →</a>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                            </svg>
+                        </div>
+                        <div class="project-status">Active</div>
+                    </div>
+                    <h3 class="project-title">Healthcare Knowledge Retrieval System</h3>
+                    <p class="project-description">
+                        RAG-based system assisting healthcare professionals in retrieving and understanding medical information. Utilized Elasticsearch and FAISS for document retrieval, leveraged HuggingFace Transformers (GPT-2, T5) for generating concise, context-aware responses. Deployed using Docker and Flask with user-friendly web interface.
+                    </p>
+                    <div class="tech-tags">
+                        <span class="tech-tag">RAG</span>
+                        <span class="tech-tag">Elasticsearch</span>
+                        <span class="tech-tag">FAISS</span>
+                        <span class="tech-tag">HuggingFace</span>
+                        <span class="tech-tag">Docker</span>
+                        <span class="tech-tag">Flask</span>
+                    </div>
+                    <a href="#" class="project-link" onclick="openModal('healthcare-modal'); return false;">Learn More →</a>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="16 18 22 12 16 6"/>
                                 <polyline points="8 6 2 12 8 18"/>
                             </svg>
@@ -1191,7 +1378,7 @@
                     </div>
                     <h3 class="project-title">API Automation Testing Framework</h3>
                     <p class="project-description">
-                        Comprehensive API testing framework developed during Python internship. Automated testing for Spectra's API and UI components using Python, Pytest, and PyCharm, optimizing testing processes and accelerating issue detection.
+                        Comprehensive API testing framework developed during Python development internship at TecUnique. Automated testing for Spectra's API and UI components using Python, Pytest, and PyCharm. Created real test cases for key entities, improving test coverage by 40% and reducing issue resolution time by 50%.
                     </p>
                     <div class="tech-tags">
                         <span class="tech-tag">Python</span>
@@ -1483,7 +1670,268 @@
         </footer>
     </div>
 
+    <!-- Modal for AI-Powered Portfolio Data Management -->
+    <div id="portfolio-modal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'portfolio-modal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-close" onclick="closeModal('portfolio-modal')">×</div>
+            
+            <div class="modal-header">
+                <h2 class="modal-title">AI-Powered Portfolio Data Management System</h2>
+                <p class="modal-subtitle">Automated intelligence system revolutionizing venture capital portfolio management through AI-driven data extraction, processing, and analysis</p>
+            </div>
+
+            <div class="modal-section">
+                <h3>🎯 Project Overview</h3>
+                <p>
+                    Designed and deployed an end-to-end automated system that transforms how investment firms manage portfolio data. The system intelligently extracts, cleans, and analyzes data from multiple sources including Crunchbase, PitchBook, and company websites, processing over 50,000 data points monthly with exceptional accuracy.
+                </p>
+            </div>
+
+            <div class="modal-metrics">
+                <div class="modal-metric">
+                    <span class="modal-metric-value">50K+</span>
+                    <span class="modal-metric-label">Data Points Processed Monthly</span>
+                </div>
+                <div class="modal-metric">
+                    <span class="modal-metric-value">95.2%</span>
+                    <span class="modal-metric-label">Data Accuracy Rate</span>
+                </div>
+                <div class="modal-metric">
+                    <span class="modal-metric-value">85%</span>
+                    <span class="modal-metric-label">Time Reduction</span>
+                </div>
+                <div class="modal-metric">
+                    <span class="modal-metric-value">15+</span>
+                    <span class="modal-metric-label">Quality Validation Checks</span>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>🔧 Key Features & Implementation</h3>
+                <ul>
+                    <li><strong>Intelligent Data Extraction:</strong> Leveraged GPT-4 API to extract structured information from unstructured web data, handling multiple data formats and sources simultaneously</li>
+                    <li><strong>PostgreSQL Data Warehouse:</strong> Designed star schema architecture optimized for analytical queries, enabling fast insights across 100+ portfolio companies</li>
+                    <li><strong>Apache Airflow Pipeline:</strong> Built robust DAGs for daily ETL processes, ensuring data freshness and reliability with automated error handling and retry logic</li>
+                    <li><strong>Real-Time Dashboard:</strong> Created Tableau visualizations providing executives with instant portfolio performance insights and investment decision support</li>
+                    <li><strong>Data Quality Framework:</strong> Implemented 15+ automated validation checks ensuring data integrity, completeness, and accuracy across all data sources</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>💡 Technical Challenges Solved</h3>
+                <ul>
+                    <li>Unified data from disparate sources with varying formats and update frequencies</li>
+                    <li>Reduced manual data entry time from 40 hours/week to 6 hours/week</li>
+                    <li>Achieved 95.2% accuracy through iterative prompt engineering and validation rules</li>
+                    <li>Built scalable architecture handling 5x data volume growth without performance degradation</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>🛠️ Technology Stack</h3>
+                <div class="modal-tech-stack">
+                    <span class="modal-tech-item">GPT-4 API</span>
+                    <span class="modal-tech-item">Python</span>
+                    <span class="modal-tech-item">PostgreSQL</span>
+                    <span class="modal-tech-item">Apache Airflow</span>
+                    <span class="modal-tech-item">Tableau</span>
+                    <span class="modal-tech-item">Pandas</span>
+                    <span class="modal-tech-item">BeautifulSoup</span>
+                    <span class="modal-tech-item">REST APIs</span>
+                    <span class="modal-tech-item">Docker</span>
+                    <span class="modal-tech-item">Git/GitHub</span>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>📈 Business Impact</h3>
+                <p>
+                    Transformed portfolio management operations by automating data-intensive tasks, enabling investment teams to focus on strategic decision-making rather than manual data collection. The system now serves as the single source of truth for portfolio analytics, supporting quarterly board presentations and investment committee meetings.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for LLM-Powered Compliance Documentation -->
+    <div id="compliance-modal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'compliance-modal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-close" onclick="closeModal('compliance-modal')">×</div>
+            
+            <div class="modal-header">
+                <h2 class="modal-title">LLM-Powered Compliance Documentation System</h2>
+                <p class="modal-subtitle">AI-driven solution automating Standard Operating Procedure generation for medical device manufacturing with regulatory compliance</p>
+            </div>
+
+            <div class="modal-section">
+                <h3>🎯 Project Overview</h3>
+                <p>
+                    Developed an intelligent system that automatically generates compliant Standard Operating Procedures (SOPs) for medical device manufacturing, ensuring adherence to FDA guidelines and ISO 13485 standards. The solution fine-tunes GPT-4 and implements RAG architecture to produce documentation that meets stringent regulatory requirements.
+                </p>
+            </div>
+
+            <div class="modal-metrics">
+                <div class="modal-metric">
+                    <span class="modal-metric-value">91%</span>
+                    <span class="modal-metric-label">Regulatory Compliance Score</span>
+                </div>
+                <div class="modal-metric">
+                    <span class="modal-metric-value">5,000+</span>
+                    <span class="modal-metric-label">Technical Documents Processed</span>
+                </div>
+                <div class="modal-metric">
+                    <span class="modal-metric-value">80%</span>
+                    <span class="modal-metric-label">Faster Document Creation</span>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>🔧 Technical Implementation</h3>
+                <ul>
+                    <li><strong>Fine-Tuned GPT-4 Model:</strong> Trained on 5,000+ technical documents including FDA guidelines, ISO 13485 standards, and existing compliant SOPs for domain-specific accuracy</li>
+                    <li><strong>RAG Architecture with FAISS:</strong> Implemented retrieval-augmented generation to ground responses in authoritative regulatory documents, ensuring compliance and accuracy</li>
+                    <li><strong>Quality Management Integration:</strong> Built production Flask web service with role-based authentication, version control, and approval workflows for enterprise deployment</li>
+                    <li><strong>Multi-Source Knowledge Base:</strong> Integrated FDA 21 CFR Part 820, ISO 13485, and company-specific quality procedures into a unified knowledge retrieval system</li>
+                    <li><strong>Structured Output Generation:</strong> Designed prompts and validation logic ensuring generated SOPs follow standardized formats with required sections and terminology</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>💡 Innovation & Approach</h3>
+                <ul>
+                    <li>Systematic evaluation of zero-shot, few-shot, and fine-tuned approaches using BLEU, ROUGE, and domain-specific compliance metrics</li>
+                    <li>Created comprehensive test suite with 200+ validation scenarios covering edge cases and regulatory requirements</li>
+                    <li>Achieved 91% regulatory compliance score through iterative prompt refinement and model fine-tuning</li>
+                    <li>Reduced SOP creation time from 8 hours to 90 minutes while maintaining quality and compliance</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>🛠️ Technology Stack</h3>
+                <div class="modal-tech-stack">
+                    <span class="modal-tech-item">GPT-4</span>
+                    <span class="modal-tech-item">Python</span>
+                    <span class="modal-tech-item">FAISS</span>
+                    <span class="modal-tech-item">LangChain</span>
+                    <span class="modal-tech-item">Flask</span>
+                    <span class="modal-tech-item">HuggingFace</span>
+                    <span class="modal-tech-item">NLP</span>
+                    <span class="modal-tech-item">PostgreSQL</span>
+                    <span class="modal-tech-item">Docker</span>
+                    <span class="modal-tech-item">API Development</span>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>📊 Results & Impact</h3>
+                <p>
+                    Successfully deployed to production, serving quality management teams across multiple manufacturing sites. The system has generated over 150 compliant SOPs, passed two FDA audit cycles, and significantly reduced documentation burden on quality engineers. Now serves as the foundation for expanding automation to other controlled documents including work instructions and quality forms.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Healthcare Knowledge Retrieval System -->
+    <div id="healthcare-modal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'healthcare-modal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-close" onclick="closeModal('healthcare-modal')">×</div>
+            
+            <div class="modal-header">
+                <h2 class="modal-title">Healthcare Knowledge Retrieval System</h2>
+                <p class="modal-subtitle">RAG-based intelligent assistant helping healthcare professionals access medical information with context-aware responses</p>
+            </div>
+
+            <div class="modal-section">
+                <h3>🎯 Project Overview</h3>
+                <p>
+                    Built a sophisticated RAG-based system that assists healthcare professionals in retrieving and understanding complex medical information. The system combines advanced document retrieval with natural language generation to provide accurate, context-aware responses from medical databases, clinical guidelines, and research papers.
+                </p>
+            </div>
+
+            <div class="modal-section">
+                <h3>🔧 System Architecture</h3>
+                <ul>
+                    <li><strong>Dual Retrieval System:</strong> Implemented both Elasticsearch for text-based search and FAISS for semantic similarity, providing comprehensive coverage across different query types</li>
+                    <li><strong>Transformer-Based Generation:</strong> Leveraged HuggingFace models (GPT-2, T5) fine-tuned on medical literature for generating accurate, concise responses that maintain clinical terminology</li>
+                    <li><strong>Multi-Source Integration:</strong> Unified access to medical guidelines (FDA, WHO), patient records, clinical recommendations, and peer-reviewed research papers</li>
+                    <li><strong>Context-Aware Processing:</strong> Built query understanding module that identifies medical entities, conditions, and procedures to improve retrieval relevance</li>
+                    <li><strong>Production Deployment:</strong> Dockerized application with Flask API and responsive web interface, supporting concurrent users with sub-3-second response times</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>💡 Key Features</h3>
+                <ul>
+                    <li>Semantic search across 100,000+ medical documents with multi-language support</li>
+                    <li>Real-time response generation with source attribution and confidence scores</li>
+                    <li>Medical entity recognition and disambiguation for improved query understanding</li>
+                    <li>Citation tracking linking responses back to source documents for verification</li>
+                    <li>Customizable response length and technical detail level based on user role (physician, nurse, researcher)</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>🛠️ Technology Stack</h3>
+                <div class="modal-tech-stack">
+                    <span class="modal-tech-item">Python</span>
+                    <span class="modal-tech-item">Elasticsearch</span>
+                    <span class="modal-tech-item">FAISS</span>
+                    <span class="modal-tech-item">HuggingFace Transformers</span>
+                    <span class="modal-tech-item">GPT-2</span>
+                    <span class="modal-tech-item">T5</span>
+                    <span class="modal-tech-item">Flask</span>
+                    <span class="modal-tech-item">Docker</span>
+                    <span class="modal-tech-item">RAG Architecture</span>
+                    <span class="modal-tech-item">NLP</span>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h3>🧪 Technical Challenges</h3>
+                <ul>
+                    <li>Balanced retrieval precision and recall across diverse medical specialties</li>
+                    <li>Ensured generated responses maintain medical accuracy while being understandable</li>
+                    <li>Handled complex medical terminology with abbreviations, synonyms, and domain-specific language</li>
+                    <li>Optimized system performance for real-time responses while maintaining comprehensive search</li>
+                </ul>
+            </div>
+
+            <div class="modal-section">
+                <h3>📈 Use Cases & Applications</h3>
+                <p>
+                    Supports clinical decision-making by providing quick access to evidence-based guidelines, drug interactions, treatment protocols, and diagnostic criteria. Particularly valuable in time-sensitive situations where healthcare professionals need reliable information immediately. The system has been tested with medical students and practicing physicians, receiving positive feedback on accuracy and usability.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeModalOnOverlay(event, modalId) {
+            if (event.target.classList.contains('modal-overlay')) {
+                closeModal(modalId);
+            }
+        }
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            }
+        });
+
         // Neural Network Background Animation
         const canvas = document.getElementById('neuralCanvas');
         const ctx = canvas.getContext('2d');
