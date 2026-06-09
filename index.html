@@ -3,1165 +3,1192 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Uttapreksha Patel — AI Engineer</title>
-  <meta name="description" content="AI Engineer. LLMs, RAG, computer vision, production ML. Graduating May 2026, Northeastern. Open to relocate.">
+  <title>feat/hire-uttapreksha → your-team/main · Pull Request #1</title>
+  <meta name="description" content="Open PR: uttapreksha-patel wants to merge feat/hire-me into your-team/main. AI engineer, LLMs, RAG, CV, HPC. May 2026.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     /* ── TOKENS ── */
     :root {
-      --paper:   #F7F4EE;
-      --ink:     #111010;
-      --amber:   #D4890A;
-      --amber-light: #F5A623;
-      --gray:    #6B6760;
-      --gray-lt: #C8C4BC;
-      --rule:    #DDD8CF;
-      --code-bg: #1A1A2E;
-      --code-fg: #E8E0D0;
-      --red:     #C0392B;
-      --green:   #1A7A4A;
-      --mono: 'JetBrains Mono', 'Courier New', monospace;
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1c2128;
+      --border: #30363d;
+      --border-subtle: #21262d;
+      --text: #e6edf3;
+      --text-muted: #7d8590;
+      --text-dim: #484f58;
+      --green: #3fb950;
+      --green-bg: #0f2b1a;
+      --green-border: #1a4228;
+      --purple: #bc8cff;
+      --purple-bg: #1f1235;
+      --blue: #58a6ff;
+      --blue-bg: #0d2044;
+      --yellow: #d29922;
+      --yellow-bg: #2b1e00;
+      --red: #f85149;
+      --red-bg: #2d1117;
+      --add: #2ea04326;
+      --add-num: #2ea04340;
+      --del: #f8514926;
+      --mono: 'JetBrains Mono', monospace;
       --sans: 'Inter', system-ui, sans-serif;
     }
 
-    /* ── RESET ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; font-size: 16px; }
+    html { scroll-behavior: smooth; }
 
     body {
-      background: var(--paper);
-      color: var(--ink);
+      background: var(--bg);
+      color: var(--text);
       font-family: var(--sans);
-      font-size: 1rem;
-      line-height: 1.65;
-      overflow-x: hidden;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
     }
 
-    /* ── SELECTION ── */
-    ::selection { background: var(--amber); color: white; }
+    ::selection { background: rgba(88,166,255,0.3); }
 
-    /* ── NAV ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 99;
-      background: var(--paper);
-      border-bottom: 1px solid var(--rule);
-      padding: 0.9rem 2rem;
-      display: flex; justify-content: space-between; align-items: center;
+    /* ── TOP HEADER ── */
+    .gh-header {
+      background: #010409;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
+    .gh-logo {
+      color: var(--text);
+      display: flex;
+      align-items: center;
+    }
+    .gh-logo svg { width: 28px; height: 28px; fill: currentColor; }
+    .gh-breadcrumb {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .gh-breadcrumb a { color: var(--blue); text-decoration: none; }
+    .gh-breadcrumb a:hover { text-decoration: underline; }
+    .gh-breadcrumb .sep { color: var(--border); }
 
-    .nav-id {
-      font-family: var(--mono);
-      font-size: 0.85rem;
-      font-weight: 500;
-      letter-spacing: 0.01em;
-      color: var(--ink);
-      text-decoration: none;
-    }
-    .nav-id span { color: var(--amber); }
-
-    .nav-links {
-      display: flex; gap: 2rem; list-style: none;
-    }
-    .nav-links a {
-      font-family: var(--mono);
-      font-size: 0.78rem;
-      color: var(--gray);
-      text-decoration: none;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--amber); }
-
-    /* ── LAYOUT WRAPPER ── */
-    .wrap {
-      max-width: 800px;
+    /* ── MAIN LAYOUT ── */
+    .main-wrap {
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 0 2rem;
+      padding: 24px 24px 80px;
     }
 
-    /* ── HERO / BUILD LOG ── */
-    #hero {
-      padding: 120px 0 80px;
-      border-bottom: 1px solid var(--rule);
+    /* ── PR TITLE ROW ── */
+    .pr-title-row {
+      margin-bottom: 12px;
     }
+    .pr-title {
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .pr-title strong { font-weight: 600; }
+    .pr-number { color: var(--text-muted); font-weight: 300; }
 
-    .eyebrow {
+    .pr-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge-open {
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green-border);
+    }
+    .badge-open svg { width: 14px; height: 14px; fill: currentColor; }
+    .pr-meta-text {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .pr-meta-text strong { color: var(--blue); font-weight: 500; }
+    .branch-pill {
+      background: var(--blue-bg);
+      color: var(--blue);
+      padding: 1px 8px;
+      border-radius: 4px;
       font-family: var(--mono);
-      font-size: 0.75rem;
-      color: var(--amber);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 1.5rem;
+      font-size: 11px;
     }
 
-    h1.name {
-      font-family: var(--mono);
-      font-size: clamp(2.2rem, 5vw, 3.6rem);
-      font-weight: 700;
-      line-height: 1.05;
-      letter-spacing: -0.02em;
-      color: var(--ink);
-      margin-bottom: 1rem;
+    /* ── TAB BAR ── */
+    .tab-bar {
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0;
+      margin-bottom: 0;
+      overflow-x: auto;
     }
-    h1.name em {
-      font-style: normal;
-      color: var(--amber);
+    .tab {
+      padding: 10px 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: color 0.15s;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      font-family: var(--sans);
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active {
+      color: var(--text);
+      border-bottom-color: #f78166;
+    }
+    .tab-count {
+      background: var(--surface2);
+      color: var(--text-muted);
+      padding: 1px 6px;
+      border-radius: 20px;
+      font-size: 11px;
     }
 
-    .hero-bio {
-      font-size: 1.05rem;
-      color: var(--gray);
-      max-width: 580px;
-      margin-bottom: 2.5rem;
-      line-height: 1.75;
+    /* ── CONTENT PANELS ── */
+    .panel { display: none; padding-top: 24px; }
+    .panel.active { display: block; }
+
+    /* ── TWO-COL LAYOUT ── */
+    .pr-body {
+      display: grid;
+      grid-template-columns: 1fr 256px;
+      gap: 24px;
+      align-items: start;
     }
 
-    /* build log */
-    .build-log {
-      background: var(--code-bg);
-      border-radius: 6px;
-      padding: 1.2rem 1.5rem;
-      margin-bottom: 2.5rem;
-      overflow: hidden;
+    /* ── CONVERSATION THREAD ── */
+    .thread { display: flex; flex-direction: column; gap: 0; }
+
+    .comment {
+      display: flex;
+      gap: 12px;
       position: relative;
     }
-    .build-log::before {
-      content: '● build_outputs.log';
-      display: block;
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      color: var(--gray);
-      margin-bottom: 0.8rem;
-      letter-spacing: 0.05em;
+    .comment::before {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 40px;
+      bottom: -16px;
+      width: 2px;
+      background: var(--border-subtle);
     }
-    .log-line {
-      font-family: var(--mono);
-      font-size: 0.82rem;
-      line-height: 1.9;
-      color: var(--code-fg);
-      opacity: 0;
-      transform: translateX(-6px);
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-    .log-line.visible { opacity: 1; transform: translateX(0); }
-    .log-line .prefix { color: #6B9FD4; }
-    .log-line .key    { color: #C5A55A; }
-    .log-line .arrow  { color: var(--amber-light); }
-    .log-line .val    { color: #9FC67A; }
-    .log-line .delta  { color: #F0856A; }
-    .log-line .ok     { color: #4CAF85; }
+    .comment:last-child::before { display: none; }
 
-    .hero-actions {
-      display: flex; gap: 1rem; flex-wrap: wrap;
-    }
-    .btn {
-      font-family: var(--mono);
-      font-size: 0.82rem;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      text-decoration: none;
-      padding: 0.65rem 1.4rem;
-      border-radius: 4px;
-      transition: all 0.2s;
-      display: inline-flex; align-items: center; gap: 0.5rem;
-    }
-    .btn-primary {
-      background: var(--amber);
-      color: white;
-    }
-    .btn-primary:hover { background: var(--amber-light); transform: translateY(-1px); }
-    .btn-ghost {
-      border: 1.5px solid var(--rule);
-      color: var(--gray);
-    }
-    .btn-ghost:hover { border-color: var(--amber); color: var(--amber); transform: translateY(-1px); }
-
-    /* ── SECTION SHARED ── */
-    section { padding: 72px 0; border-bottom: 1px solid var(--rule); }
-    section:last-of-type { border-bottom: none; }
-
-    .section-label {
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--amber);
-      margin-bottom: 0.4rem;
-    }
-
-    h2.section-title {
-      font-family: var(--mono);
-      font-size: 1.55rem;
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
       font-weight: 700;
-      color: var(--ink);
-      letter-spacing: -0.02em;
-      margin-bottom: 2.5rem;
+      font-family: var(--mono);
+      border: 1px solid var(--border);
+      position: relative;
+      z-index: 1;
     }
+    .avatar-up { background: linear-gradient(135deg, #1a2d5a, #2d1a5a); color: #79c0ff; }
+    .avatar-ai { background: linear-gradient(135deg, #0f2b1a, #1a2b0f); color: var(--green); }
+    .avatar-bot { background: var(--purple-bg); color: var(--purple); }
 
-    /* ── METRICS BAR (about section) ── */
-    .metrics-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1px;
-      background: var(--rule);
-      border: 1px solid var(--rule);
+    .comment-body {
+      flex: 1;
+      border: 1px solid var(--border);
       border-radius: 6px;
       overflow: hidden;
-      margin-bottom: 2.5rem;
+      margin-bottom: 16px;
     }
-    .metric-cell {
-      background: var(--paper);
-      padding: 1.2rem 1rem;
+    .comment-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .comment-author {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--blue);
+    }
+    .comment-author.bot { color: var(--purple); }
+    .comment-time {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .comment-badge {
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+    .badge-author { background: var(--blue-bg); color: var(--blue); border: 1px solid #1b4b82; }
+    .badge-contributor { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .badge-ai-reviewer { background: var(--purple-bg); color: var(--purple); border: 1px solid #3d1f6e; }
+
+    .comment-content {
+      padding: 14px 16px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .comment-content p { margin-bottom: 10px; }
+    .comment-content p:last-child { margin-bottom: 0; }
+    .comment-content strong { color: var(--text); font-weight: 600; }
+    .comment-content code {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #79c0ff;
+    }
+    .comment-content ul {
+      padding-left: 20px;
+      margin: 8px 0;
+    }
+    .comment-content li { margin-bottom: 4px; }
+    .comment-content .metric-inline {
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    /* ── CI CHECKS ── */
+    .checks-box {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .checks-header {
+      background: var(--surface);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .check-icon-pass { color: var(--green); }
+    .check-icon-fail { color: var(--red); }
+    .checks-title { font-weight: 600; font-size: 13px; }
+    .checks-subtitle { font-size: 12px; color: var(--text-muted); }
+    .check-row {
+      border-top: 1px solid var(--border-subtle);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+    .check-name { flex: 1; color: var(--text); }
+    .check-detail { font-size: 12px; color: var(--text-muted); font-family: var(--mono); }
+    .dot-pass { width: 12px; height: 12px; background: var(--green); border-radius: 50%; flex-shrink: 0; }
+    .dot-fail { width: 12px; height: 12px; background: var(--red); border-radius: 50%; flex-shrink: 0; }
+
+    /* ── MERGE BUTTON ── */
+    .merge-section {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .merge-header {
+      background: var(--green-bg);
+      border-bottom: 1px solid var(--green-border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .merge-header svg { color: var(--green); flex-shrink: 0; }
+    .merge-header-text { font-size: 13px; color: var(--green); font-weight: 500; }
+    .merge-body { padding: 14px 16px; }
+    .merge-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green);
+      color: #0d1117;
+      border: none;
+      padding: 9px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.1s;
+      font-family: var(--sans);
+      width: 100%;
+      justify-content: center;
+    }
+    .merge-btn:hover { background: #4ac261; transform: translateY(-1px); }
+    .merge-btn:active { transform: translateY(0); }
+    .merge-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
       text-align: center;
     }
-    .metric-cell .mval {
+
+    /* ── SIDEBAR ── */
+    .sidebar { display: flex; flex-direction: column; gap: 20px; }
+    .sidebar-section { }
+    .sidebar-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+    .sidebar-item .s-avatar {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a2d5a, #2d1a5a);
+      color: #79c0ff;
+      font-size: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-family: var(--mono);
+    }
+    .label-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      margin-right: 4px;
+    }
+    .lp-ai    { background: #0d2044; color: var(--blue); border: 1px solid #1b4b82; }
+    .lp-ml    { background: var(--purple-bg); color: var(--purple); border: 1px solid #3d1f6e; }
+    .lp-infra { background: var(--yellow-bg); color: var(--yellow); border: 1px solid #5a3e00; }
+    .lp-cv    { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .lp-hpc   { background: #2d1117; color: #ffa198; border: 1px solid #5e1b1b; }
+
+    .milestone-bar {
+      background: var(--surface2);
+      border-radius: 4px;
+      overflow: hidden;
+      height: 6px;
+      margin: 6px 0 4px;
+    }
+    .milestone-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 4px;
+    }
+
+    /* ── DIFF TAB ── */
+    .diff-header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .diff-filename {
       font-family: var(--mono);
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--amber);
-      display: block;
-      line-height: 1.1;
+      font-size: 12px;
+      color: var(--text);
     }
-    .metric-cell .mlabel {
-      font-size: 0.72rem;
-      color: var(--gray);
-      letter-spacing: 0.03em;
-      margin-top: 0.2rem;
+    .diff-stat { font-size: 12px; }
+    .diff-add { color: var(--green); }
+    .diff-rem { color: var(--red); }
+    .diff-body {
+      border: 1px solid var(--border);
+      border-radius: 0 0 6px 6px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .diff-row {
+      display: grid;
+      grid-template-columns: 40px 40px 1fr;
+      min-height: 22px;
+      line-height: 22px;
+    }
+    .diff-row.add { background: var(--add); }
+    .diff-row.del { background: var(--del); }
+    .diff-row.hunk { background: var(--blue-bg); }
+    .diff-row.ctx { }
+    .diff-ln {
+      padding: 0 8px;
+      color: var(--text-dim);
+      text-align: right;
+      border-right: 1px solid var(--border-subtle);
+      user-select: none;
+      font-size: 11px;
+    }
+    .diff-row.add .diff-ln { background: var(--add-num); }
+    .diff-row.del .diff-ln { background: rgba(248,81,73,0.15); }
+    .diff-row.hunk .diff-ln { background: rgba(88,166,255,0.1); color: var(--blue); }
+    .diff-code {
+      padding: 0 12px;
+      white-space: pre;
+      color: var(--text);
+    }
+    .diff-row.add .diff-code::before { content: '+'; color: var(--green); margin-right: 6px; }
+    .diff-row.del .diff-code::before { content: '-'; color: var(--red); margin-right: 6px; }
+    .diff-row.ctx .diff-code::before { content: ' '; margin-right: 6px; }
+    .diff-row.hunk .diff-code { color: var(--blue); }
+
+    .diff-section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 24px 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .diff-section-title span {
+      background: var(--surface2);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: var(--text-muted);
     }
 
-    .about-body {
-      font-size: 1rem;
-      color: var(--ink);
-      line-height: 1.8;
-    }
-    .about-body p { margin-bottom: 1.1rem; }
-    .about-body strong { color: var(--amber); font-weight: 600; }
-
-    /* ── PROJECTS ── */
-    .project-list { display: flex; flex-direction: column; gap: 0; }
-
-    .project-entry {
-      border: 1px solid var(--rule);
+    /* ── AI CHAT TAB ── */
+    .ai-intro {
+      border: 1px solid var(--border);
       border-radius: 6px;
       overflow: hidden;
-      margin-bottom: 1.2rem;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      cursor: pointer;
+      margin-bottom: 20px;
     }
-    .project-entry:hover {
-      border-color: var(--amber);
-      box-shadow: 0 2px 16px rgba(212,137,10,0.08);
-    }
-
-    .project-head {
-      padding: 1.3rem 1.5rem;
+    .ai-intro-header {
+      background: var(--purple-bg);
+      border-bottom: 1px solid #3d1f6e;
+      padding: 12px 16px;
       display: flex;
-      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .ai-intro-header h3 { font-size: 13px; color: var(--purple); font-weight: 600; }
+    .ai-intro-header p { font-size: 12px; color: #a88cc8; }
+    .ai-intro-body { padding: 14px 16px; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+    .chat-window {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .chat-messages {
+      min-height: 300px;
+      max-height: 480px;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: var(--bg);
+    }
+    .chat-msg {
+      display: flex;
+      gap: 10px;
       align-items: flex-start;
-      gap: 1rem;
-      background: white;
     }
-    .project-left { flex: 1; }
-    .project-num {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      color: var(--amber);
-      letter-spacing: 0.08em;
-      margin-bottom: 0.35rem;
-    }
-    .project-name {
-      font-family: var(--mono);
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--ink);
-      margin-bottom: 0.4rem;
-    }
-    .project-blurb {
-      font-size: 0.9rem;
-      color: var(--gray);
-      line-height: 1.55;
-      max-width: 520px;
-    }
-    .project-right {
-      flex-shrink: 0;
-      text-align: right;
-    }
-    .project-status {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      font-weight: 500;
-      padding: 0.25rem 0.7rem;
-      border-radius: 20px;
-      letter-spacing: 0.04em;
-    }
-    .status-prod  { background: #E8F5EE; color: var(--green); }
-    .status-research { background: #FFF3E0; color: var(--amber); }
-    .status-done  { background: #F0F0F0; color: var(--gray); }
-
-    .project-body {
-      display: none;
-      padding: 0 1.5rem 1.5rem;
-      background: white;
-      border-top: 1px solid var(--rule);
-    }
-    .project-entry.open .project-body { display: block; }
-    .project-entry.open .project-head { border-bottom: 1px solid var(--rule); }
-
-    .p-section-label {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--gray);
-      margin: 1.2rem 0 0.5rem;
-    }
-
-    .p-metrics {
-      display: flex; flex-wrap: wrap; gap: 0.7rem;
-      margin: 0.8rem 0;
-    }
-    .p-metric {
-      background: var(--paper);
-      border: 1px solid var(--rule);
-      border-radius: 4px;
-      padding: 0.5rem 0.9rem;
-      font-family: var(--mono);
-      font-size: 0.82rem;
-    }
-    .p-metric .pm-val { color: var(--amber); font-weight: 700; }
-    .p-metric .pm-key { color: var(--gray); font-size: 0.72rem; display: block; }
-
-    .tag-list { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
-    .tag {
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      padding: 0.2rem 0.65rem;
-      background: var(--paper);
-      border: 1px solid var(--rule);
-      border-radius: 3px;
-      color: var(--gray);
-      letter-spacing: 0.02em;
-    }
-
-    .p-link {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      font-family: var(--mono);
-      font-size: 0.8rem;
-      color: var(--amber);
-      text-decoration: none;
-      margin-top: 1rem;
-      transition: gap 0.2s;
-    }
-    .p-link:hover { gap: 0.7rem; }
-
-    .toggle-hint {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      color: var(--gray-lt);
-      letter-spacing: 0.08em;
-    }
-
-    /* ── EXPERIENCE / TIMELINE ── */
-    .exp-list { display: flex; flex-direction: column; gap: 2.5rem; }
-
-    .exp-item {
-      display: grid;
-      grid-template-columns: 160px 1fr;
-      gap: 2rem;
-    }
-    .exp-date {
-      font-family: var(--mono);
-      font-size: 0.78rem;
-      color: var(--gray);
-      padding-top: 0.15rem;
-      line-height: 1.55;
-    }
-    .exp-date .exp-year { font-weight: 700; color: var(--amber); display: block; }
-
-    .exp-content h3 {
-      font-family: var(--mono);
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--ink);
-      margin-bottom: 0.15rem;
-    }
-    .exp-company {
-      font-family: var(--mono);
-      font-size: 0.82rem;
-      color: var(--amber);
-      margin-bottom: 0.8rem;
-    }
-    .exp-bullets { list-style: none; padding: 0; }
-    .exp-bullets li {
-      font-size: 0.92rem;
-      color: var(--gray);
-      padding-left: 1.2rem;
-      position: relative;
-      margin-bottom: 0.5rem;
+    .chat-msg.user { flex-direction: row-reverse; }
+    .chat-bubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
       line-height: 1.6;
     }
-    .exp-bullets li::before {
-      content: '→';
-      position: absolute; left: 0;
-      color: var(--amber);
-      font-family: var(--mono);
-      font-size: 0.8rem;
+    .chat-msg.user .chat-bubble {
+      background: var(--blue-bg);
+      color: var(--text);
+      border: 1px solid #1b4b82;
     }
-
-    /* ── SKILLS ── */
-    .skills-table { width: 100%; border-collapse: collapse; }
-    .skills-table tr { border-bottom: 1px solid var(--rule); }
-    .skills-table tr:last-child { border-bottom: none; }
-    .skills-table td { padding: 1rem 0; vertical-align: top; }
-    .skills-table td:first-child {
+    .chat-msg.assistant .chat-bubble {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .chat-bubble strong { color: var(--green); }
+    .chat-bubble code {
+      background: var(--surface2);
+      padding: 1px 5px;
+      border-radius: 3px;
       font-family: var(--mono);
-      font-size: 0.78rem;
-      color: var(--amber);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      width: 160px;
-      padding-right: 2rem;
+      font-size: 11px;
+      color: #79c0ff;
+    }
+    .chat-mini-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; font-family: var(--mono);
+    }
+    .chat-mini-avatar.user { background: linear-gradient(135deg,#1a2d5a,#2d1a5a); color: #79c0ff; }
+    .chat-mini-avatar.bot  { background: var(--purple-bg); color: var(--purple); }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .chat-input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: var(--sans);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .chat-input:focus { border-color: var(--blue); }
+    .chat-input::placeholder { color: var(--text-dim); }
+    .chat-send {
+      background: var(--blue);
+      color: #0d1117;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-family: var(--sans);
       white-space: nowrap;
     }
-    .skill-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-    .chip {
-      font-family: var(--mono);
-      font-size: 0.78rem;
-      padding: 0.25rem 0.65rem;
-      background: white;
-      border: 1px solid var(--rule);
-      border-radius: 3px;
-      color: var(--ink);
-      transition: border-color 0.15s, color 0.15s;
-    }
-    .chip:hover { border-color: var(--amber); color: var(--amber); }
+    .chat-send:hover { background: #79c0ff; }
+    .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* ── EDUCATION ── */
-    .edu-list { display: flex; flex-direction: column; gap: 1.8rem; }
-    .edu-item {
-      display: grid;
-      grid-template-columns: 160px 1fr;
-      gap: 2rem;
-    }
-    .edu-year {
-      font-family: var(--mono);
-      font-size: 0.78rem;
-      color: var(--gray);
-      padding-top: 0.15rem;
-    }
-    .edu-year strong { color: var(--amber); display: block; font-size: 0.82rem; }
-    .edu-content h3 {
-      font-family: var(--mono);
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 0.15rem;
-    }
-    .edu-school {
-      font-size: 0.9rem;
-      color: var(--gray);
-      margin-bottom: 0.4rem;
-    }
-    .gpa-badge {
-      display: inline-block;
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      background: #E8F5EE;
-      color: var(--green);
-      padding: 0.15rem 0.6rem;
-      border-radius: 3px;
-      margin-bottom: 0.6rem;
-    }
-    .edu-detail {
-      font-size: 0.875rem;
-      color: var(--gray);
-      line-height: 1.6;
-    }
-
-    /* ── CONTACT ── */
-    #contact {
-      padding: 72px 0 80px;
-    }
-    .contact-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1px;
-      background: var(--rule);
-      border: 1px solid var(--rule);
-      border-radius: 6px;
-      overflow: hidden;
-      margin-top: 2rem;
-    }
-    .contact-cell {
-      background: white;
-      padding: 1.4rem 1.5rem;
-      text-decoration: none;
-      transition: background 0.15s;
-      display: flex; align-items: center; gap: 1rem;
-    }
-    .contact-cell:hover { background: var(--paper); }
-    .contact-icon {
-      width: 36px; height: 36px;
-      border: 1.5px solid var(--rule);
-      border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      color: var(--amber);
-    }
-    .contact-cell .c-label {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      color: var(--gray);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-    .contact-cell .c-val {
-      font-family: var(--mono);
-      font-size: 0.85rem;
-      color: var(--ink);
-      font-weight: 500;
-    }
-    .contact-blurb {
-      font-size: 1rem;
-      color: var(--gray);
-      line-height: 1.75;
-      max-width: 560px;
-    }
-    .contact-blurb strong { color: var(--ink); }
-
-    /* ── FOOTER ── */
-    footer {
-      padding: 2rem;
-      border-top: 1px solid var(--rule);
+    .suggested-qs {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
       flex-wrap: wrap;
-      gap: 0.5rem;
-      max-width: 800px; margin: 0 auto;
+      gap: 6px;
+      padding: 0 12px 12px;
+      background: var(--surface);
+      border-top: 1px solid var(--border-subtle);
     }
-    footer p {
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      color: var(--gray);
+    .sq-label { width: 100%; font-size: 11px; color: var(--text-muted); padding-top: 10px; padding-bottom: 4px; }
+    .sq {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      font-family: var(--sans);
     }
-    footer a { color: var(--amber); text-decoration: none; }
+    .sq:hover { border-color: var(--blue); color: var(--blue); }
 
-    /* ── SCROLL ANIMATIONS ── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(18px);
-      transition: opacity 0.55s ease, transform 0.55s ease;
+    .typing-indicator {
+      display: flex; align-items: center; gap: 4px;
+      padding: 10px 14px;
     }
-    .reveal.in-view {
-      opacity: 1;
-      transform: translateY(0);
+    .typing-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--purple);
+      animation: typing 1.2s infinite;
     }
+    .typing-dot:nth-child(2) { animation-delay: .2s; }
+    .typing-dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes typing { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+    /* ── COMMITS TAB ── */
+    .commit-group-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 4px;
+    }
+    .commit-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .commit-row:last-child { border-bottom: none; }
+    .commit-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .commit-msg { flex: 1; font-size: 13px; color: var(--text); }
+    .commit-msg span { color: var(--text-muted); font-size: 12px; }
+    .commit-hash {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--blue);
+      background: var(--blue-bg);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    /* ── ANIMATIONS ── */
+    .fade-in { animation: fadeIn 0.3s ease forwards; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
 
     /* ── RESPONSIVE ── */
-    @media (max-width: 640px) {
-      .wrap { padding: 0 1.2rem; }
-      .exp-item, .edu-item {
-        grid-template-columns: 1fr;
-        gap: 0.4rem;
-      }
-      .metrics-row { grid-template-columns: repeat(2,1fr); }
-      .contact-grid { grid-template-columns: 1fr; }
-      h1.name { font-size: 2rem; }
-      .nav-links { display: none; }
+    @media (max-width: 900px) {
+      .pr-body { grid-template-columns: 1fr; }
+      .sidebar { order: -1; }
     }
-    @media (max-width: 480px) {
-      .metrics-row { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 600px) {
+      .main-wrap { padding: 16px 12px 60px; }
+      .pr-title { font-size: 18px; }
+      .gh-header { padding: 10px 14px; }
+      .diff-row { grid-template-columns: 28px 28px 1fr; }
     }
-
-    /* ── CURSOR BLINK ── */
-    .cursor {
-      display: inline-block;
-      width: 2px; height: 1em;
-      background: var(--amber);
-      margin-left: 2px;
-      vertical-align: middle;
-      animation: blink 1s step-end infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-
     @media (prefers-reduced-motion: reduce) {
-      *, .reveal, .log-line { transition: none !important; animation: none !important; }
-      .reveal { opacity: 1; transform: none; }
-      .log-line { opacity: 1; transform: none; }
+      .typing-dot { animation: none; }
+      .fade-in { animation: none; }
+      .merge-btn { transition: none; }
     }
   </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <a href="#hero" class="nav-id">UP<span>_</span>patel</a>
-  <ul class="nav-links">
-    <li><a href="#about">about</a></li>
-    <li><a href="#projects">systems</a></li>
-    <li><a href="#experience">exp</a></li>
-    <li><a href="#skills">stack</a></li>
-    <li><a href="#contact">contact</a></li>
-  </ul>
-</nav>
+<!-- TOP HEADER -->
+<header class="gh-header">
+  <div class="gh-logo">
+    <svg height="28" viewBox="0 0 16 16" width="28"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+  </div>
+  <div class="gh-breadcrumb">
+    <a href="#">your-team</a>
+    <span class="sep">/</span>
+    <a href="#"><strong>engineering</strong></a>
+    <span class="sep">·</span>
+    <span>Pull Request</span>
+    <span style="color:var(--text-muted)">#1</span>
+  </div>
+</header>
 
-<!-- HERO -->
-<div class="wrap">
-  <section id="hero">
-    <p class="eyebrow">available · may 2026 · open to relocate</p>
-    <h1 class="name">Uttapreksha<br>Patel<span class="cursor"></span></h1>
-    <p class="hero-bio">
-      AI engineer building systems that actually work in production — not notebooks, not demos.
-      LLMs, RAG, computer vision, distributed ML, HPC infrastructure.
-      M.S. ECE @ Northeastern (3.9 GPA), graduating May 2026.
-    </p>
+<div class="main-wrap">
 
-    <!-- BUILD LOG — the signature element -->
-    <div class="build-log" id="buildLog" aria-label="Selected engineering outcomes">
-      <div class="log-line" data-delay="100">
-        <span class="prefix">[ memory_agent ]</span>
-        &nbsp;<span class="key">query_accuracy</span>
-        &nbsp;<span class="arrow">→</span>
-        &nbsp;<span class="val">0.613</span>
-        &nbsp;<span class="arrow">▶</span>
-        &nbsp;<span class="val">0.760</span>
-        &nbsp;<span class="ok">(+24pp over RAG baseline)</span>
-      </div>
-      <div class="log-line" data-delay="340">
-        <span class="prefix">[ memory_agent ]</span>
-        &nbsp;<span class="key">slot_extraction_failures</span>
-        &nbsp;<span class="arrow">↓</span>
-        &nbsp;<span class="delta">−64%</span>
-        &nbsp;<span class="ok">vs rule-based memory</span>
-      </div>
-      <div class="log-line" data-delay="580">
-        <span class="prefix">[ rag_system   ]</span>
-        &nbsp;<span class="key">hallucinations</span>
-        &nbsp;<span class="arrow">↓</span>
-        &nbsp;<span class="delta">−18%</span>
-        &nbsp;<span class="key">| answer_correctness</span>
-        &nbsp;<span class="arrow">↑</span>
-        &nbsp;<span class="ok">+25%</span>
-      </div>
-      <div class="log-line" data-delay="820">
-        <span class="prefix">[ rag_system   ]</span>
-        &nbsp;<span class="key">end_to_end_latency</span>
-        &nbsp;<span class="arrow">↓</span>
-        &nbsp;<span class="delta">−22%</span>
-        &nbsp;<span class="ok">via retrieval opt + Docker</span>
-      </div>
-      <div class="log-line" data-delay="1060">
-        <span class="prefix">[ vlm_paper    ]</span>
-        &nbsp;<span class="key">classification_AUROC</span>
-        &nbsp;<span class="arrow">=</span>
-        &nbsp;<span class="val">0.916</span>
-        &nbsp;<span class="key">| seg_AUROC</span>
-        &nbsp;<span class="arrow">=</span>
-        &nbsp;<span class="val">0.907</span>
-        &nbsp;<span class="ok">[ MVTec + VisA ]</span>
-      </div>
-      <div class="log-line" data-delay="1300">
-        <span class="prefix">[ spark_reco   ]</span>
-        &nbsp;<span class="key">training_time</span>
-        &nbsp;<span class="arrow">→</span>
-        &nbsp;<span class="val">129s</span>
-        &nbsp;<span class="arrow">▶</span>
-        &nbsp;<span class="val">32s</span>
-        &nbsp;<span class="ok">(3.98× speedup, 25M ratings)</span>
-      </div>
-      <div class="log-line" data-delay="1540">
-        <span class="prefix">[ hpc_pipeline ]</span>
-        &nbsp;<span class="key">records_processed</span>
-        &nbsp;<span class="arrow">=</span>
-        &nbsp;<span class="val">10M+</span>
-        &nbsp;<span class="key">| reliability</span>
-        &nbsp;<span class="arrow">↑</span>
-        &nbsp;<span class="ok">+30%</span>
-      </div>
+  <!-- PR TITLE -->
+  <div class="pr-title-row">
+    <h1 class="pr-title">
+      <strong>feat/hire-uttapreksha:</strong> Add AI engineer with LLMs, RAG, CV & HPC infra
+      <span class="pr-number">#1</span>
+    </h1>
+    <div class="pr-meta-row">
+      <span class="badge badge-open">
+        <svg viewBox="0 0 16 16"><path d="M7.177 3.073L9.573.677A.25.25 0 0110 .854v4.792a.25.25 0 01-.427.177L7.177 3.427a.25.25 0 010-.354zM3.75 2.5a.75.75 0 100 1.5.75.75 0 000-1.5zm-2.25.75a2.25 2.25 0 113 2.122v5.256a2.251 2.251 0 11-1.5 0V5.372A2.25 2.25 0 011.5 3.25zM11 2.5h-1V4h1a1 1 0 011 1v5.628a2.251 2.251 0 101.5 0V5A2.5 2.5 0 0011 2.5zm1 10.25a.75.75 0 111.5 0 .75.75 0 01-1.5 0zM3.75 12a.75.75 0 100 1.5.75.75 0 000-1.5z"/></svg>
+        Open
+      </span>
+      <span class="pr-meta-text">
+        <strong>uttapreksha-patel</strong> wants to merge <span class="branch-pill">feat/hire-me</span> into <span class="branch-pill">your-team/main</span>
+      </span>
+      <span class="pr-meta-text" style="color:var(--text-dim)">· opened May 2026 · Boston, MA → anywhere</span>
     </div>
+  </div>
 
-    <div class="hero-actions">
-      <a href="mailto:patel.utt@northeastern.edu" class="btn btn-primary">→ get in touch</a>
-      <a href="https://github.com/Uttaprexa" target="_blank" class="btn btn-ghost">GitHub ↗</a>
-      <a href="https://www.linkedin.com/in/uttapreksha-patel/" target="_blank" class="btn btn-ghost">LinkedIn ↗</a>
-      <a href="https://uttaprexa.github.io/resumeu.pdf" target="_blank" class="btn btn-ghost">Resume PDF ↗</a>
-    </div>
-  </section>
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab active" onclick="switchTab('conversation', this)">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2.5 2.75a.25.25 0 01.25-.25h10.5a.25.25 0 01.25.25v7.5a.25.25 0 01-.25.25h-6.5a.75.75 0 00-.53.22L4 12.44v-1.94a.75.75 0 00-.75-.75H2.75a.25.25 0 01-.25-.25v-7.5zm.25-1.75A1.75 1.75 0 001 2.75v7.5c0 .966.784 1.75 1.75 1.75H3v2a.75.75 0 001.28.53l2.5-2.5H13.25A1.75 1.75 0 0015 10.25v-7.5A1.75 1.75 0 0013.25 1H2.75z"/></svg>
+      Conversation <span class="tab-count">6</span>
+    </button>
+    <button class="tab" onclick="switchTab('commits', this)">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M10.5 7.75a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zm1.43.75a4.002 4.002 0 01-7.86 0H.75a.75.75 0 110-1.5h3.32a4.001 4.001 0 017.86 0h3.32a.75.75 0 110 1.5h-3.32z"/></svg>
+      Commits <span class="tab-count">8</span>
+    </button>
+    <button class="tab" onclick="switchTab('diff', this)">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2 1.75C2 .784 2.784 0 3.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0112.25 16h-8.5A1.75 1.75 0 012 14.25V1.75zm1.75-.25a.25.25 0 00-.25.25v12.5c0 .138.112.25.25.25h8.5a.25.25 0 00.25-.25V6h-2.75A1.75 1.75 0 018 4.25V1.5H3.75zm6.75.062V4.25c0 .138.112.25.25.25h2.688a.252.252 0 00-.011-.013L10.513 1.573a.252.252 0 00-.013-.011z"/></svg>
+      Files changed <span class="tab-count">6</span>
+    </button>
+    <button class="tab" onclick="switchTab('aireview', this)">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0114.25 13H8.06l-2.573 2.573A1.457 1.457 0 013 14.543V13H1.75A1.75 1.75 0 010 11.25v-9.5zm1.75-.25a.25.25 0 00-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 01.75.75v2.19l2.72-2.72a.749.749 0 01.53-.22h6.5a.25.25 0 00.25-.25v-9.5a.25.25 0 00-.25-.25H1.75z"/></svg>
+      ✨ Ask AI Reviewer <span class="tab-count" style="background:var(--purple-bg);color:var(--purple)">live</span>
+    </button>
+  </div>
 
-  <!-- ABOUT -->
-  <section id="about">
-    <p class="section-label">§ 00 — overview</p>
-    <h2 class="section-title">About</h2>
+  <!-- ══ CONVERSATION PANEL ══ -->
+  <div id="panel-conversation" class="panel active">
+    <div class="pr-body">
+      <div>
 
-    <div class="metrics-row reveal">
-      <div class="metric-cell">
-        <span class="mval">3.9</span>
-        <div class="mlabel">GPA / 4.0</div>
-      </div>
-      <div class="metric-cell">
-        <span class="mval">10M+</span>
-        <div class="mlabel">records/pipeline</div>
-      </div>
-      <div class="metric-cell">
-        <span class="mval">4×</span>
-        <div class="mlabel">distributed speedup</div>
-      </div>
-      <div class="metric-cell">
-        <span class="mval">0.916</span>
-        <div class="mlabel">AUROC published</div>
-      </div>
-    </div>
+        <!-- Opening comment -->
+        <div class="thread">
+          <div class="comment">
+            <div class="avatar avatar-up">UP</div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-author">uttapreksha-patel</span>
+                <span class="comment-badge badge-author">Author</span>
+                <span class="comment-time">May 2026</span>
+              </div>
+              <div class="comment-content">
+                <p>Hey — opening this PR to merge myself into your engineering team. Happy to discuss anything in the diff, or <strong>ask the AI reviewer below</strong> — it knows my full project history, benchmarks, and stack.</p>
+                <p><strong>What this PR adds:</strong></p>
+                <ul>
+                  <li>AI engineer with deep LLM, RAG, and agentic systems experience</li>
+                  <li>Computer vision researcher (published, <code>AUROC=0.916</code>)</li>
+                  <li>HPC + distributed ML infrastructure (10M+ records, 3.98× speedup)</li>
+                  <li>Production-minded: everything I build has benchmarks and a deployment story</li>
+                </ul>
+                <p>M.S. ECE @ Northeastern, GPA 3.9, graduating May 2026. Open to relocate anywhere. 📍 Boston → wherever you need me.</p>
+              </div>
+            </div>
+          </div>
 
-    <div class="about-body reveal">
-      <p>
-        I'm finishing an M.S. in Electrical and Computer Engineering at Northeastern University (concentration: ML, CV, Algorithms), graduating May 2026 with a 3.9. My work lives at the boundary between research rigor and production reality — I care about systems that <strong>evaluate cleanly, deploy reliably, and improve measurably</strong>.
-      </p>
-      <p>
-        Right now I'm a Research Assistant at NEU, building HPC telemetry infrastructure on AWS EC2 that processes 10M+ system records with Darshan and LDMS. Before that, a Python dev intern at TecUnique, where I automated API test coverage and cut issue resolution time by 50%.
-      </p>
-      <p>
-        My personal projects are where I push hardest: a memory-aware LLM agent that beat RAG by 24 percentage points, a published VLM anomaly detection paper (0.916 AUROC), a distributed Spark recommendation engine with 4× speedup, and a Dockerized RAG system that cut hallucinations 18%. Everything has a benchmark. Everything has a number.
-      </p>
-      <p>
-        Based in Boston. <strong>Open to relocate anywhere</strong> for the right role — AI engineer, ML engineer, forward deployed engineer, SWE infra, or any role where the work is hard and the product matters.
-      </p>
-    </div>
-  </section>
+          <!-- CI checks as inline comment -->
+          <div class="comment" style="margin-left:52px">
+            <div class="checks-box" style="flex:1">
+              <div class="checks-header">
+                <svg class="check-icon-pass" width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 16A8 8 0 108 0a8 8 0 000 16zm3.78-9.72a.75.75 0 00-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 00-1.06 1.06l2 2a.75.75 0 001.06 0l4.5-4.5z"/></svg>
+                <div>
+                  <div class="checks-title">All checks passed</div>
+                  <div class="checks-subtitle">6/6 checks · Candidate review passed</div>
+                </div>
+              </div>
+              <div class="check-row">
+                <div class="dot-pass"></div>
+                <div class="check-name">skills / llm-rag-agentic-systems</div>
+                <div class="check-detail">LangChain · Claude API · RAG · Memory Architectures</div>
+              </div>
+              <div class="check-row">
+                <div class="dot-pass"></div>
+                <div class="check-name">skills / computer-vision</div>
+                <div class="check-detail">PyTorch · VLM · CLIP · AUROC=0.916 published</div>
+              </div>
+              <div class="check-row">
+                <div class="dot-pass"></div>
+                <div class="check-name">skills / distributed-systems-hpc</div>
+                <div class="check-detail">PySpark · Slurm · Darshan · LDMS · 3.98× speedup</div>
+              </div>
+              <div class="check-row">
+                <div class="dot-pass"></div>
+                <div class="check-name">skills / mlops-infrastructure</div>
+                <div class="check-detail">Docker · AWS EC2 · MLflow · CI/CD</div>
+              </div>
+              <div class="check-row">
+                <div class="dot-pass"></div>
+                <div class="check-name">benchmark / production-deployments</div>
+                <div class="check-detail">RAG: −18% hallucinations · Reliability: +30%</div>
+              </div>
+              <div class="check-row">
+                <div class="dot-pass"></div>
+                <div class="check-name">academic / northeastern-mse</div>
+                <div class="check-detail">GPA 3.9/4.0 · ML + CV + Algorithms · May 2026</div>
+              </div>
+            </div>
+          </div>
 
-  <!-- PROJECTS -->
-  <section id="projects">
-    <p class="section-label">§ 01 — systems built</p>
-    <h2 class="section-title">Projects</h2>
-    <p style="font-size:0.8rem; font-family:var(--mono); color:var(--gray); margin-bottom:1.5rem;">click any row to expand</p>
+          <!-- Merge section -->
+          <div class="comment" style="margin-left:52px">
+            <div class="merge-section" style="flex:1">
+              <div class="merge-header">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M5.45 5.154A4.25 4.25 0 0 0 9.5 7.5h1.378a2.251 2.251 0 1 1 0 1.5H9.5A5.734 5.734 0 0 1 5 7.123v3.505a2.25 2.25 0 1 1-1.5 0V5.372A2.25 2.25 0 1 1 5.45 5.154Zm2.3-2.3a.75.75 0 0 0 0 1.5.75.75 0 0 0 0-1.5Zm4.5 0a.75.75 0 0 0 0 1.5.75.75 0 0 0 0-1.5Z"/></svg>
+                <span class="merge-header-text">This branch has no conflicts and is ready to merge</span>
+              </div>
+              <div class="merge-body">
+                <a href="mailto:patel.utt@northeastern.edu" class="merge-btn">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M5.45 5.154A4.25 4.25 0 0 0 9.5 7.5h1.378a2.251 2.251 0 1 1 0 1.5H9.5A5.734 5.734 0 0 1 5 7.123v3.505a2.25 2.25 0 1 1-1.5 0V5.372A2.25 2.25 0 1 1 5.45 5.154Z"/></svg>
+                  Merge pull request — hire Uttapreksha
+                </a>
+                <div class="merge-note">Opens email · patel.utt@northeastern.edu</div>
+              </div>
+            </div>
+          </div>
 
-    <div class="project-list">
-
-      <!-- P1 -->
-      <div class="project-entry" onclick="toggle(this)">
-        <div class="project-head">
-          <div class="project-left">
-            <div class="project-num">P.01</div>
-            <div class="project-name">Memory-Aware LLM Agent Framework</div>
-            <div class="project-blurb">Adaptive memory architecture for long-horizon dialogue agents — classifies turns into STORE / KEEP / DROP. Outperformed RAG, window, summary, and rule-based baselines across 75 dialogues in 15 domains.</div>
-          </div>
-          <div class="project-right">
-            <span class="project-status status-prod">Production-grade</span>
-            <div class="toggle-hint" style="margin-top:0.5rem; text-align:right;">+ expand</div>
-          </div>
-        </div>
-        <div class="project-body">
-          <div class="p-section-label">outcomes</div>
-          <div class="p-metrics">
-            <div class="p-metric"><span class="pm-val">0.760</span><span class="pm-key">query accuracy (was 0.613)</span></div>
-            <div class="p-metric"><span class="pm-val">−64%</span><span class="pm-key">slot extraction failures vs rule-based</span></div>
-            <div class="p-metric"><span class="pm-val">+24pp</span><span class="pm-key">over RAG baseline</span></div>
-            <div class="p-metric"><span class="pm-val">75</span><span class="pm-key">dialogues evaluated</span></div>
-          </div>
-          <div class="p-section-label">approach</div>
-          <p style="font-size:0.88rem; color:var(--gray); line-height:1.65; margin-bottom:0.8rem;">
-            Designed a three-class memory classifier (STORE/KEEP/DROP) based on semantic relevance rather than recency. Compared against four baselines using standardized evaluation across 15 domains. Built reproducible eval pipeline with automated metrics and qualitative error analysis.
-          </p>
-          <div class="p-section-label">stack</div>
-          <div class="tag-list">
-            <span class="tag">Python</span><span class="tag">Claude API</span><span class="tag">LangChain</span>
-            <span class="tag">RAG</span><span class="tag">Prompt Engineering</span><span class="tag">Evaluation</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- P2 -->
-      <div class="project-entry" onclick="toggle(this)">
-        <div class="project-head">
-          <div class="project-left">
-            <div class="project-num">P.02</div>
-            <div class="project-name">VLM Anomaly Detection — Published Research</div>
-            <div class="project-blurb">Evaluated WinCLIP and AnomalyCLIP on MVTec AD and VisA for visual anomaly classification and segmentation. Achieved 0.916 AUROC (classification) and 0.907 AUROC (segmentation). Full error analysis and qualitative failure inspection.</div>
-          </div>
-          <div class="project-right">
-            <span class="project-status status-research">Research / Published</span>
-            <div class="toggle-hint" style="margin-top:0.5rem; text-align:right;">+ expand</div>
-          </div>
-        </div>
-        <div class="project-body">
-          <div class="p-section-label">outcomes</div>
-          <div class="p-metrics">
-            <div class="p-metric"><span class="pm-val">0.916</span><span class="pm-key">classification AUROC</span></div>
-            <div class="p-metric"><span class="pm-val">0.907</span><span class="pm-key">segmentation AUROC</span></div>
-            <div class="p-metric"><span class="pm-val">2</span><span class="pm-key">benchmark datasets (MVTec + VisA)</span></div>
-          </div>
-          <div class="p-section-label">approach</div>
-          <p style="font-size:0.88rem; color:var(--gray); line-height:1.65; margin-bottom:0.8rem;">
-            Zero-shot VLM evaluation with reproducible benchmark workflows. Dataset-level error analysis and qualitative failure inspection to compare multimodal model behavior and limitations across 15 object categories.
-          </p>
-          <div class="p-section-label">stack</div>
-          <div class="tag-list">
-            <span class="tag">PyTorch</span><span class="tag">Computer Vision</span><span class="tag">CLIP</span>
-            <span class="tag">VLM</span><span class="tag">Benchmarking</span><span class="tag">Error Analysis</span>
-          </div>
         </div>
       </div>
 
-      <!-- P3 -->
-      <div class="project-entry" onclick="toggle(this)">
-        <div class="project-head">
-          <div class="project-left">
-            <div class="project-num">P.03</div>
-            <div class="project-name">Healthcare Knowledge Retrieval (RAG)</div>
-            <div class="project-blurb">Retrieval-augmented generation system for medical knowledge access. Improved answer correctness 25%, reduced hallucinations 18%, cut latency 22% through retrieval tuning and Docker deployment.</div>
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-label">Reviewers</div>
+          <div class="sidebar-item">
+            <div class="s-avatar">👤</div>
+            <span style="color:var(--text-muted);font-size:13px">Awaiting your review</span>
           </div>
-          <div class="project-right">
-            <span class="project-status status-prod">Deployed</span>
-            <div class="toggle-hint" style="margin-top:0.5rem; text-align:right;">+ expand</div>
-          </div>
-        </div>
-        <div class="project-body">
-          <div class="p-section-label">outcomes</div>
-          <div class="p-metrics">
-            <div class="p-metric"><span class="pm-val">+25%</span><span class="pm-key">answer correctness</span></div>
-            <div class="p-metric"><span class="pm-val">−18%</span><span class="pm-key">hallucinations</span></div>
-            <div class="p-metric"><span class="pm-val">−22%</span><span class="pm-key">end-to-end latency</span></div>
-          </div>
-          <div class="p-section-label">approach</div>
-          <p style="font-size:0.88rem; color:var(--gray); line-height:1.65; margin-bottom:0.8rem;">
-            Built embeddings pipeline with semantic search, chunking strategy tuning, and golden-question benchmarks. Compared chunking and retrieval approaches systematically. Dockerized for reproducible deployment.
-          </p>
-          <div class="p-section-label">stack</div>
-          <div class="tag-list">
-            <span class="tag">Python</span><span class="tag">RAG</span><span class="tag">FAISS</span>
-            <span class="tag">HuggingFace</span><span class="tag">Docker</span><span class="tag">Flask</span>
+          <div class="sidebar-item">
+            <div class="s-avatar" style="background:var(--purple-bg);color:var(--purple);font-size:8px">AI</div>
+            <span style="color:var(--purple);font-size:13px">AI Reviewer (active)</span>
           </div>
         </div>
-      </div>
 
-      <!-- P4 -->
-      <div class="project-entry" onclick="toggle(this)">
-        <div class="project-head">
-          <div class="project-left">
-            <div class="project-num">P.04</div>
-            <div class="project-name">Distributed Recommendation (PySpark)</div>
-            <div class="project-blurb">Distributed ALS recommendation engine on MovieLens 25M. 3.98× speedup by parallelizing across 8 cores on Slurm cluster. RMSE 0.8131, Precision@10 0.663.</div>
-          </div>
-          <div class="project-right">
-            <span class="project-status status-done">Completed</span>
-            <div class="toggle-hint" style="margin-top:0.5rem; text-align:right;">+ expand</div>
-          </div>
+        <div class="sidebar-section">
+          <div class="sidebar-label">Labels</div>
+          <span class="label-pill lp-ai">ai-engineer</span>
+          <span class="label-pill lp-ml">ml-research</span>
+          <span class="label-pill lp-infra">mlops</span>
+          <span class="label-pill lp-cv">computer-vision</span>
+          <span class="label-pill lp-hpc">hpc-systems</span>
         </div>
-        <div class="project-body">
-          <div class="p-section-label">outcomes</div>
-          <div class="p-metrics">
-            <div class="p-metric"><span class="pm-val">3.98×</span><span class="pm-key">training speedup</span></div>
-            <div class="p-metric"><span class="pm-val">129s→32s</span><span class="pm-key">wall-clock time</span></div>
-            <div class="p-metric"><span class="pm-val">0.8131</span><span class="pm-key">RMSE</span></div>
-            <div class="p-metric"><span class="pm-val">25M</span><span class="pm-key">ratings, 162K users</span></div>
-          </div>
-          <div class="p-section-label">stack</div>
-          <div class="tag-list">
-            <span class="tag">PySpark</span><span class="tag">Spark MLlib</span><span class="tag">ALS</span>
-            <span class="tag">Slurm</span><span class="tag">Distributed Systems</span><span class="tag">SQL</span>
-          </div>
-        </div>
-      </div>
 
-      <!-- P5 -->
-      <div class="project-entry" onclick="toggle(this)">
-        <div class="project-head">
-          <div class="project-left">
-            <div class="project-num">P.05</div>
-            <div class="project-name">GPU Benchmarking — P100 / V100 / H100</div>
-            <div class="project-blurb">ResNet-50 training profiled across three NVIDIA GPU generations using NVIDIA Nsight. Quantified CUDA kernel execution, memory utilization, host-device transfers, and synchronization overhead.</div>
-          </div>
-          <div class="project-right">
-            <span class="project-status status-research">Research</span>
-            <div class="toggle-hint" style="margin-top:0.5rem; text-align:right;">+ expand</div>
-          </div>
+        <div class="sidebar-section">
+          <div class="sidebar-label">Milestone</div>
+          <div style="font-size:13px;color:var(--text);margin-bottom:4px">Summer 2026 Hiring</div>
+          <div class="milestone-bar"><div class="milestone-fill" style="width:88%"></div></div>
+          <div style="font-size:11px;color:var(--text-muted)">88% — 1 open slot remaining</div>
         </div>
-        <div class="project-body">
-          <div class="p-section-label">outcomes</div>
-          <div class="p-metrics">
-            <div class="p-metric"><span class="pm-val">−70%</span><span class="pm-key">training time H100 vs P100</span></div>
-            <div class="p-metric"><span class="pm-val">3</span><span class="pm-key">GPU generations compared</span></div>
-            <div class="p-metric"><span class="pm-val">3</span><span class="pm-key">datasets (ImageNet, COCO, CIFAR)</span></div>
-          </div>
-          <div class="p-section-label">stack</div>
-          <div class="tag-list">
-            <span class="tag">PyTorch</span><span class="tag">CUDA</span><span class="tag">NVIDIA Nsight</span>
-            <span class="tag">HPC</span><span class="tag">GPU Profiling</span><span class="tag">Benchmarking</span>
-          </div>
-        </div>
-      </div>
 
-      <!-- P6 -->
-      <div class="project-entry" onclick="toggle(this)">
-        <div class="project-head">
-          <div class="project-left">
-            <div class="project-num">P.06</div>
-            <div class="project-name">Robotic Manipulation Policy (RL + CV)</div>
-            <div class="project-blurb">PyTorch reinforcement learning policies for robot pick-and-place in simulation. CNN-based perception pipeline improved action prediction consistency 22% on unseen scenarios.</div>
-          </div>
-          <div class="project-right">
-            <span class="project-status status-done">Completed</span>
-            <div class="toggle-hint" style="margin-top:0.5rem; text-align:right;">+ expand</div>
+        <div class="sidebar-section">
+          <div class="sidebar-label">Quick Stats</div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:2">
+            <div><span style="color:var(--green);font-family:var(--mono)">+10M</span> records/pipeline</div>
+            <div><span style="color:var(--green);font-family:var(--mono)">+3.98×</span> distributed speedup</div>
+            <div><span style="color:var(--green);font-family:var(--mono)">−64%</span> agent failures</div>
+            <div><span style="color:var(--green);font-family:var(--mono)">0.916</span> AUROC published</div>
+            <div><span style="color:var(--green);font-family:var(--mono)">3.9</span> GPA / 4.0</div>
           </div>
         </div>
-        <div class="project-body">
-          <div class="p-section-label">outcomes</div>
-          <div class="p-metrics">
-            <div class="p-metric"><span class="pm-val">+22%</span><span class="pm-key">action prediction consistency</span></div>
-            <div class="p-metric"><span class="pm-val">CNN</span><span class="pm-key">perception pipeline</span></div>
-          </div>
-          <div class="p-section-label">stack</div>
-          <div class="tag-list">
-            <span class="tag">PyTorch</span><span class="tag">Reinforcement Learning</span><span class="tag">Computer Vision</span>
-            <span class="tag">Simulation</span><span class="tag">CNN</span><span class="tag">Data Augmentation</span>
-          </div>
-        </div>
-      </div>
 
-    </div>
-  </section>
-
-  <!-- EXPERIENCE -->
-  <section id="experience">
-    <p class="section-label">§ 02 — work</p>
-    <h2 class="section-title">Experience</h2>
-
-    <div class="exp-list">
-      <div class="exp-item reveal">
-        <div class="exp-date">
-          <span class="exp-year">2025–now</span>
-          Feb 2025 – Present
-        </div>
-        <div class="exp-content">
-          <h3>Research Assistant</h3>
-          <div class="exp-company">Northeastern University · Boston, MA</div>
-          <ul class="exp-bullets">
-            <li>Built Python/Linux telemetry pipelines processing 10M+ system records using Darshan, LDMS, and OVIS across AWS EC2 and HPC environments</li>
-            <li>Developed automated data ingestion, validation, and monitoring workflows for I/O benchmarks and ML workloads — improved reliability by 30%</li>
-            <li>Analyzed distributed workload telemetry to identify I/O bottlenecks, temporal anomalies, and performance regressions across large-scale systems</li>
-            <li>Presented evaluation findings and performance analyses to research collaborators through scorecards and visualizations</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="exp-item reveal">
-        <div class="exp-date">
-          <span class="exp-year">2024</span>
-          Dec 2023 – Apr 2024
-        </div>
-        <div class="exp-content">
-          <h3>Python Development Intern</h3>
-          <div class="exp-company">TecUnique Pvt. Ltd. · Vadodara, India</div>
-          <ul class="exp-bullets">
-            <li>Built reusable Pytest automation for API/UI validation across GET, POST, PUT, PATCH, DELETE workflows with structured reports</li>
-            <li>Optimized SQL query execution and numerical pipelines, reducing runtime by 20% across production-style workflows</li>
-            <li>Improved engineering reliability through validation checks, Git-based version control, Linux tooling, and containerized workflows</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SKILLS -->
-  <section id="skills">
-    <p class="section-label">§ 03 — technical stack</p>
-    <h2 class="section-title">Skills</h2>
-
-    <table class="skills-table reveal">
-      <tr>
-        <td>Languages</td>
-        <td>
-          <div class="skill-chips">
-            <span class="chip">Python</span><span class="chip">SQL</span><span class="chip">C++</span><span class="chip">Bash</span>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td>AI / LLMs</td>
-        <td>
-          <div class="skill-chips">
-            <span class="chip">LLMs</span><span class="chip">RAG</span><span class="chip">Prompt Engineering</span>
-            <span class="chip">Agentic Systems</span><span class="chip">Memory Architectures</span>
-            <span class="chip">Embeddings</span><span class="chip">OpenAI API</span><span class="chip">Claude API</span>
-            <span class="chip">LangChain</span><span class="chip">HuggingFace</span>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td>ML / CV</td>
-        <td>
-          <div class="skill-chips">
-            <span class="chip">PyTorch</span><span class="chip">TensorFlow</span><span class="chip">scikit-learn</span>
-            <span class="chip">Computer Vision</span><span class="chip">NLP</span><span class="chip">Transformers</span>
-            <span class="chip">Reinforcement Learning</span><span class="chip">Fine-Tuning</span><span class="chip">Evaluation Pipelines</span>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td>MLOps / Infra</td>
-        <td>
-          <div class="skill-chips">
-            <span class="chip">Docker</span><span class="chip">AWS EC2</span><span class="chip">MLflow</span>
-            <span class="chip">CI/CD</span><span class="chip">Linux</span><span class="chip">Git</span>
-            <span class="chip">Experiment Tracking</span><span class="chip">Drift Monitoring</span>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td>HPC / Systems</td>
-        <td>
-          <div class="skill-chips">
-            <span class="chip">PySpark</span><span class="chip">Slurm</span><span class="chip">Darshan</span>
-            <span class="chip">LDMS</span><span class="chip">NVIDIA Nsight</span><span class="chip">CUDA concepts</span>
-            <span class="chip">GPU Profiling</span><span class="chip">Parallel Computing</span>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td>Data</td>
-        <td>
-          <div class="skill-chips">
-            <span class="chip">Pandas</span><span class="chip">NumPy</span><span class="chip">PostgreSQL</span>
-            <span class="chip">Statistical Analysis</span><span class="chip">Benchmarking</span><span class="chip">Error Analysis</span>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </section>
-
-  <!-- EDUCATION -->
-  <section id="education">
-    <p class="section-label">§ 04 — education</p>
-    <h2 class="section-title">Education</h2>
-
-    <div class="edu-list">
-      <div class="edu-item reveal">
-        <div class="edu-year">
-          <strong>May 2026</strong>
-          Northeastern Univ.
-        </div>
-        <div class="edu-content">
-          <h3>M.S. Electrical & Computer Engineering</h3>
-          <div class="edu-school">Northeastern University · Boston, MA</div>
-          <span class="gpa-badge">GPA 3.9 / 4.0</span>
-          <div class="edu-detail">
-            Concentration: Machine Learning, Computer Vision, Algorithms<br>
-            Coursework: Advanced ML, Advanced Computer Vision, MLOps, High Performance Computing, Parallel Processing for Data Analytics<br>
-            Leadership: IEEE Workshop Coordinator (Spring 2025) · Global Student Mentor (GSM Fall 2024)
-          </div>
-        </div>
-      </div>
-
-      <div class="edu-item reveal">
-        <div class="edu-year">
-          <strong>May 2024</strong>
-          G.H. Patel CoE
-        </div>
-        <div class="edu-content">
-          <h3>B.E. Electronics & Communication Engineering</h3>
-          <div class="edu-school">G H Patel College of Engineering · Anand, India</div>
-          <span class="gpa-badge">GPA 3.7 / 4.0</span>
-          <div class="edu-detail">
-            Relevant: Digital Image Processing, Information Theory, IoT, Python for Engineers<br>
-            Leadership: ISTE Documentation Head (2022–23) · IDEA Lab Co-Ambassador · TEDx Volunteer
+        <div class="sidebar-section">
+          <div class="sidebar-label">Links</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <a href="https://github.com/Uttaprexa" target="_blank" style="color:var(--blue);font-size:12px;text-decoration:none;">↗ GitHub / Uttaprexa</a>
+            <a href="https://linkedin.com/in/uttapreksha-patel" target="_blank" style="color:var(--blue);font-size:12px;text-decoration:none;">↗ LinkedIn</a>
+            <a href="mailto:patel.utt@northeastern.edu" style="color:var(--blue);font-size:12px;text-decoration:none;">↗ patel.utt@northeastern.edu</a>
+            <a href="tel:+16179619251" style="color:var(--blue);font-size:12px;text-decoration:none;">↗ (617) 961-9251</a>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- CONTACT -->
-  <section id="contact">
-    <p class="section-label">§ 05 — reach out</p>
-    <h2 class="section-title">Let's talk.</h2>
+  <!-- ══ COMMITS PANEL ══ -->
+  <div id="panel-commits" class="panel">
+    <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;max-width:900px">
+      <div style="background:var(--surface);padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-muted)">8 commits into <span class="branch-pill">your-team/main</span> from <span class="branch-pill">feat/hire-me</span></div>
+      <div style="padding:0 16px">
+        <div class="commit-group-label" style="margin-top:12px">Research & Publications</div>
+        <div class="commit-row"><div class="commit-dot"></div><div class="commit-msg">feat: VLM anomaly detection — 0.916 AUROC on MVTec AD + VisA <span>· published paper</span></div><div class="commit-hash">a3f92c1</div></div>
+        <div class="commit-row"><div class="commit-dot"></div><div class="commit-msg">feat: memory-aware LLM agent, STORE/KEEP/DROP classifier <span>· 75 dialogues, 15 domains</span></div><div class="commit-hash">b81de44</div></div>
 
-    <p class="contact-blurb">
-      Looking for roles in <strong>AI engineering, ML engineering, forward deployed engineering, or SWE infra</strong> — anywhere in the US. I relocate. I ship on Day 1. If you're building something hard, let's talk.
-    </p>
+        <div class="commit-group-label" style="margin-top:8px">Production Systems</div>
+        <div class="commit-row"><div class="commit-dot"></div><div class="commit-msg">feat: healthcare RAG system — −18% hallucinations, −22% latency <span>· Dockerized</span></div><div class="commit-hash">c29ab7f</div></div>
+        <div class="commit-row"><div class="commit-dot"></div><div class="commit-msg">feat: climate data pipeline — ingestion, drift monitoring, Parquet <span>· scheduled hourly</span></div><div class="commit-hash">d44fc03</div></div>
+        <div class="commit-row"><div class="commit-dot"></div><div class="commit-msg">perf: PySpark ALS reco engine — 3.98× speedup, 129s→32s <span>· 25M ratings</span></div><div class="commit-hash">e17aa91</div></div>
 
-    <div class="contact-grid">
-      <a href="mailto:patel.utt@northeastern.edu" class="contact-cell">
-        <div class="contact-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        </div>
-        <div>
-          <div class="c-label">email</div>
-          <div class="c-val">patel.utt@northeastern.edu</div>
-        </div>
-      </a>
-      <a href="tel:+16179619251" class="contact-cell">
-        <div class="contact-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 15a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.59 4.11h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 11.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 18.92z"/></svg>
-        </div>
-        <div>
-          <div class="c-label">phone</div>
-          <div class="c-val">(617) 961-9251</div>
-        </div>
-      </a>
-      <a href="https://www.linkedin.com/in/uttapreksha-patel/" target="_blank" class="contact-cell">
-        <div class="contact-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-        </div>
-        <div>
-          <div class="c-label">linkedin</div>
-          <div class="c-val">uttapreksha-patel ↗</div>
-        </div>
-      </a>
-      <a href="https://github.com/Uttaprexa" target="_blank" class="contact-cell">
-        <div class="contact-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-        </div>
-        <div>
-          <div class="c-label">github</div>
-          <div class="c-val">Uttaprexa ↗</div>
-        </div>
+        <div class="commit-group-label" style="margin-top:8px">Infrastructure</div>
+        <div class="commit-row"><div class="commit-dot"></div><div class="commit-msg">feat: HPC telemetry pipeline — 10M+ records, Darshan/LDMS/OVIS <span>· AWS EC2</span></div><div class="commit-hash">f03bc88</div></div>
+        <div class="commit-row"><div class="commit-dot"></div><div class="commit-msg">feat: GPU benchmarking P100/V100/H100 — NVIDIA Nsight profiling <span>· −70% train time</span></div><div class="commit-hash">2a9de56</div></div>
+        <div class="commit-row" style="border-bottom:none"><div class="commit-dot"></div><div class="commit-msg">feat: robotic manipulation RL policies — +22% action prediction <span>· simulation env</span></div><div class="commit-hash">3b11f7c</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DIFF PANEL ══ -->
+  <div id="panel-diff" class="panel" style="max-width:1000px">
+
+    <div class="diff-section-title">Added files <span>6 files changed, +Uttapreksha, −0 gaps</span></div>
+
+    <!-- Diff 1 -->
+    <div class="diff-header">
+      <span class="diff-filename">skills/llm_rag_agents.py</span>
+      <span class="diff-stat"><span class="diff-add">+++ 11</span></span>
+    </div>
+    <div class="diff-body">
+      <div class="diff-row hunk"><div class="diff-ln"></div><div class="diff-ln"></div><div class="diff-code">@@ -0,0 +1,11 @@ class UttaprekshaPatel:</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">1</div><div class="diff-code">  llms           = ["OpenAI", "Claude", "HuggingFace", "LangChain"]</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">2</div><div class="diff-code">  rag_systems    = True  # −18% hallucinations, +25% correctness</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">3</div><div class="diff-code">  memory_agents  = True  # STORE/KEEP/DROP · 0.613→0.760 accuracy</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">4</div><div class="diff-code">  embeddings     = ["FAISS", "vector_search", "semantic_chunking"]</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">5</div><div class="diff-code">  prompt_eng     = ["few-shot", "chain-of-thought", "RAG templates"]</div></div>
+    </div>
+
+    <!-- Diff 2 -->
+    <div class="diff-header" style="margin-top:16px">
+      <span class="diff-filename">skills/computer_vision.py</span>
+      <span class="diff-stat"><span class="diff-add">+++ 8</span></span>
+    </div>
+    <div class="diff-body">
+      <div class="diff-row hunk"><div class="diff-ln"></div><div class="diff-ln"></div><div class="diff-code">@@ -0,0 +1,8 @@ class ComputerVision:</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">1</div><div class="diff-code">  vlm_research   = {"AUROC_cls": 0.916, "AUROC_seg": 0.907}  # published</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">2</div><div class="diff-code">  anomaly_det    = ["WinCLIP", "AnomalyCLIP", "MVTec_AD", "VisA"]</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">3</div><div class="diff-code">  robotics_rl    = {"action_consistency": "+22%", "env": "simulation"}</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">4</div><div class="diff-code">  gpu_profiling  = ["P100", "V100", "H100", "NVIDIA_Nsight"]</div></div>
+    </div>
+
+    <!-- Diff 3 -->
+    <div class="diff-header" style="margin-top:16px">
+      <span class="diff-filename">skills/hpc_distributed.py</span>
+      <span class="diff-stat"><span class="diff-add">+++ 9</span></span>
+    </div>
+    <div class="diff-body">
+      <div class="diff-row hunk"><div class="diff-ln"></div><div class="diff-ln"></div><div class="diff-code">@@ -0,0 +1,9 @@ class HPCInfrastructure:</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">1</div><div class="diff-code">  telemetry_pipeline = {"records": "10M+", "reliability": "+30%"}</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">2</div><div class="diff-code">  tools          = ["Darshan", "LDMS", "OVIS", "Slurm", "OpenMPI"]</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">3</div><div class="diff-code">  spark_reco     = {"speedup": "3.98x", "time": "129s→32s", "scale": "25M"}</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">4</div><div class="diff-code">  cloud          = ["AWS_EC2", "S3", "Docker", "MLflow", "CI/CD"]</div></div>
+    </div>
+
+    <!-- Diff 4 - climate pipeline -->
+    <div class="diff-header" style="margin-top:16px">
+      <span class="diff-filename">projects/climate_pipeline/monitor.py</span>
+      <span class="diff-stat"><span class="diff-add">+++ 12</span></span>
+    </div>
+    <div class="diff-body">
+      <div class="diff-row hunk"><div class="diff-ln"></div><div class="diff-ln"></div><div class="diff-code">@@ -0,0 +1,12 @@ # Climate Data Pipeline — Production Monitoring</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">1</div><div class="diff-code">  sources     = ["Open-Meteo Forecast API", "Open-Meteo Climate API"]</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">2</div><div class="diff-code">  format_in   = ["CSV (hourly forecast)", "JSON (10yr climate normals)"]</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">3</div><div class="diff-code">  output      = "Apache Parquet (columnar, compressed)"</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">4</div><div class="diff-code">  monitoring  = ["completeness", "schema_drift", "stat_drift", "thresholds"]</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">5</div><div class="diff-code">  drift_method = "Z-score vs saved JSON baseline"</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">6</div><div class="diff-code">  schedule    = "every 1h via scheduler.py → Airflow in prod"</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">7</div><div class="diff-code">  logs        = {"pipeline.log": "ops", "monitor.log": "quality_alerts"}</div></div>
+    </div>
+
+    <!-- Diff 5 -->
+    <div class="diff-header" style="margin-top:16px">
+      <span class="diff-filename">education/northeastern_mse.txt</span>
+      <span class="diff-stat"><span class="diff-add">+++ 5</span></span>
+    </div>
+    <div class="diff-body">
+      <div class="diff-row hunk"><div class="diff-ln"></div><div class="diff-ln"></div><div class="diff-code">@@ -0,0 +1,5 @@ # M.S. Electrical & Computer Engineering</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">1</div><div class="diff-code">  university   = "Northeastern University, Boston MA"</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">2</div><div class="diff-code">  gpa          = 3.9  # out of 4.0</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">3</div><div class="diff-code">  graduation   = "May 2026"</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">4</div><div class="diff-code">  focus        = ["Machine Learning", "Computer Vision", "Algorithms"]</div></div>
+      <div class="diff-row add"><div class="diff-ln"></div><div class="diff-ln">5</div><div class="diff-code">  leadership   = ["IEEE Workshop Coordinator", "GSM Mentor"]</div></div>
+    </div>
+
+    <div style="margin-top:24px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:6px;text-align:center">
+      <a href="mailto:patel.utt@northeastern.edu" class="merge-btn" style="display:inline-flex;max-width:400px">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M5.45 5.154A4.25 4.25 0 0 0 9.5 7.5h1.378a2.251 2.251 0 1 1 0 1.5H9.5A5.734 5.734 0 0 1 5 7.123v3.505a2.25 2.25 0 1 1-1.5 0V5.372A2.25 2.25 0 1 1 5.45 5.154Z"/></svg>
+        Merge pull request — hire Uttapreksha
       </a>
     </div>
-  </section>
+  </div>
+
+  <!-- ══ AI REVIEWER PANEL ══ -->
+  <div id="panel-aireview" class="panel">
+    <div class="ai-intro">
+      <div class="ai-intro-header">
+        <div>
+          <h3>✨ AI Code Reviewer — knows Uttapreksha's full history</h3>
+          <p>Ask anything about her skills, projects, fit for your role, or benchmarks</p>
+        </div>
+      </div>
+      <div class="ai-intro-body">
+        This reviewer has read every commit in this PR — all projects, benchmarks, code, and experience. Ask it like you'd ask a senior engineer who's worked with her.
+      </div>
+    </div>
+
+    <div class="chat-window">
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg assistant fade-in">
+          <div class="chat-mini-avatar bot">AI</div>
+          <div class="chat-bubble">
+            Hey 👋 I've reviewed this entire PR — all of Uttapreksha's projects, benchmarks, and code. Ask me anything: her skills, fit for a specific role, strongest projects, or anything else. I'll give you a straight answer.
+          </div>
+        </div>
+      </div>
+
+      <div class="suggested-qs" id="suggestedQs">
+        <div class="sq-label">Suggested questions</div>
+        <button class="sq" onclick="askQuestion('Does she actually know RAG or just list it on her resume?')">Does she actually know RAG?</button>
+        <button class="sq" onclick="askQuestion('What is her strongest project and why?')">Strongest project?</button>
+        <button class="sq" onclick="askQuestion('Would she be good at Palantir as a Forward Deployed Engineer?')">Good fit for Palantir FDE?</button>
+        <button class="sq" onclick="askQuestion('What does her climate data pipeline actually do?')">Tell me about the climate pipeline</button>
+        <button class="sq" onclick="askQuestion('Can she work at a fast-moving early-stage startup?')">Startup fit?</button>
+        <button class="sq" onclick="askQuestion('What gaps or weaknesses should I know about?')">Any weaknesses?</button>
+      </div>
+
+      <div class="chat-input-row">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Ask the AI reviewer anything about Uttapreksha..." onkeydown="if(event.key==='Enter')sendMessage()">
+        <button class="chat-send" id="sendBtn" onclick="sendMessage()">Ask ↗</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<footer>
-  <p>Uttapreksha Patel · Boston, MA · May 2026</p>
-  <p>Built with <a href="https://github.com/Uttaprexa">code</a> · <a href="mailto:patel.utt@northeastern.edu">hire me</a></p>
-</footer>
-
 <script>
-  // Build log animation
-  window.addEventListener('load', () => {
-    const lines = document.querySelectorAll('.log-line');
-    lines.forEach(line => {
-      const delay = parseInt(line.dataset.delay) || 0;
-      setTimeout(() => line.classList.add('visible'), delay);
-    });
-  });
-
-  // Project toggle
-  function toggle(el) {
-    const wasOpen = el.classList.contains('open');
-    document.querySelectorAll('.project-entry.open').forEach(e => {
-      e.classList.remove('open');
-      e.querySelector('.toggle-hint').textContent = '+ expand';
-    });
-    if (!wasOpen) {
-      el.classList.add('open');
-      el.querySelector('.toggle-hint').textContent = '− collapse';
-    }
+  // ── TAB SWITCHING ──
+  function switchTab(name, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    el.classList.add('active');
   }
 
-  // Scroll reveal
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in-view'); });
-  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  // ── SUGGESTED QUESTION ──
+  function askQuestion(q) {
+    document.getElementById('chatInput').value = q;
+    sendMessage();
+  }
 
-  // Nav scroll effect
-  const nav = document.querySelector('nav');
-  window.addEventListener('scroll', () => {
-    nav.style.boxShadow = window.scrollY > 20
-      ? '0 1px 12px rgba(0,0,0,0.06)'
-      : 'none';
-  });
+  // ── SYSTEM PROMPT — all of Uttapreksha's info ──
+  const SYSTEM = `You are an AI code reviewer embedded in Uttapreksha Patel's portfolio, which is styled as a GitHub Pull Request. You have read every commit and file in this PR. Your job is to answer questions from engineers and recruiters about Uttapreksha — her skills, projects, fit for roles, and background.
+
+Answer like a senior engineer who has actually worked with her and reviewed her code. Be direct, specific, and honest. Use her real numbers and project names. Don't be a cheerleader — give nuanced, useful assessments.
+
+UTTAPREKSHA'S FULL PROFILE:
+
+NAME: Uttapreksha Patel
+EDUCATION: M.S. Electrical & Computer Engineering, Northeastern University, Boston MA. GPA 3.9/4.0. Graduating May 2026. Concentration: Machine Learning, Computer Vision, Algorithms. Coursework: Advanced ML, Advanced Computer Vision, MLOps, High Performance Computing, Parallel Processing for Data Analytics.
+UNDERGRAD: B.E. Electronics & Communication Engineering, G H Patel College of Engineering, India. GPA 3.7/4.0. May 2024.
+LOCATION: Boston MA, open to relocate anywhere.
+CONTACT: patel.utt@northeastern.edu, (617) 961-9251.
+
+EXPERIENCE:
+1. Research Assistant, Northeastern University (Feb 2025–Present): Built Python/Linux telemetry pipelines processing 10M+ system records using Darshan, LDMS, OVIS on AWS EC2 and HPC environments. Improved pipeline reliability 30%. Analyzed distributed workload telemetry to identify I/O bottlenecks, temporal anomalies, performance regressions. Presented results through scorecards and visualizations.
+2. Python Development Intern, TecUnique Pvt. Ltd., India (Dec 2023–Apr 2024): Built Pytest automation for API/UI validation, improved test coverage 40%, cut issue resolution time 50%. SQL query optimization, −20% runtime. Git, Docker, Linux.
+
+PROJECTS:
+1. Memory-Aware LLM Agent Framework: Built adaptive memory architecture for long-horizon LLM agents. Classifies every dialogue turn into STORE, KEEP, or DROP based on semantic relevance (not recency). Evaluated across 75 dialogues in 15 domains against 4 baselines (context-window, summary, RAG, rule-based). Results: query accuracy 0.613→0.760 (+24pp over RAG), slot extraction failures −64% vs rule-based. Stack: Python, Claude API, LangChain, RAG, Prompt Engineering.
+
+2. VLM Anomaly Detection Research (Published Paper): Evaluated WinCLIP and AnomalyCLIP on MVTec AD and VisA datasets for visual anomaly classification and segmentation. Results: 0.916 classification AUROC, 0.907 segmentation AUROC. Full dataset-level error analysis and qualitative failure inspection. Stack: PyTorch, CLIP, VLM, benchmarking.
+
+3. Healthcare Knowledge Retrieval System (RAG): Designed RAG system for medical knowledge access. Improved answer correctness +25%, reduced hallucinations −18%, cut end-to-end latency −22% through retrieval tuning, chunking strategy, and golden-question benchmarks. Dockerized deployment. Stack: Python, FAISS, HuggingFace, Docker, Flask.
+
+4. Climate & Time-Series Data Pipeline: Production-style Python data pipeline that ingests real weather data from two APIs (Open-Meteo Forecast CSV, Open-Meteo Climate JSON). Cleans/validates data, aggregates 336 hourly records to 14 daily summaries, saves as Apache Parquet. Automated data quality and drift monitoring with 4 checks: completeness, schema drift, Z-score statistical drift, threshold alerts. Runs hourly via scheduler.py. Separate pipeline.log and monitor.log. Stack: Python, Pandas, NumPy, PyArrow, Parquet, REST APIs, scheduling.
+
+5. Distributed Recommendation System (PySpark): ALS recommendation engine on MovieLens 25M dataset. 25M ratings, 162K users, 59K movies. RMSE 0.8131, Precision@10 0.663. Training time 129s→32s, 3.98× speedup using parallel execution on Slurm cluster with 8 cores. Stack: PySpark, Spark MLlib, ALS, Slurm, SQL.
+
+6. GPU Benchmarking P100/V100/H100: Benchmarked ResNet-50 training across three NVIDIA GPU generations using ImageNet, MS COCO, CIFAR-100. Profiled with NVIDIA Nsight: CUDA kernel execution, memory utilization, host-device transfers, sync overhead. H100 showed 70% lower training time than P100. Stack: PyTorch, CUDA, NVIDIA Nsight.
+
+7. Robotic Manipulation Policy Learning: PyTorch RL policies for robotic pick-and-place in simulation. CNN-based perception pipeline, augmented multi-object datasets. Improved action prediction consistency +22% on unseen scenarios. Stack: PyTorch, RL, CNN, simulation.
+
+8. AI Evaluation & Benchmarking Framework: Reproducible evaluation pipelines for AI systems. Automated metrics, benchmark datasets, qualitative error analysis. Compared multiple foundation model approaches across classification and retrieval tasks.
+
+SKILLS:
+Languages: Python, SQL, C++, Bash
+AI/LLMs: LLMs, RAG, Prompt Engineering, Few-Shot, Chain-of-Thought, Embeddings, Vector Search, Agentic Systems, Memory Architectures, OpenAI APIs, Claude APIs, LangChain, HuggingFace
+ML/CV: PyTorch, TensorFlow/Keras, scikit-learn, Transformers, NLP, Computer Vision, Reinforcement Learning, Model Evaluation, Fine-Tuning
+MLOps/Infra: MLflow, Docker, AWS EC2, CI/CD, Git, Linux, Experiment Tracking, Model Monitoring, Reproducible Workflows
+HPC/Systems: PySpark, Slurm, Darshan, LDMS, OVIS, CUDA, GPU Profiling, Parallel Computing, Distributed Systems
+Data: Pandas, NumPy, SciPy, PostgreSQL/MySQL, Statistical Analysis, Benchmarking, Evaluation Pipelines
+
+HONEST ASSESSMENT:
+Strengths: Strong on benchmarking and reproducibility (everything has a number), solid breadth from GPU kernels to LLM agents, published research, real production deployments. Good at building end-to-end systems rather than just components.
+Gaps to be honest about: Limited full-time industry experience (1 intern role + research), no frontend experience, most deployment has been Docker/Flask rather than large-scale Kubernetes/cloud-native. Growing into senior engineering from a strong research base.
+
+Be honest, direct, and specific. If someone asks about weaknesses, tell them. If they ask about fit for a specific role, give a real assessment. Keep answers to 3-5 sentences unless more depth is needed. You can use markdown formatting lightly.`;
+
+  // ── CHAT ──
+  async function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const btn = document.getElementById('sendBtn');
+    const messages = document.getElementById('chatMessages');
+    const text = input.value.trim();
+    if (!text) return;
+
+    // hide suggested questions after first use
+    document.getElementById('suggestedQs').style.display = 'none';
+
+    // add user message
+    input.value = '';
+    btn.disabled = true;
+
+    const userMsg = document.createElement('div');
+    userMsg.className = 'chat-msg user fade-in';
+    userMsg.innerHTML = `<div class="chat-mini-avatar user">you</div><div class="chat-bubble">${escapeHtml(text)}</div>`;
+    messages.appendChild(userMsg);
+    messages.scrollTop = messages.scrollHeight;
+
+    // typing indicator
+    const typing = document.createElement('div');
+    typing.className = 'chat-msg assistant fade-in';
+    typing.innerHTML = `<div class="chat-mini-avatar bot">AI</div><div class="chat-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+    messages.appendChild(typing);
+    messages.scrollTop = messages.scrollHeight;
+
+    // conversation history
+    if (!window.chatHistory) window.chatHistory = [];
+    window.chatHistory.push({ role: 'user', content: text });
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: SYSTEM,
+          messages: window.chatHistory
+        })
+      });
+
+      const data = await res.json();
+      const reply = data.content?.[0]?.text || 'Something went wrong — try again.';
+      window.chatHistory.push({ role: 'assistant', content: reply });
+
+      typing.remove();
+      const botMsg = document.createElement('div');
+      botMsg.className = 'chat-msg assistant fade-in';
+      botMsg.innerHTML = `<div class="chat-mini-avatar bot">AI</div><div class="chat-bubble">${formatReply(reply)}</div>`;
+      messages.appendChild(botMsg);
+      messages.scrollTop = messages.scrollHeight;
+    } catch(e) {
+      typing.remove();
+      const errMsg = document.createElement('div');
+      errMsg.className = 'chat-msg assistant fade-in';
+      errMsg.innerHTML = `<div class="chat-mini-avatar bot">AI</div><div class="chat-bubble" style="color:var(--red)">Error reaching the API. Make sure this page is served with a valid Anthropic API key injected, or open in an environment that supports it.</div>`;
+      messages.appendChild(errMsg);
+    }
+
+    btn.disabled = false;
+    input.focus();
+  }
+
+  function formatReply(text) {
+    return escapeHtml(text)
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/`(.+?)`/g, '<code>$1</code>')
+      .replace(/\n/g, '<br>');
+  }
+
+  function escapeHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
 </script>
 </body>
 </html>
