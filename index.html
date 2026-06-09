@@ -1,2071 +1,1167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uttapreksha Patel - ML Engineer & Computer Vision Specialist</title>
-    <meta name="description" content="ML Engineer specializing in Computer Vision and MLOps. Building production systems that create real impact.">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #c084fc;
-            --secondary: #f472b6;
-            --accent: #8b5cf6;
-            --dark: #0f172a;
-            --darker: #0a0e1a;
-            --light: #e2e8f0;
-            --gray: #64748b;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            overflow-x: hidden;
-            color: white;
-            background: linear-gradient(135deg, var(--darker) 0%, #1e1b4b 50%, var(--darker) 100%);
-            line-height: 1.6;
-        }
-
-        #neuralCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-        }
-
-        .content {
-            position: relative;
-            z-index: 10;
-        }
-
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            backdrop-filter: blur(16px);
-            background: rgba(15, 23, 42, 0.7);
-            border-bottom: 1px solid rgba(192, 132, 252, 0.1);
-            z-index: 100;
-            transition: all 0.3s;
-        }
-
-        nav.scrolled {
-            background: rgba(15, 23, 42, 0.95);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1.2rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -1px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2.5rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: all 0.3s;
-            font-weight: 500;
-            position: relative;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .cta-btn {
-            padding: 0.6rem 1.5rem;
-            background: linear-gradient(135deg, var(--accent), var(--secondary));
-            border: none;
-            border-radius: 25px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-        }
-
-        .cta-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(192, 132, 252, 0.3);
-        }
-
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-            padding-top: 100px;
-        }
-
-        .hero-content {
-            max-width: 1200px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-        }
-
-        .hero-text h1 {
-            font-size: clamp(2.5rem, 6vw, 4rem);
-            font-weight: 900;
-            margin-bottom: 1rem;
-            line-height: 1.1;
-            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            background-size: 200% auto;
-            animation: gradient 4s linear infinite;
-        }
-
-        @keyframes gradient {
-            to { background-position: 200% center; }
-        }
-
-        .hero-text .tagline {
-            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-        }
-
-        .hero-text .description {
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 2rem;
-            line-height: 1.8;
-        }
-
-        .hero-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 1rem;
-            background: rgba(192, 132, 252, 0.1);
-            border-radius: 15px;
-            border: 1px solid rgba(192, 132, 252, 0.2);
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary);
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .hero-visual {
-            position: relative;
-        }
-
-        .profile-card {
-            background: rgba(30, 41, 59, 0.5);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 3rem;
-            border: 1px solid rgba(192, 132, 252, 0.2);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-        }
-
-        .profile-avatar {
-            width: 220px;
-            height: 220px;
-            margin: 0 auto 1.5rem;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--secondary));
-            padding: 5px;
-            animation: pulse 3s infinite;
-        }
-
-        .profile-avatar-inner {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: var(--dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4.5rem;
-            font-weight: 900;
-        }
-        .profile-photo {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            object-position: center;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.05); }
-        }
-
-        .profile-info {
-            text-align: center;
-        }
-
-        .profile-info h3 {
-            font-size: 1.6rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .profile-info p {
-            color: var(--primary);
-            font-size: 1.1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-
-        .social-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: rgba(192, 132, 252, 0.15);
-            border: 1px solid rgba(192, 132, 252, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            cursor: pointer;
-            text-decoration: none;
-            color: white;
-        }
-
-        .social-btn:hover {
-            background: rgba(192, 132, 252, 0.3);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(192, 132, 252, 0.2);
-        }
-
-        .section {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 6rem 2rem;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-
-        .section-title {
-            font-size: clamp(2rem, 4vw, 3rem);
-            font-weight: 900;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .section-subtitle {
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.6);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .about-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: start;
-        }
-
-        .about-text {
-            font-size: 1.05rem;
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.9;
-        }
-
-        .about-text p {
-            margin-bottom: 1.5rem;
-        }
-
-        .about-text strong {
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        .about-highlights {
-            background: rgba(30, 41, 59, 0.5);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
-            padding: 2rem;
-            border: 1px solid rgba(192, 132, 252, 0.2);
-        }
-
-        .highlight-item {
-            display: flex;
-            align-items: start;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .highlight-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--accent), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .highlight-content h4 {
-            font-size: 1.1rem;
-            margin-bottom: 0.3rem;
-            color: var(--primary);
-        }
-
-        .highlight-content p {
-            font-size: 0.95rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 2rem;
-        }
-
-        .project-card {
-            background: rgba(30, 41, 59, 0.5);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
-            padding: 2.5rem;
-            border: 1px solid rgba(192, 132, 252, 0.2);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .project-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent), var(--secondary));
-            transform: scaleX(0);
-            transition: transform 0.4s;
-        }
-
-        .project-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .project-card:hover {
-            border-color: rgba(192, 132, 252, 0.5);
-            transform: translateY(-8px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-        }
-
-        .project-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 1.5rem;
-        }
-
-        .project-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
-            background: linear-gradient(135deg, var(--accent), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .project-status {
-            padding: 0.4rem 1rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            background: rgba(34, 197, 94, 0.2);
-            color: #4ade80;
-            border: 1px solid rgba(34, 197, 94, 0.3);
-        }
-
-        .project-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: white;
-        }
-
-        .project-description {
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 1.5rem;
-            font-size: 0.95rem;
-            line-height: 1.7;
-        }
-
-        .project-metrics {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
-        }
-
-        .metric {
-            text-align: center;
-        }
-
-        .metric-value {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--primary);
-            display: block;
-        }
-
-        .metric-label {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .tech-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .tech-tag {
-            padding: 0.4rem 1rem;
-            border-radius: 20px;
-            background: rgba(192, 132, 252, 0.15);
-            color: var(--primary);
-            border: 1px solid rgba(192, 132, 252, 0.3);
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .project-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .project-link:hover {
-            color: var(--secondary);
-            gap: 0.8rem;
-        }
-
-        .timeline {
-            max-width: 900px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: linear-gradient(180deg, var(--accent), var(--secondary));
-            transform: translateX(-50%);
-        }
-
-        .timeline-item {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            margin-bottom: 4rem;
-            position: relative;
-        }
-
-        .timeline-item:nth-child(even) .timeline-content {
-            grid-column: 2;
-        }
-
-        .timeline-item:nth-child(even) .timeline-date {
-            grid-column: 1;
-            text-align: right;
-        }
-
-        .timeline-dot {
-            position: absolute;
-            left: 50%;
-            top: 0;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--primary);
-            transform: translateX(-50%);
-            box-shadow: 0 0 0 6px rgba(192, 132, 252, 0.2);
-        }
-
-        .timeline-content {
-            background: rgba(30, 41, 59, 0.5);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 2rem;
-            border: 1px solid rgba(192, 132, 252, 0.2);
-        }
-
-        .timeline-content h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-            color: white;
-        }
-
-        .timeline-content .company {
-            color: var(--primary);
-            font-weight: 600;
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        .timeline-content ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .timeline-content li {
-            padding-left: 1.5rem;
-            margin-bottom: 0.8rem;
-            position: relative;
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.6;
-        }
-
-        .timeline-content li::before {
-            content: '•';
-            position: absolute;
-            left: 0;
-            color: var(--primary);
-            font-weight: bold;
-        }
-
-        .timeline-date {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .skills-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .skill-category {
-            background: rgba(30, 41, 59, 0.5);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 2rem;
-            border: 1px solid rgba(192, 132, 252, 0.2);
-        }
-
-        .skill-category h3 {
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .skill-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-        }
-
-        .skill-item {
-            padding: 0.5rem 1rem;
-            background: rgba(192, 132, 252, 0.1);
-            border: 1px solid rgba(192, 132, 252, 0.2);
-            border-radius: 20px;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s;
-        }
-
-        .skill-item:hover {
-            background: rgba(192, 132, 252, 0.2);
-            border-color: rgba(192, 132, 252, 0.4);
-            transform: translateY(-2px);
-        }
-
-        .education-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 2rem;
-        }
-
-        .education-card {
-            background: rgba(30, 41, 59, 0.5);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
-            padding: 2.5rem;
-            border: 1px solid rgba(192, 132, 252, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .education-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 150px;
-            height: 150px;
-            background: linear-gradient(135deg, var(--accent), var(--secondary));
-            border-radius: 0 0 0 100%;
-            opacity: 0.1;
-        }
-
-        .degree {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: white;
-        }
-
-        .university {
-            color: var(--primary);
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .gpa {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            background: rgba(34, 197, 94, 0.2);
-            color: #4ade80;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .coursework {
-            margin-top: 1.5rem;
-        }
-
-        .coursework h4 {
-            font-size: 1rem;
-            margin-bottom: 0.8rem;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .coursework-list {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-            line-height: 1.8;
-        }
-
-        .contact-content {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .contact-text {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 3rem;
-            line-height: 1.8;
-        }
-
-        .contact-methods {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .contact-method {
-            background: rgba(30, 41, 59, 0.5);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 2rem;
-            border: 1px solid rgba(192, 132, 252, 0.2);
-            text-decoration: none;
-            color: white;
-            transition: all 0.3s;
-        }
-
-        .contact-method:hover {
-            border-color: rgba(192, 132, 252, 0.5);
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .contact-icon {
-            width: 50px;
-            height: 50px;
-            margin: 0 auto 1rem;
-            border-radius: 15px;
-            background: linear-gradient(135deg, var(--accent), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .contact-label {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 0.3rem;
-        }
-
-        .contact-value {
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        footer {
-            border-top: 1px solid rgba(192, 132, 252, 0.2);
-            backdrop-filter: blur(20px);
-            background: rgba(15, 23, 42, 0.7);
-            padding: 3rem 2rem;
-            text-align: center;
-        }
-
-        footer p {
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-tagline {
-            color: var(--primary);
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            padding: 2rem;
-            overflow-y: auto;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 3rem;
-            max-width: 900px;
-            width: 100%;
-            border: 2px solid rgba(192, 132, 252, 0.3);
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
-            position: relative;
-            animation: modalSlideIn 0.3s ease-out;
-        }
-
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(192, 132, 252, 0.2);
-            border: 1px solid rgba(192, 132, 252, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: white;
-            font-size: 1.5rem;
-        }
-
-        .modal-close:hover {
-            background: rgba(192, 132, 252, 0.4);
-            transform: rotate(90deg);
-        }
-
-        .modal-header {
-            margin-bottom: 2rem;
-        }
-
-        .modal-title {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .modal-subtitle {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-
-        .modal-section {
-            margin-bottom: 2rem;
-        }
-
-        .modal-section h3 {
-            font-size: 1.3rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .modal-section p {
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.8;
-            margin-bottom: 1rem;
-        }
-
-        .modal-section ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .modal-section li {
-            padding-left: 1.5rem;
-            margin-bottom: 0.8rem;
-            position: relative;
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.6;
-        }
-
-        .modal-section li::before {
-            content: '•';
-            position: absolute;
-            left: 0;
-            color: var(--primary);
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .modal-metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .modal-metric {
-            text-align: center;
-            padding: 1.5rem;
-            background: rgba(192, 132, 252, 0.1);
-            border-radius: 15px;
-            border: 1px solid rgba(192, 132, 252, 0.2);
-        }
-
-        .modal-metric-value {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary);
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        .modal-metric-label {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .modal-tech-stack {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-            margin-top: 1rem;
-        }
-
-        .modal-tech-item {
-            padding: 0.5rem 1rem;
-            background: rgba(192, 132, 252, 0.15);
-            color: var(--primary);
-            border: 1px solid rgba(192, 132, 252, 0.3);
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        @media (max-width: 1024px) {
-            .hero-content {
-                grid-template-columns: 1fr;
-                gap: 3rem;
-            }
-
-            .about-content {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-
-            .projects-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .timeline::before {
-                left: 20px;
-            }
-
-            .timeline-item {
-                grid-template-columns: 1fr;
-                gap: 0;
-                padding-left: 60px;
-            }
-
-            .timeline-item:nth-child(even) .timeline-content,
-            .timeline-item:nth-child(even) .timeline-date {
-                grid-column: 1;
-                text-align: left;
-            }
-
-            .timeline-dot {
-                left: 20px;
-            }
-
-            .timeline-date {
-                justify-content: flex-start;
-                margin-bottom: 1rem;
-            }
-
-            .education-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                gap: 1rem;
-                font-size: 0.9rem;
-            }
-
-            .cta-btn {
-                display: none;
-            }
-
-            .hero-stats {
-                grid-template-columns: 1fr;
-            }
-
-            .section {
-                padding: 4rem 1.5rem;
-            }
-
-            .contact-methods {
-                grid-template-columns: 1fr;
-            }
-
-            .modal-content {
-                padding: 2rem 1.5rem;
-                margin: 1rem;
-            }
-
-            .modal-title {
-                font-size: 1.5rem;
-            }
-
-            .modal-metrics {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uttapreksha Patel — AI Engineer</title>
+  <meta name="description" content="AI Engineer. LLMs, RAG, computer vision, production ML. Graduating May 2026, Northeastern. Open to relocate.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --paper:   #F7F4EE;
+      --ink:     #111010;
+      --amber:   #D4890A;
+      --amber-light: #F5A623;
+      --gray:    #6B6760;
+      --gray-lt: #C8C4BC;
+      --rule:    #DDD8CF;
+      --code-bg: #1A1A2E;
+      --code-fg: #E8E0D0;
+      --red:     #C0392B;
+      --green:   #1A7A4A;
+      --mono: 'JetBrains Mono', 'Courier New', monospace;
+      --sans: 'Inter', system-ui, sans-serif;
+    }
+
+    /* ── RESET ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 1rem;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* ── SELECTION ── */
+    ::selection { background: var(--amber); color: white; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 99;
+      background: var(--paper);
+      border-bottom: 1px solid var(--rule);
+      padding: 0.9rem 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .nav-id {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .nav-id span { color: var(--amber); }
+
+    .nav-links {
+      display: flex; gap: 2rem; list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--gray);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--amber); }
+
+    /* ── LAYOUT WRAPPER ── */
+    .wrap {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ── HERO / BUILD LOG ── */
+    #hero {
+      padding: 120px 0 80px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--amber);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    h1.name {
+      font-family: var(--mono);
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 1rem;
+    }
+    h1.name em {
+      font-style: normal;
+      color: var(--amber);
+    }
+
+    .hero-bio {
+      font-size: 1.05rem;
+      color: var(--gray);
+      max-width: 580px;
+      margin-bottom: 2.5rem;
+      line-height: 1.75;
+    }
+
+    /* build log */
+    .build-log {
+      background: var(--code-bg);
+      border-radius: 6px;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 2.5rem;
+      overflow: hidden;
+      position: relative;
+    }
+    .build-log::before {
+      content: '● build_outputs.log';
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--gray);
+      margin-bottom: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+    .log-line {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.9;
+      color: var(--code-fg);
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .log-line.visible { opacity: 1; transform: translateX(0); }
+    .log-line .prefix { color: #6B9FD4; }
+    .log-line .key    { color: #C5A55A; }
+    .log-line .arrow  { color: var(--amber-light); }
+    .log-line .val    { color: #9FC67A; }
+    .log-line .delta  { color: #F0856A; }
+    .log-line .ok     { color: #4CAF85; }
+
+    .hero-actions {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+    }
+    .btn {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      padding: 0.65rem 1.4rem;
+      border-radius: 4px;
+      transition: all 0.2s;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .btn-primary {
+      background: var(--amber);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--amber-light); transform: translateY(-1px); }
+    .btn-ghost {
+      border: 1.5px solid var(--rule);
+      color: var(--gray);
+    }
+    .btn-ghost:hover { border-color: var(--amber); color: var(--amber); transform: translateY(-1px); }
+
+    /* ── SECTION SHARED ── */
+    section { padding: 72px 0; border-bottom: 1px solid var(--rule); }
+    section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 0.4rem;
+    }
+
+    h2.section-title {
+      font-family: var(--mono);
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      margin-bottom: 2.5rem;
+    }
+
+    /* ── METRICS BAR (about section) ── */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 2.5rem;
+    }
+    .metric-cell {
+      background: var(--paper);
+      padding: 1.2rem 1rem;
+      text-align: center;
+    }
+    .metric-cell .mval {
+      font-family: var(--mono);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--amber);
+      display: block;
+      line-height: 1.1;
+    }
+    .metric-cell .mlabel {
+      font-size: 0.72rem;
+      color: var(--gray);
+      letter-spacing: 0.03em;
+      margin-top: 0.2rem;
+    }
+
+    .about-body {
+      font-size: 1rem;
+      color: var(--ink);
+      line-height: 1.8;
+    }
+    .about-body p { margin-bottom: 1.1rem; }
+    .about-body strong { color: var(--amber); font-weight: 600; }
+
+    /* ── PROJECTS ── */
+    .project-list { display: flex; flex-direction: column; gap: 0; }
+
+    .project-entry {
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 1.2rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .project-entry:hover {
+      border-color: var(--amber);
+      box-shadow: 0 2px 16px rgba(212,137,10,0.08);
+    }
+
+    .project-head {
+      padding: 1.3rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      background: white;
+    }
+    .project-left { flex: 1; }
+    .project-num {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--amber);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.35rem;
+    }
+    .project-name {
+      font-family: var(--mono);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+    .project-blurb {
+      font-size: 0.9rem;
+      color: var(--gray);
+      line-height: 1.55;
+      max-width: 520px;
+    }
+    .project-right {
+      flex-shrink: 0;
+      text-align: right;
+    }
+    .project-status {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      padding: 0.25rem 0.7rem;
+      border-radius: 20px;
+      letter-spacing: 0.04em;
+    }
+    .status-prod  { background: #E8F5EE; color: var(--green); }
+    .status-research { background: #FFF3E0; color: var(--amber); }
+    .status-done  { background: #F0F0F0; color: var(--gray); }
+
+    .project-body {
+      display: none;
+      padding: 0 1.5rem 1.5rem;
+      background: white;
+      border-top: 1px solid var(--rule);
+    }
+    .project-entry.open .project-body { display: block; }
+    .project-entry.open .project-head { border-bottom: 1px solid var(--rule); }
+
+    .p-section-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin: 1.2rem 0 0.5rem;
+    }
+
+    .p-metrics {
+      display: flex; flex-wrap: wrap; gap: 0.7rem;
+      margin: 0.8rem 0;
+    }
+    .p-metric {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 0.5rem 0.9rem;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+    }
+    .p-metric .pm-val { color: var(--amber); font-weight: 700; }
+    .p-metric .pm-key { color: var(--gray); font-size: 0.72rem; display: block; }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+    .tag {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      padding: 0.2rem 0.65rem;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      color: var(--gray);
+      letter-spacing: 0.02em;
+    }
+
+    .p-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--amber);
+      text-decoration: none;
+      margin-top: 1rem;
+      transition: gap 0.2s;
+    }
+    .p-link:hover { gap: 0.7rem; }
+
+    .toggle-hint {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--gray-lt);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── EXPERIENCE / TIMELINE ── */
+    .exp-list { display: flex; flex-direction: column; gap: 2.5rem; }
+
+    .exp-item {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 2rem;
+    }
+    .exp-date {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--gray);
+      padding-top: 0.15rem;
+      line-height: 1.55;
+    }
+    .exp-date .exp-year { font-weight: 700; color: var(--amber); display: block; }
+
+    .exp-content h3 {
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.15rem;
+    }
+    .exp-company {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: var(--amber);
+      margin-bottom: 0.8rem;
+    }
+    .exp-bullets { list-style: none; padding: 0; }
+    .exp-bullets li {
+      font-size: 0.92rem;
+      color: var(--gray);
+      padding-left: 1.2rem;
+      position: relative;
+      margin-bottom: 0.5rem;
+      line-height: 1.6;
+    }
+    .exp-bullets li::before {
+      content: '→';
+      position: absolute; left: 0;
+      color: var(--amber);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+    }
+
+    /* ── SKILLS ── */
+    .skills-table { width: 100%; border-collapse: collapse; }
+    .skills-table tr { border-bottom: 1px solid var(--rule); }
+    .skills-table tr:last-child { border-bottom: none; }
+    .skills-table td { padding: 1rem 0; vertical-align: top; }
+    .skills-table td:first-child {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--amber);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      width: 160px;
+      padding-right: 2rem;
+      white-space: nowrap;
+    }
+    .skill-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .chip {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      padding: 0.25rem 0.65rem;
+      background: white;
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      color: var(--ink);
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .chip:hover { border-color: var(--amber); color: var(--amber); }
+
+    /* ── EDUCATION ── */
+    .edu-list { display: flex; flex-direction: column; gap: 1.8rem; }
+    .edu-item {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 2rem;
+    }
+    .edu-year {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--gray);
+      padding-top: 0.15rem;
+    }
+    .edu-year strong { color: var(--amber); display: block; font-size: 0.82rem; }
+    .edu-content h3 {
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+    .edu-school {
+      font-size: 0.9rem;
+      color: var(--gray);
+      margin-bottom: 0.4rem;
+    }
+    .gpa-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      background: #E8F5EE;
+      color: var(--green);
+      padding: 0.15rem 0.6rem;
+      border-radius: 3px;
+      margin-bottom: 0.6rem;
+    }
+    .edu-detail {
+      font-size: 0.875rem;
+      color: var(--gray);
+      line-height: 1.6;
+    }
+
+    /* ── CONTACT ── */
+    #contact {
+      padding: 72px 0 80px;
+    }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 2rem;
+    }
+    .contact-cell {
+      background: white;
+      padding: 1.4rem 1.5rem;
+      text-decoration: none;
+      transition: background 0.15s;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .contact-cell:hover { background: var(--paper); }
+    .contact-icon {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--rule);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: var(--amber);
+    }
+    .contact-cell .c-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--gray);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .contact-cell .c-val {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--ink);
+      font-weight: 500;
+    }
+    .contact-blurb {
+      font-size: 1rem;
+      color: var(--gray);
+      line-height: 1.75;
+      max-width: 560px;
+    }
+    .contact-blurb strong { color: var(--ink); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem;
+      border-top: 1px solid var(--rule);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      max-width: 800px; margin: 0 auto;
+    }
+    footer p {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--gray);
+    }
+    footer a { color: var(--amber); text-decoration: none; }
+
+    /* ── SCROLL ANIMATIONS ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .reveal.in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .wrap { padding: 0 1.2rem; }
+      .exp-item, .edu-item {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+      }
+      .metrics-row { grid-template-columns: repeat(2,1fr); }
+      .contact-grid { grid-template-columns: 1fr; }
+      h1.name { font-size: 2rem; }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 480px) {
+      .metrics-row { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ── CURSOR BLINK ── */
+    .cursor {
+      display: inline-block;
+      width: 2px; height: 1em;
+      background: var(--amber);
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, .reveal, .log-line { transition: none !important; animation: none !important; }
+      .reveal { opacity: 1; transform: none; }
+      .log-line { opacity: 1; transform: none; }
+    }
+  </style>
 </head>
 <body>
-    <canvas id="neuralCanvas"></canvas>
-    
-    <div class="content">
-        <nav id="navbar">
-            <div class="nav-container">
-                <div class="logo">UP</div>
-                <div class="nav-links">
-                    <a href="#about">About</a>
-                    <a href="#projects">Projects</a>
-                    <a href="#experience">Experience</a>
-                    <a href="#skills">Skills</a>
-                    <a href="#education">Education</a>
-                    <a href="#contact" class="cta-btn">Get in Touch</a>
-                </div>
-            </div>
-        </nav>
 
-        <section class="hero">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <h1>Building ML Systems That People Actually Use</h1>
-                    <p class="tagline">Not models in notebooks. Production systems that create real impact.</p>
-                    <p class="description">
-                        Hi, I'm <strong>Uttapreksha Patel</strong> 👋 Master's student in Electrical and Computer Engineering at Northeastern University (GPA: 3.9), specializing in Computer Vision, Machine Learning, and Algorithms.
-                    </p>
-                    <div class="hero-stats">
-                        <div class="stat-item">
-                            <span class="stat-number">50K+</span>
-                            <span class="stat-label">Data Points/Month</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">95.2%</span>
-                            <span class="stat-label">Model Accuracy</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">3.9</span>
-                            <span class="stat-label">GPA</span>
-                        </div>
-                    </div>
-                    <a href="https://github.com/Uttaprexa/uttaprexa.github.io/blob/main/resumeu.pdf" download class="cta-btn" style="display: inline-block; margin-top: 2rem;">
-                        📄 Download Resume
-                    </a>
-                </div>
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-id">UP<span>_</span>patel</a>
+  <ul class="nav-links">
+    <li><a href="#about">about</a></li>
+    <li><a href="#projects">systems</a></li>
+    <li><a href="#experience">exp</a></li>
+    <li><a href="#skills">stack</a></li>
+    <li><a href="#contact">contact</a></li>
+  </ul>
+</nav>
 
-                <div class="hero-visual">
-                    <div class="profile-card">
-                        <div class="profile-avatar">
-                            <img src="https://uttaprexa.github.io/profile.jpeg" 
-                                 alt="Uttapreksha Patel" 
-                                 class="profile-photo"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="profile-avatar-inner" style="display: none;">UP</div>
-                        </div>
-                        <div class="profile-info">
-                            <h3>Uttapreksha Patel</h3>
-                            <p>ML Engineer | Research Assistant @ NEU</p>
-                            <div class="social-links">
-                                <a href="https://github.com/Uttaprexa" target="_blank" class="social-btn" title="GitHub">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                                    </svg>
-                                </a>
-                                <a href="https://www.linkedin.com/in/uttapreksha-patel/" target="_blank" class="social-btn" title="LinkedIn">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                                    </svg>
-                                </a>
-                                <a href="mailto:patel.utt@northeastern.edu" class="social-btn" title="Email">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                                        <polyline points="22,6 12,13 2,6"/>
-                                    </svg>
-                                </a>
-                                <a href="tel:+16179619251" class="social-btn" title="Phone">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+<!-- HERO -->
+<div class="wrap">
+  <section id="hero">
+    <p class="eyebrow">available · may 2026 · open to relocate</p>
+    <h1 class="name">Uttapreksha<br>Patel<span class="cursor"></span></h1>
+    <p class="hero-bio">
+      AI engineer building systems that actually work in production — not notebooks, not demos.
+      LLMs, RAG, computer vision, distributed ML, HPC infrastructure.
+      M.S. ECE @ Northeastern (3.9 GPA), graduating May 2026.
+    </p>
 
-        <section id="about" class="section">
-            <div class="section-header">
-                <h2 class="section-title">About Me</h2>
-                <p class="section-subtitle">Building production ML systems that create measurable impact</p>
-            </div>
-            
-            <div class="about-content">
-                <div class="about-text">
-                    <p>
-                        <strong>What drives me? Impact.</strong> I got into this field because data and ML can genuinely make people's lives better. Whether it's saving analysts 34 hours a week, helping manufacturers maintain compliance, or giving honest feedback to improve presentations, I care about building things that matter.
-                    </p>
-                    <p>
-                        <strong>My style: Collaborative.</strong> I'm a people person. The best solutions come from working together and learning from different perspectives. My technical skills are strong (Python, TensorFlow, PyTorch, Docker, AWS, GCP), but what I value most is translating between technical complexity and human needs.
-                    </p>
-                    <p>
-                        Production ML is different from research ML. It's about <strong>reliability, monitoring, and continuous improvement</strong>. Building real systems taught me this. I believe in being honest about what I don't know and learning quickly.
-                    </p>
-                    <p>
-                        Currently a Research Assistant at Northeastern working on data pipelines and ML deployments on AWS, while completing my Master's in Electrical and Computer Engineering with a 3.9 GPA.
-                    </p>
-                </div>
-
-                <div class="about-highlights">
-                    <div class="highlight-item">
-                        <div class="highlight-icon">🎯</div>
-                        <div class="highlight-content">
-                            <h4>Impact-Driven</h4>
-                            <p>Built systems processing 50K+ data points monthly with 95.2% accuracy, saving teams 34+ hours weekly</p>
-                        </div>
-                    </div>
-                    <div class="highlight-item">
-                        <div class="highlight-icon">🤝</div>
-                        <div class="highlight-content">
-                            <h4>Team Player</h4>
-                            <p>IEEE Workshop Coordinator, mentoring peers and building tools to solve collective problems</p>
-                        </div>
-                    </div>
-                    <div class="highlight-item">
-                        <div class="highlight-icon">🚀</div>
-                        <div class="highlight-content">
-                            <h4>Production Focus</h4>
-                            <p>Not prototypes. Building reliable, monitored ML systems that work in the real world</p>
-                        </div>
-                    </div>
-                    <div class="highlight-item">
-                        <div class="highlight-icon">📈</div>
-                        <div class="highlight-content">
-                            <h4>Always Learning</h4>
-                            <p>Turned fear of public speaking into a strength, continuously growing technical and soft skills</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="projects" class="section">
-            <div class="section-header">
-                <h2 class="section-title">Featured Projects</h2>
-                <p class="section-subtitle">Production ML systems solving real-world problems</p>
-            </div>
-            
-            <div class="projects-grid">
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M23 7l-7 5 7 5V7z"/>
-                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-                            </svg>
-                        </div>
-                        <div class="project-status">In Production</div>
-                    </div>
-                    <h3 class="project-title">PitchQuest: Multimodal Pitch Analysis</h3>
-                    <p class="project-description">
-                        AI-powered platform analyzing pitch presentations across content, delivery, and visual performance. Combines Whisper API, Wav2Vec2, MediaPipe, DeepFace, and finetuned SmolVLM-500M for comprehensive feedback comparable to professional pitch coaches. Features automated retraining pipeline and sub-2-minute processing for 10-minute videos.
-                    </p>
-                    <div class="project-metrics">
-                        <div class="metric">
-                            <span class="metric-value">&lt;2min</span>
-                            <span class="metric-label">Processing Time</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value">85%+</span>
-                            <span class="metric-label">Human Agreement</span>
-                        </div>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">Computer Vision</span>
-                        <span class="tech-tag">NLP</span>
-                        <span class="tech-tag">SmolVLM</span>
-                        <span class="tech-tag">FastAPI</span>
-                        <span class="tech-tag">Next.js</span>
-                        <span class="tech-tag">MLOps</span>
-                        <span class="tech-tag">Multimodal AI</span>
-                    </div>
-                    <a href="https://github.com/harshitashitut/MLOps-Project" class="project-link" target="_blank">View on GitHub →</a>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <circle cx="12" cy="12" r="3"/>
-                                <line x1="12" y1="2" x2="12" y2="9"/>
-                                <line x1="12" y1="15" x2="12" y2="22"/>
-                            </svg>
-                        </div>
-                        <div class="project-status">Research</div>
-                    </div>
-                    <h3 class="project-title">VLM-Based Approaches Analysis</h3>
-                    <p class="project-description">
-                        Advanced Computer Vision course project analyzing Vision-Language Models for Activity Classification and Action Segmentation applications. Comprehensive evaluation of state-of-the-art VLM architectures for understanding complex video sequences and temporal relationships.
-                    </p>
-                    <div class="tech-tags">
-                        <span class="tech-tag">Computer Vision</span>
-                        <span class="tech-tag">VLM</span>
-                        <span class="tech-tag">PyTorch</span>
-                        <span class="tech-tag">Deep Learning</span>
-                        <span class="tech-tag">Action Recognition</span>
-                    </div>
-                    <a href="https://github.com/Uttaprexa/Analyzing-VLM-Based-Approaches-for-AC-AS" class="project-link" target="_blank">View on GitHub →</a>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-                                <line x1="12" y1="22.08" x2="12" y2="12"/>
-                            </svg>
-                        </div>
-                        <div class="project-status">In Production</div>
-                    </div>
-                    <h3 class="project-title">AI-Powered Portfolio Data Management</h3>
-                    <p class="project-description">
-                        End-to-end automated system extracting and cleaning portfolio data from Crunchbase, PitchBook, and company websites using GPT-4 API. Designed PostgreSQL data warehouse with star schema and Apache Airflow DAGs for daily ETL processes. Created comprehensive data validation framework with real-time monitoring.
-                    </p>
-                    <div class="project-metrics">
-                        <div class="metric">
-                            <span class="metric-value">50K+</span>
-                            <span class="metric-label">Data Points/Month</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value">95.2%</span>
-                            <span class="metric-label">Accuracy</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value">85%</span>
-                            <span class="metric-label">Time Saved</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value">15+</span>
-                            <span class="metric-label">Quality Checks</span>
-                        </div>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">GPT-4 API</span>
-                        <span class="tech-tag">PostgreSQL</span>
-                        <span class="tech-tag">Apache Airflow</span>
-                        <span class="tech-tag">Python</span>
-                        <span class="tech-tag">Tableau</span>
-                        <span class="tech-tag">ETL</span>
-                    </div>
-                    <a href="#" class="project-link" onclick="openModal('portfolio-modal'); return false;">Learn More →</a>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                                <line x1="16" y1="13" x2="8" y2="13"/>
-                                <line x1="16" y1="17" x2="8" y2="17"/>
-                                <polyline points="10 9 9 9 8 9"/>
-                            </svg>
-                        </div>
-                        <div class="project-status">Completed</div>
-                    </div>
-                    <h3 class="project-title">LLM-Powered Compliance Documentation</h3>
-                    <p class="project-description">
-                        Fine-tuned GPT-4 to automatically generate Standard Operating Procedures (SOPs) for medical device manufacturing. Implemented RAG architecture with FAISS, integrating FDA guidelines and ISO 13485 standards. Developed production Flask web service with authentication for quality management system integration.
-                    </p>
-                    <div class="project-metrics">
-                        <div class="metric">
-                            <span class="metric-value">91%</span>
-                            <span class="metric-label">Compliance Score</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value">5K+</span>
-                            <span class="metric-label">Documents Processed</span>
-                        </div>
-                    </div>
-                    <div class="tech-tags">
-                        <span class="tech-tag">GPT-4</span>
-                        <span class="tech-tag">RAG</span>
-                        <span class="tech-tag">FAISS</span>
-                        <span class="tech-tag">Flask</span>
-                        <span class="tech-tag">NLP</span>
-                        <span class="tech-tag">FDA/ISO Standards</span>
-                    </div>
-                    <a href="#" class="project-link" onclick="openModal('compliance-modal'); return false;">Learn More →</a>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                            </svg>
-                        </div>
-                        <div class="project-status">Active</div>
-                    </div>
-                    <h3 class="project-title">Healthcare Knowledge Retrieval System</h3>
-                    <p class="project-description">
-                        RAG-based system assisting healthcare professionals in retrieving and understanding medical information. Utilized Elasticsearch and FAISS for document retrieval, leveraged HuggingFace Transformers (GPT-2, T5) for generating concise, context-aware responses. Deployed using Docker and Flask with user-friendly web interface.
-                    </p>
-                    <div class="tech-tags">
-                        <span class="tech-tag">RAG</span>
-                        <span class="tech-tag">Elasticsearch</span>
-                        <span class="tech-tag">FAISS</span>
-                        <span class="tech-tag">HuggingFace</span>
-                        <span class="tech-tag">Docker</span>
-                        <span class="tech-tag">Flask</span>
-                    </div>
-                    <a href="#" class="project-link" onclick="openModal('healthcare-modal'); return false;">Learn More →</a>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="16 18 22 12 16 6"/>
-                                <polyline points="8 6 2 12 8 18"/>
-                            </svg>
-                        </div>
-                        <div class="project-status">Production</div>
-                    </div>
-                    <h3 class="project-title">API Automation Testing Framework</h3>
-                    <p class="project-description">
-                        Comprehensive API testing framework developed during Python development internship at TecUnique. Automated testing for Spectra's API and UI components using Python, Pytest, and PyCharm. Created real test cases for key entities, improving test coverage by 40% and reducing issue resolution time by 50%.
-                    </p>
-                    <div class="tech-tags">
-                        <span class="tech-tag">Python</span>
-                        <span class="tech-tag">Pytest</span>
-                        <span class="tech-tag">API Testing</span>
-                        <span class="tech-tag">Automation</span>
-                        <span class="tech-tag">CI/CD</span>
-                    </div>
-                    <a href="https://github.com/Uttaprexa/api-automation-testing" class="project-link" target="_blank">View on GitHub →</a>
-                </div>
-            </div>
-        </section>
-
-        <section id="experience" class="section">
-            <div class="section-header">
-                <h2 class="section-title">Professional Experience</h2>
-                <p class="section-subtitle">Building production systems and conducting cutting-edge research</p>
-            </div>
-            
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-date">Feb 2025 - Present</div>
-                    <div class="timeline-content">
-                        <h3>Research Assistant</h3>
-                        <span class="company">Northeastern University, Boston, MA</span>
-                        <ul>
-                            <li>Engineer data collection pipeline using Darshan and LDMS on AWS with I/O benchmarks (IOR, VPIC), creating automated job scorecards and Python visualizations to analyze distributed system performance</li>
-                            <li>Deploy containerized ML workloads (miniGAN) via Docker on AWS, generating large-scale test datasets and building monitoring scripts to track and visualize performance metrics</li>
-                            <li>Collaborate on data-driven optimization strategies for distributed systems</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-date">Dec 2023 - Apr 2024</div>
-                    <div class="timeline-content">
-                        <h3>Python Development Intern</h3>
-                        <span class="company">TecUnique Pvt Ltd, Vadodara, India</span>
-                        <ul>
-                            <li>Developed and implemented an automated testing framework using Python, Pytest, and PyCharm to validate Spectra's API and UI components</li>
-                            <li>Created comprehensive test cases for key entities, improving test coverage by 40% and efficiency</li>
-                            <li>Generated detailed test reports with visualizations, enhancing visibility into test results and facilitating 50% quicker resolution of issues</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="skills" class="section">
-            <div class="section-header">
-                <h2 class="section-title">Technical Arsenal</h2>
-                <p class="section-subtitle">Production-ready skills across the ML stack</p>
-            </div>
-            
-            <div class="skills-container">
-                <div class="skill-category">
-                    <h3>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="16 18 22 12 16 6"/>
-                            <polyline points="8 6 2 12 8 18"/>
-                        </svg>
-                        Programming & Analysis
-                    </h3>
-                    <div class="skill-list">
-                        <span class="skill-item">Python</span>
-                        <span class="skill-item">Pandas</span>
-                        <span class="skill-item">NumPy</span>
-                        <span class="skill-item">Scikit-learn</span>
-                        <span class="skill-item">C/C++</span>
-                        <span class="skill-item">R</span>
-                        <span class="skill-item">SQL</span>
-                        <span class="skill-item">Java</span>
-                        <span class="skill-item">JavaScript</span>
-                        <span class="skill-item">MATLAB</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                        Machine Learning & AI
-                    </h3>
-                    <div class="skill-list">
-                        <span class="skill-item">Deep Learning</span>
-                        <span class="skill-item">CNNs</span>
-                        <span class="skill-item">RNNs</span>
-                        <span class="skill-item">LLMs</span>
-                        <span class="skill-item">Langchain</span>
-                        <span class="skill-item">TensorFlow</span>
-                        <span class="skill-item">PyTorch</span>
-                        <span class="skill-item">Keras</span>
-                        <span class="skill-item">HuggingFace</span>
-                        <span class="skill-item">Model Training</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                        </svg>
-                        MLOps & Deployment
-                    </h3>
-                    <div class="skill-list">
-                        <span class="skill-item">Docker</span>
-                        <span class="skill-item">AWS (EC2, S3)</span>
-                        <span class="skill-item">Google Cloud Platform</span>
-                        <span class="skill-item">Apache Spark</span>
-                        <span class="skill-item">Apache Airflow</span>
-                        <span class="skill-item">Azure AI</span>
-                        <span class="skill-item">CI/CD Pipelines</span>
-                        <span class="skill-item">Git/GitHub</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                        </svg>
-                        NLP & Text Mining
-                    </h3>
-                    <div class="skill-list">
-                        <span class="skill-item">Transformers</span>
-                        <span class="skill-item">Named Entity Recognition</span>
-                        <span class="skill-item">Text Classification</span>
-                        <span class="skill-item">Information Retrieval</span>
-                        <span class="skill-item">RAG</span>
-                        <span class="skill-item">Prompt Engineering</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2"/>
-                            <path d="M3 9h18"/>
-                            <path d="M9 21V9"/>
-                        </svg>
-                        Data Management & Tools
-                    </h3>
-                    <div class="skill-list">
-                        <span class="skill-item">PostgreSQL</span>
-                        <span class="skill-item">MongoDB</span>
-                        <span class="skill-item">Snowflake</span>
-                        <span class="skill-item">Tableau</span>
-                        <span class="skill-item">Power BI</span>
-                        <span class="skill-item">Looker</span>
-                        <span class="skill-item">ETL Pipelines</span>
-                        <span class="skill-item">Data Warehousing</span>
-                    </div>
-                </div>
-
-                <div class="skill-category">
-                    <h3>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2v20M2 12h20"/>
-                            <path d="M5 12a7 7 0 0 1 14 0"/>
-                        </svg>
-                        AI/ML APIs & Tools
-                    </h3>
-                    <div class="skill-list">
-                        <span class="skill-item">ChatGPT API</span>
-                        <span class="skill-item">Claude API</span>
-                        <span class="skill-item">OpenAI Codex</span>
-                        <span class="skill-item">Flask</span>
-                        <span class="skill-item">API Development</span>
-                        <span class="skill-item">Jupyter</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="education" class="section">
-            <div class="section-header">
-                <h2 class="section-title">Education</h2>
-                <p class="section-subtitle">Strong academic foundation in ML and Computer Engineering</p>
-            </div>
-            
-            <div class="education-grid">
-                <div class="education-card">
-                    <h3 class="degree">Master of Science</h3>
-                    <p class="university">Northeastern University, Boston, MA</p>
-                    <span class="gpa">GPA: 3.9/4.0</span>
-                    <p style="color: var(--primary); margin-bottom: 1rem;">Electrical and Computer Engineering | Expected May 2026</p>
-                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;"><strong>Concentration:</strong> Computer Vision, Machine Learning, and Algorithms</p>
-                    <div class="coursework">
-                        <h4>Relevant Coursework:</h4>
-                        <p class="coursework-list">
-                            Machine Learning Operations (MLOps), Advanced Computer Vision, Advanced Machine Learning, High Performance Computing, Introduction to ML and Pattern Recognition, Fundamentals of Computer Engineering
-                        </p>
-                    </div>
-                    <div class="coursework">
-                        <h4>Leadership:</h4>
-                        <p class="coursework-list">
-                            IEEE Workshop Coordinator (Spring 2025), Global Student Mentee (GSM Program – Fall 2024)
-                        </p>
-                    </div>
-                </div>
-
-                <div class="education-card">
-                    <h3 class="degree">Bachelor of Engineering</h3>
-                    <p class="university">G H Patel College of Engineering (CVM University)</p>
-                    <span class="gpa">GPA: 3.7/4.0</span>
-                    <p style="color: var(--primary); margin-bottom: 1rem;">Electronics and Communication Engineering | May 2024</p>
-                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;"><strong>Location:</strong> Anand, India</p>
-                    <div class="coursework">
-                        <h4>Relevant Coursework:</h4>
-                        <p class="coursework-list">
-                            Digital Image Processing, Information Theory and Coding, IoT and Applications, Python for Engineers
-                        </p>
-                    </div>
-                    <div class="coursework">
-                        <h4>Leadership:</h4>
-                        <p class="coursework-list">
-                            ISTE Documentation Head (2022-23), IDEA Lab Co-Ambassador (2022-23), TEDx Registration and Campaigning Volunteer (2022)
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="contact" class="section">
-            <div class="section-header">
-                <h2 class="section-title">Let's Build Something Together</h2>
-                <p class="section-subtitle">Open to Data Science, ML Engineering, and MLOps opportunities</p>
-            </div>
-            
-            <div class="contact-content">
-                <p class="contact-text">
-                    Looking for Data Science, ML Engineering, or MLOps opportunities where I can work on problems that create real value, collaborate with mission-driven teams, build production systems (not prototypes), and continue learning and growing. If you're building something that matters, let's connect!
-                </p>
-                
-                <div class="contact-methods">
-                    <a href="mailto:patel.utt@northeastern.edu" class="contact-method">
-                        <div class="contact-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                                <polyline points="22,6 12,13 2,6"/>
-                            </svg>
-                        </div>
-                        <div class="contact-label">Email</div>
-                        <div class="contact-value">patel.utt@northeastern.edu</div>
-                    </a>
-
-                    <a href="tel:+16179619251" class="contact-method">
-                        <div class="contact-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                            </svg>
-                        </div>
-                        <div class="contact-label">Phone</div>
-                        <div class="contact-value">(617) 961-9251</div>
-                    </a>
-
-                    <a href="https://www.linkedin.com/in/uttapreksha-patel/" target="_blank" class="contact-method">
-                        <div class="contact-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                            </svg>
-                        </div>
-                        <div class="contact-label">LinkedIn</div>
-                        <div class="contact-value">Connect with me</div>
-                    </a>
-
-                    <a href="https://github.com/Uttaprexa" target="_blank" class="contact-method">
-                        <div class="contact-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                            </svg>
-                        </div>
-                        <div class="contact-label">GitHub</div>
-                        <div class="contact-value">View my code</div>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <footer>
-            <p>© 2025 | Uttapreksha Patel</p>
-            <p class="footer-tagline">Exploring the intersection of AI, Vision, and Real-World Impact</p>
-            <p style="margin-top: 1rem; color: rgba(255,255,255,0.4); font-size: 0.9rem;">Boston, MA | Available for opportunities</p>
-        </footer>
+    <!-- BUILD LOG — the signature element -->
+    <div class="build-log" id="buildLog" aria-label="Selected engineering outcomes">
+      <div class="log-line" data-delay="100">
+        <span class="prefix">[ memory_agent ]</span>
+        &nbsp;<span class="key">query_accuracy</span>
+        &nbsp;<span class="arrow">→</span>
+        &nbsp;<span class="val">0.613</span>
+        &nbsp;<span class="arrow">▶</span>
+        &nbsp;<span class="val">0.760</span>
+        &nbsp;<span class="ok">(+24pp over RAG baseline)</span>
+      </div>
+      <div class="log-line" data-delay="340">
+        <span class="prefix">[ memory_agent ]</span>
+        &nbsp;<span class="key">slot_extraction_failures</span>
+        &nbsp;<span class="arrow">↓</span>
+        &nbsp;<span class="delta">−64%</span>
+        &nbsp;<span class="ok">vs rule-based memory</span>
+      </div>
+      <div class="log-line" data-delay="580">
+        <span class="prefix">[ rag_system   ]</span>
+        &nbsp;<span class="key">hallucinations</span>
+        &nbsp;<span class="arrow">↓</span>
+        &nbsp;<span class="delta">−18%</span>
+        &nbsp;<span class="key">| answer_correctness</span>
+        &nbsp;<span class="arrow">↑</span>
+        &nbsp;<span class="ok">+25%</span>
+      </div>
+      <div class="log-line" data-delay="820">
+        <span class="prefix">[ rag_system   ]</span>
+        &nbsp;<span class="key">end_to_end_latency</span>
+        &nbsp;<span class="arrow">↓</span>
+        &nbsp;<span class="delta">−22%</span>
+        &nbsp;<span class="ok">via retrieval opt + Docker</span>
+      </div>
+      <div class="log-line" data-delay="1060">
+        <span class="prefix">[ vlm_paper    ]</span>
+        &nbsp;<span class="key">classification_AUROC</span>
+        &nbsp;<span class="arrow">=</span>
+        &nbsp;<span class="val">0.916</span>
+        &nbsp;<span class="key">| seg_AUROC</span>
+        &nbsp;<span class="arrow">=</span>
+        &nbsp;<span class="val">0.907</span>
+        &nbsp;<span class="ok">[ MVTec + VisA ]</span>
+      </div>
+      <div class="log-line" data-delay="1300">
+        <span class="prefix">[ spark_reco   ]</span>
+        &nbsp;<span class="key">training_time</span>
+        &nbsp;<span class="arrow">→</span>
+        &nbsp;<span class="val">129s</span>
+        &nbsp;<span class="arrow">▶</span>
+        &nbsp;<span class="val">32s</span>
+        &nbsp;<span class="ok">(3.98× speedup, 25M ratings)</span>
+      </div>
+      <div class="log-line" data-delay="1540">
+        <span class="prefix">[ hpc_pipeline ]</span>
+        &nbsp;<span class="key">records_processed</span>
+        &nbsp;<span class="arrow">=</span>
+        &nbsp;<span class="val">10M+</span>
+        &nbsp;<span class="key">| reliability</span>
+        &nbsp;<span class="arrow">↑</span>
+        &nbsp;<span class="ok">+30%</span>
+      </div>
     </div>
 
-    <!-- Modal for AI-Powered Portfolio Data Management -->
-    <div id="portfolio-modal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'portfolio-modal')">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-close" onclick="closeModal('portfolio-modal')">×</div>
-            
-            <div class="modal-header">
-                <h2 class="modal-title">AI-Powered Portfolio Data Management System</h2>
-                <p class="modal-subtitle">Automated intelligence system revolutionizing venture capital portfolio management through AI-driven data extraction, processing, and analysis</p>
-            </div>
+    <div class="hero-actions">
+      <a href="mailto:patel.utt@northeastern.edu" class="btn btn-primary">→ get in touch</a>
+      <a href="https://github.com/Uttaprexa" target="_blank" class="btn btn-ghost">GitHub ↗</a>
+      <a href="https://www.linkedin.com/in/uttapreksha-patel/" target="_blank" class="btn btn-ghost">LinkedIn ↗</a>
+      <a href="https://uttaprexa.github.io/resumeu.pdf" target="_blank" class="btn btn-ghost">Resume PDF ↗</a>
+    </div>
+  </section>
 
-            <div class="modal-section">
-                <h3>🎯 Project Overview</h3>
-                <p>
-                    Designed and deployed an end-to-end automated system that transforms how investment firms manage portfolio data. The system intelligently extracts, cleans, and analyzes data from multiple sources including Crunchbase, PitchBook, and company websites, processing over 50,000 data points monthly with exceptional accuracy.
-                </p>
-            </div>
+  <!-- ABOUT -->
+  <section id="about">
+    <p class="section-label">§ 00 — overview</p>
+    <h2 class="section-title">About</h2>
 
-            <div class="modal-metrics">
-                <div class="modal-metric">
-                    <span class="modal-metric-value">50K+</span>
-                    <span class="modal-metric-label">Data Points Processed Monthly</span>
-                </div>
-                <div class="modal-metric">
-                    <span class="modal-metric-value">95.2%</span>
-                    <span class="modal-metric-label">Data Accuracy Rate</span>
-                </div>
-                <div class="modal-metric">
-                    <span class="modal-metric-value">85%</span>
-                    <span class="modal-metric-label">Time Reduction</span>
-                </div>
-                <div class="modal-metric">
-                    <span class="modal-metric-value">15+</span>
-                    <span class="modal-metric-label">Quality Validation Checks</span>
-                </div>
-            </div>
+    <div class="metrics-row reveal">
+      <div class="metric-cell">
+        <span class="mval">3.9</span>
+        <div class="mlabel">GPA / 4.0</div>
+      </div>
+      <div class="metric-cell">
+        <span class="mval">10M+</span>
+        <div class="mlabel">records/pipeline</div>
+      </div>
+      <div class="metric-cell">
+        <span class="mval">4×</span>
+        <div class="mlabel">distributed speedup</div>
+      </div>
+      <div class="metric-cell">
+        <span class="mval">0.916</span>
+        <div class="mlabel">AUROC published</div>
+      </div>
+    </div>
 
-            <div class="modal-section">
-                <h3>🔧 Key Features & Implementation</h3>
-                <ul>
-                    <li><strong>Intelligent Data Extraction:</strong> Leveraged GPT-4 API to extract structured information from unstructured web data, handling multiple data formats and sources simultaneously</li>
-                    <li><strong>PostgreSQL Data Warehouse:</strong> Designed star schema architecture optimized for analytical queries, enabling fast insights across 100+ portfolio companies</li>
-                    <li><strong>Apache Airflow Pipeline:</strong> Built robust DAGs for daily ETL processes, ensuring data freshness and reliability with automated error handling and retry logic</li>
-                    <li><strong>Real-Time Dashboard:</strong> Created Tableau visualizations providing executives with instant portfolio performance insights and investment decision support</li>
-                    <li><strong>Data Quality Framework:</strong> Implemented 15+ automated validation checks ensuring data integrity, completeness, and accuracy across all data sources</li>
-                </ul>
-            </div>
+    <div class="about-body reveal">
+      <p>
+        I'm finishing an M.S. in Electrical and Computer Engineering at Northeastern University (concentration: ML, CV, Algorithms), graduating May 2026 with a 3.9. My work lives at the boundary between research rigor and production reality — I care about systems that <strong>evaluate cleanly, deploy reliably, and improve measurably</strong>.
+      </p>
+      <p>
+        Right now I'm a Research Assistant at NEU, building HPC telemetry infrastructure on AWS EC2 that processes 10M+ system records with Darshan and LDMS. Before that, a Python dev intern at TecUnique, where I automated API test coverage and cut issue resolution time by 50%.
+      </p>
+      <p>
+        My personal projects are where I push hardest: a memory-aware LLM agent that beat RAG by 24 percentage points, a published VLM anomaly detection paper (0.916 AUROC), a distributed Spark recommendation engine with 4× speedup, and a Dockerized RAG system that cut hallucinations 18%. Everything has a benchmark. Everything has a number.
+      </p>
+      <p>
+        Based in Boston. <strong>Open to relocate anywhere</strong> for the right role — AI engineer, ML engineer, forward deployed engineer, SWE infra, or any role where the work is hard and the product matters.
+      </p>
+    </div>
+  </section>
 
-            <div class="modal-section">
-                <h3>💡 Technical Challenges Solved</h3>
-                <ul>
-                    <li>Unified data from disparate sources with varying formats and update frequencies</li>
-                    <li>Reduced manual data entry time from 40 hours/week to 6 hours/week</li>
-                    <li>Achieved 95.2% accuracy through iterative prompt engineering and validation rules</li>
-                    <li>Built scalable architecture handling 5x data volume growth without performance degradation</li>
-                </ul>
-            </div>
+  <!-- PROJECTS -->
+  <section id="projects">
+    <p class="section-label">§ 01 — systems built</p>
+    <h2 class="section-title">Projects</h2>
+    <p style="font-size:0.8rem; font-family:var(--mono); color:var(--gray); margin-bottom:1.5rem;">click any row to expand</p>
 
-            <div class="modal-section">
-                <h3>🛠️ Technology Stack</h3>
-                <div class="modal-tech-stack">
-                    <span class="modal-tech-item">GPT-4 API</span>
-                    <span class="modal-tech-item">Python</span>
-                    <span class="modal-tech-item">PostgreSQL</span>
-                    <span class="modal-tech-item">Apache Airflow</span>
-                    <span class="modal-tech-item">Tableau</span>
-                    <span class="modal-tech-item">Pandas</span>
-                    <span class="modal-tech-item">BeautifulSoup</span>
-                    <span class="modal-tech-item">REST APIs</span>
-                    <span class="modal-tech-item">Docker</span>
-                    <span class="modal-tech-item">Git/GitHub</span>
-                </div>
-            </div>
+    <div class="project-list">
 
-            <div class="modal-section">
-                <h3>📈 Business Impact</h3>
-                <p>
-                    Transformed portfolio management operations by automating data-intensive tasks, enabling investment teams to focus on strategic decision-making rather than manual data collection. The system now serves as the single source of truth for portfolio analytics, supporting quarterly board presentations and investment committee meetings.
-                </p>
-            </div>
+      <!-- P1 -->
+      <div class="project-entry" onclick="toggle(this)">
+        <div class="project-head">
+          <div class="project-left">
+            <div class="project-num">P.01</div>
+            <div class="project-name">Memory-Aware LLM Agent Framework</div>
+            <div class="project-blurb">Adaptive memory architecture for long-horizon dialogue agents — classifies turns into STORE / KEEP / DROP. Outperformed RAG, window, summary, and rule-based baselines across 75 dialogues in 15 domains.</div>
+          </div>
+          <div class="project-right">
+            <span class="project-status status-prod">Production-grade</span>
+            <div class="toggle-hint" style="margin-top:0.5rem; text-align:right;">+ expand</div>
+          </div>
         </div>
-    </div>
-
-    <!-- Modal for LLM-Powered Compliance Documentation -->
-    <div id="compliance-modal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'compliance-modal')">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-close" onclick="closeModal('compliance-modal')">×</div>
-            
-            <div class="modal-header">
-                <h2 class="modal-title">LLM-Powered Compliance Documentation System</h2>
-                <p class="modal-subtitle">AI-driven solution automating Standard Operating Procedure generation for medical device manufacturing with regulatory compliance</p>
-            </div>
-
-            <div class="modal-section">
-                <h3>🎯 Project Overview</h3>
-                <p>
-                    Developed an intelligent system that automatically generates compliant Standard Operating Procedures (SOPs) for medical device manufacturing, ensuring adherence to FDA guidelines and ISO 13485 standards. The solution fine-tunes GPT-4 and implements RAG architecture to produce documentation that meets stringent regulatory requirements.
-                </p>
-            </div>
-
-            <div class="modal-metrics">
-                <div class="modal-metric">
-                    <span class="modal-metric-value">91%</span>
-                    <span class="modal-metric-label">Regulatory Compliance Score</span>
-                </div>
-                <div class="modal-metric">
-                    <span class="modal-metric-value">5,000+</span>
-                    <span class="modal-metric-label">Technical Documents Processed</span>
-                </div>
-                <div class="modal-metric">
-                    <span class="modal-metric-value">80%</span>
-                    <span class="modal-metric-label">Faster Document Creation</span>
-                </div>
-            </div>
-
-            <div class="modal-section">
-                <h3>🔧 Technical Implementation</h3>
-                <ul>
-                    <li><strong>Fine-Tuned GPT-4 Model:</strong> Trained on 5,000+ technical documents including FDA guidelines, ISO 13485 standards, and existing compliant SOPs for domain-specific accuracy</li>
-                    <li><strong>RAG Architecture with FAISS:</strong> Implemented retrieval-augmented generation to ground responses in authoritative regulatory documents, ensuring compliance and accuracy</li>
-                    <li><strong>Quality Management Integration:</strong> Built production Flask web service with role-based authentication, version control, and approval workflows for enterprise deployment</li>
-                    <li><strong>Multi-Source Knowledge Base:</strong> Integrated FDA 21 CFR Part 820, ISO 13485, and company-specific quality procedures into a unified knowledge retrieval system</li>
-                    <li><strong>Structured Output Generation:</strong> Designed prompts and validation logic ensuring generated SOPs follow standardized formats with required sections and terminology</li>
-                </ul>
-            </div>
-
-            <div class="modal-section">
-                <h3>💡 Innovation & Approach</h3>
-                <ul>
-                    <li>Systematic evaluation of zero-shot, few-shot, and fine-tuned approaches using BLEU, ROUGE, and domain-specific compliance metrics</li>
-                    <li>Created comprehensive test suite with 200+ validation scenarios covering edge cases and regulatory requirements</li>
-                    <li>Achieved 91% regulatory compliance score through iterative prompt refinement and model fine-tuning</li>
-                    <li>Reduced SOP creation time from 8 hours to 90 minutes while maintaining quality and compliance</li>
-                </ul>
-            </div>
-
-            <div class="modal-section">
-                <h3>🛠️ Technology Stack</h3>
-                <div class="modal-tech-stack">
-                    <span class="modal-tech-item">GPT-4</span>
-                    <span class="modal-tech-item">Python</span>
-                    <span class="modal-tech-item">FAISS</span>
-                    <span class="modal-tech-item">LangChain</span>
-                    <span class="modal-tech-item">Flask</span>
-                    <span class="modal-tech-item">HuggingFace</span>
-                    <span class="modal-tech-item">NLP</span>
-                    <span class="modal-tech-item">PostgreSQL</span>
-                    <span class="modal-tech-item">Docker</span>
-                    <span class="modal-tech-item">API Development</span>
-                </div>
-            </div>
-
-            <div class="modal-section">
-                <h3>📊 Results & Impact</h3>
-                <p>
-                    Successfully deployed to production, serving quality management teams across multiple manufacturing sites. The system has generated over 150 compliant SOPs, passed two FDA audit cycles, and significantly reduced documentation burden on quality engineers. Now serves as the foundation for expanding automation to other controlled documents including work instructions and quality forms.
-                </p>
-            </div>
+        <div class="project-body">
+          <div class="p-section-label">outcomes</div>
+          <div class="p-metrics">
+            <div class="p-metric"><span class="pm-val">0.760</span><span class="pm-key">query accuracy (was 0.613)</span></div>
+            <div class="p-metric"><span class="pm-val">−64%</span><span class="pm-key">slot extraction failures vs rule-based</span></div>
+            <div class="p-metric"><span class="pm-val">+24pp</span><span class="pm-key">over RAG baseline</span></div>
+            <div class="p-metric"><span class="pm-val">75</span><span class="pm-key">dialogues evaluated</span></div>
+          </div>
+          <div class="p-section-label">approach</div>
+          <p style="font-size:0.88rem; color:var(--gray); line-height:1.65; margin-bottom:0.8rem;">
+            Designed a three-class memory classifier (STORE/KEEP/DROP) based on semantic relevance rather than recency. Compared against four baselines using standardized evaluation across 15 domains. Built reproducible eval pipeline with automated metrics and qualitative error analysis.
+          </p>
+          <div class="p-section-label">stack</div>
+          <div class="tag-list">
+            <span class="tag">Python</span><span class="tag">Claude API</span><span class="tag">LangChain</span>
+            <span class="tag">RAG</span><span class="tag">Prompt Engineering</span><span class="tag">Evaluation</span>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- Modal for Healthcare Knowledge Retrieval System -->
-    <div id="healthcare-modal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'healthcare-modal')">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-close" onclick="closeModal('healthcare-modal')">×</div>
-            
-            <div class="modal-header">
-                <h2 class="modal-title">Healthcare Knowledge Retrieval System</h2>
-                <p class="modal-subtitle">RAG-based intelligent assistant helping healthcare professionals access medical information with context-aware responses</p>
-            </div>
-
-            <div class="modal-section">
-                <h3>🎯 Project Overview</h3>
-                <p>
-                    Built a sophisticated RAG-based system that assists healthcare professionals in retrieving and understanding complex medical information. The system combines advanced document retrieval with natural language generation to provide accurate, context-aware responses from medical databases, clinical guidelines, and research papers.
-                </p>
-            </div>
-
-            <div class="modal-section">
-                <h3>🔧 System Architecture</h3>
-                <ul>
-                    <li><strong>Dual Retrieval System:</strong> Implemented both Elasticsearch for text-based search and FAISS for semantic similarity, providing comprehensive coverage across different query types</li>
-                    <li><strong>Transformer-Based Generation:</strong> Leveraged HuggingFace models (GPT-2, T5) fine-tuned on medical literature for generating accurate, concise responses that maintain clinical terminology</li>
-                    <li><strong>Multi-Source Integration:</strong> Unified access to medical guidelines (FDA, WHO), patient records, clinical recommendations, and peer-reviewed research papers</li>
-                    <li><strong>Context-Aware Processing:</strong> Built query understanding module that identifies medical entities, conditions, and procedures to improve retrieval relevance</li>
-                    <li><strong>Production Deployment:</strong> Dockerized application with Flask API and responsive web interface, supporting concurrent users with sub-3-second response times</li>
-                </ul>
-            </div>
-
-            <div class="modal-section">
-                <h3>💡 Key Features</h3>
-                <ul>
-                    <li>Semantic search across 100,000+ medical documents with multi-language support</li>
-                    <li>Real-time response generation with source attribution and confidence scores</li>
-                    <li>Medical entity recognition and disambiguation for improved query understanding</li>
-                    <li>Citation tracking linking responses back to source documents for verification</li>
-                    <li>Customizable response length and technical detail level based on user role (physician, nurse, researcher)</li>
-                </ul>
-            </div>
-
-            <div class="modal-section">
-                <h3>🛠️ Technology Stack</h3>
-                <div class="modal-tech-stack">
-                    <span class="modal-tech-item">Python</span>
-                    <span class="modal-tech-item">Elasticsearch</span>
-                    <span class="modal-tech-item">FAISS</span>
-                    <span class="modal-tech-item">HuggingFace Transformers</span>
-                    <span class="modal-tech-item">GPT-2</span>
-                    <span class="modal-tech-item">T5</span>
-                    <span class="modal-tech-item">Flask</span>
-                    <span class="modal-tech-item">Docker</span>
-                    <span class="modal-tech-item">RAG Architecture</span>
-                    <span class="modal-tech-item">NLP</span>
-                </div>
-            </div>
-
-            <div class="modal-section">
-                <h3>🧪 Technical Challenges</h3>
-                <ul>
-                    <li>Balanced retrieval precision and recall across diverse medical specialties</li>
-                    <li>Ensured generated responses maintain medical accuracy while being understandable</li>
-                    <li>Handled complex medical terminology with abbreviations, synonyms, and domain-specific language</li>
-                    <li>Optimized system performance for real-time responses while maintaining comprehensive search</li>
-                </ul>
-            </div>
-
-            <div class="modal-section">
-                <h3>📈 Use Cases & Applications</h3>
-                <p>
-                    Supports clinical decision-making by providing quick access to evidence-based guidelines, drug interactions, treatment protocols, and diagnostic criteria. Particularly valuable in time-sensitive situations where healthcare professionals need reliable information immediately. The system has been tested with medical students and practicing physicians, receiving positive feedback on accuracy and usability.
-                </p>
-            </div>
+      <!-- P2 -->
+      <div class="project-entry" onclick="toggle(this)">
+        <div class="project-head">
+          <div class="project-left">
+            <div class="project-num">P.02</div>
+            <div class="project-name">VLM Anomaly Detection — Published Research</div>
+            <div class="project-blurb">Evaluated WinCLIP and AnomalyCLIP on MVTec AD and VisA for visual anomaly classification and segmentation. Achieved 0.916 AUROC (classification) and 0.907 AUROC (segmentation). Full error analysis and qualitative failure inspection.</div>
+          </div>
+          <div class="project-right">
+            <span class="project-status status-research">Research / Published</span>
+            <div class="toggle-hint" style="margin-top:0.5rem; text-align:right;">+ expand</div>
+          </div>
         </div>
+        <div class="project-body">
+          <div class="p-section-label">outcomes</div>
+          <div class="p-metrics">
+            <div class="p-metric"><span class="pm-val">0.916</span><span class="pm-key">classification AUROC</span></div>
+            <div class="p-metric"><span class="pm-val">0.907</span><span class="pm-key">segmentation AUROC</span></div>
+            <div class="p-metric"><span class="pm-val">2</span><span class="pm-key">benchmark datasets (MVTec + VisA)</span></div>
+          </div>
+          <div class="p-section-label">approach</div>
+          <p style="font-size:0.88rem; color:var(--gray); line-height:1.65; margin-bottom:0.8rem;">
+            Zero-shot VLM evaluation with reproducible benchmark workflows. Dataset-level error analysis and qualitative failure inspection to compare multimodal model behavior and limitations across 15 object categories.
+          </p>
+          <div class="p-section-label">stack</div>
+          <div class="tag-list">
+            <span class="tag">PyTorch</span><span class="tag">Computer Vision</span><span class="tag">CLIP</span>
+            <span class="tag">VLM</span><span class="tag">Benchmarking</span><span class="tag">Error Analysis</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- P3 -->
+      <div class="project-entry" onclick="toggle(this)">
+        <div class="project-head">
+          <div class="project-left">
+            <div class="project-num">P.03</div>
+            <div class="project-name">Healthcare Knowledge Retrieval (RAG)</div>
+            <div class="project-blurb">Retrieval-augmented generation system for medical knowledge access. Improved answer correctness 25%, reduced hallucinations 18%, cut latency 22% through retrieval tuning and Docker deployment.</div>
+          </div>
+          <div class="project-right">
+            <span class="project-status status-prod">Deployed</span>
+            <div class="toggle-hint" style="margin-top:0.5rem; text-align:right;">+ expand</div>
+          </div>
+        </div>
+        <div class="project-body">
+          <div class="p-section-label">outcomes</div>
+          <div class="p-metrics">
+            <div class="p-metric"><span class="pm-val">+25%</span><span class="pm-key">answer correctness</span></div>
+            <div class="p-metric"><span class="pm-val">−18%</span><span class="pm-key">hallucinations</span></div>
+            <div class="p-metric"><span class="pm-val">−22%</span><span class="pm-key">end-to-end latency</span></div>
+          </div>
+          <div class="p-section-label">approach</div>
+          <p style="font-size:0.88rem; color:var(--gray); line-height:1.65; margin-bottom:0.8rem;">
+            Built embeddings pipeline with semantic search, chunking strategy tuning, and golden-question benchmarks. Compared chunking and retrieval approaches systematically. Dockerized for reproducible deployment.
+          </p>
+          <div class="p-section-label">stack</div>
+          <div class="tag-list">
+            <span class="tag">Python</span><span class="tag">RAG</span><span class="tag">FAISS</span>
+            <span class="tag">HuggingFace</span><span class="tag">Docker</span><span class="tag">Flask</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- P4 -->
+      <div class="project-entry" onclick="toggle(this)">
+        <div class="project-head">
+          <div class="project-left">
+            <div class="project-num">P.04</div>
+            <div class="project-name">Distributed Recommendation (PySpark)</div>
+            <div class="project-blurb">Distributed ALS recommendation engine on MovieLens 25M. 3.98× speedup by parallelizing across 8 cores on Slurm cluster. RMSE 0.8131, Precision@10 0.663.</div>
+          </div>
+          <div class="project-right">
+            <span class="project-status status-done">Completed</span>
+            <div class="toggle-hint" style="margin-top:0.5rem; text-align:right;">+ expand</div>
+          </div>
+        </div>
+        <div class="project-body">
+          <div class="p-section-label">outcomes</div>
+          <div class="p-metrics">
+            <div class="p-metric"><span class="pm-val">3.98×</span><span class="pm-key">training speedup</span></div>
+            <div class="p-metric"><span class="pm-val">129s→32s</span><span class="pm-key">wall-clock time</span></div>
+            <div class="p-metric"><span class="pm-val">0.8131</span><span class="pm-key">RMSE</span></div>
+            <div class="p-metric"><span class="pm-val">25M</span><span class="pm-key">ratings, 162K users</span></div>
+          </div>
+          <div class="p-section-label">stack</div>
+          <div class="tag-list">
+            <span class="tag">PySpark</span><span class="tag">Spark MLlib</span><span class="tag">ALS</span>
+            <span class="tag">Slurm</span><span class="tag">Distributed Systems</span><span class="tag">SQL</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- P5 -->
+      <div class="project-entry" onclick="toggle(this)">
+        <div class="project-head">
+          <div class="project-left">
+            <div class="project-num">P.05</div>
+            <div class="project-name">GPU Benchmarking — P100 / V100 / H100</div>
+            <div class="project-blurb">ResNet-50 training profiled across three NVIDIA GPU generations using NVIDIA Nsight. Quantified CUDA kernel execution, memory utilization, host-device transfers, and synchronization overhead.</div>
+          </div>
+          <div class="project-right">
+            <span class="project-status status-research">Research</span>
+            <div class="toggle-hint" style="margin-top:0.5rem; text-align:right;">+ expand</div>
+          </div>
+        </div>
+        <div class="project-body">
+          <div class="p-section-label">outcomes</div>
+          <div class="p-metrics">
+            <div class="p-metric"><span class="pm-val">−70%</span><span class="pm-key">training time H100 vs P100</span></div>
+            <div class="p-metric"><span class="pm-val">3</span><span class="pm-key">GPU generations compared</span></div>
+            <div class="p-metric"><span class="pm-val">3</span><span class="pm-key">datasets (ImageNet, COCO, CIFAR)</span></div>
+          </div>
+          <div class="p-section-label">stack</div>
+          <div class="tag-list">
+            <span class="tag">PyTorch</span><span class="tag">CUDA</span><span class="tag">NVIDIA Nsight</span>
+            <span class="tag">HPC</span><span class="tag">GPU Profiling</span><span class="tag">Benchmarking</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- P6 -->
+      <div class="project-entry" onclick="toggle(this)">
+        <div class="project-head">
+          <div class="project-left">
+            <div class="project-num">P.06</div>
+            <div class="project-name">Robotic Manipulation Policy (RL + CV)</div>
+            <div class="project-blurb">PyTorch reinforcement learning policies for robot pick-and-place in simulation. CNN-based perception pipeline improved action prediction consistency 22% on unseen scenarios.</div>
+          </div>
+          <div class="project-right">
+            <span class="project-status status-done">Completed</span>
+            <div class="toggle-hint" style="margin-top:0.5rem; text-align:right;">+ expand</div>
+          </div>
+        </div>
+        <div class="project-body">
+          <div class="p-section-label">outcomes</div>
+          <div class="p-metrics">
+            <div class="p-metric"><span class="pm-val">+22%</span><span class="pm-key">action prediction consistency</span></div>
+            <div class="p-metric"><span class="pm-val">CNN</span><span class="pm-key">perception pipeline</span></div>
+          </div>
+          <div class="p-section-label">stack</div>
+          <div class="tag-list">
+            <span class="tag">PyTorch</span><span class="tag">Reinforcement Learning</span><span class="tag">Computer Vision</span>
+            <span class="tag">Simulation</span><span class="tag">CNN</span><span class="tag">Data Augmentation</span>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </section>
 
-    <script>
-        // Modal Functions
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <p class="section-label">§ 02 — work</p>
+    <h2 class="section-title">Experience</h2>
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
+    <div class="exp-list">
+      <div class="exp-item reveal">
+        <div class="exp-date">
+          <span class="exp-year">2025–now</span>
+          Feb 2025 – Present
+        </div>
+        <div class="exp-content">
+          <h3>Research Assistant</h3>
+          <div class="exp-company">Northeastern University · Boston, MA</div>
+          <ul class="exp-bullets">
+            <li>Built Python/Linux telemetry pipelines processing 10M+ system records using Darshan, LDMS, and OVIS across AWS EC2 and HPC environments</li>
+            <li>Developed automated data ingestion, validation, and monitoring workflows for I/O benchmarks and ML workloads — improved reliability by 30%</li>
+            <li>Analyzed distributed workload telemetry to identify I/O bottlenecks, temporal anomalies, and performance regressions across large-scale systems</li>
+            <li>Presented evaluation findings and performance analyses to research collaborators through scorecards and visualizations</li>
+          </ul>
+        </div>
+      </div>
 
-        function closeModalOnOverlay(event, modalId) {
-            if (event.target.classList.contains('modal-overlay')) {
-                closeModal(modalId);
-            }
-        }
+      <div class="exp-item reveal">
+        <div class="exp-date">
+          <span class="exp-year">2024</span>
+          Dec 2023 – Apr 2024
+        </div>
+        <div class="exp-content">
+          <h3>Python Development Intern</h3>
+          <div class="exp-company">TecUnique Pvt. Ltd. · Vadodara, India</div>
+          <ul class="exp-bullets">
+            <li>Built reusable Pytest automation for API/UI validation across GET, POST, PUT, PATCH, DELETE workflows with structured reports</li>
+            <li>Optimized SQL query execution and numerical pipelines, reducing runtime by 20% across production-style workflows</li>
+            <li>Improved engineering reliability through validation checks, Git-based version control, Linux tooling, and containerized workflows</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        // Close modal on ESC key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay.active').forEach(modal => {
-                    modal.classList.remove('active');
-                    document.body.style.overflow = 'auto';
-                });
-            }
-        });
+  <!-- SKILLS -->
+  <section id="skills">
+    <p class="section-label">§ 03 — technical stack</p>
+    <h2 class="section-title">Skills</h2>
 
-        // Neural Network Background Animation
-        const canvas = document.getElementById('neuralCanvas');
-        const ctx = canvas.getContext('2d');
+    <table class="skills-table reveal">
+      <tr>
+        <td>Languages</td>
+        <td>
+          <div class="skill-chips">
+            <span class="chip">Python</span><span class="chip">SQL</span><span class="chip">C++</span><span class="chip">Bash</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>AI / LLMs</td>
+        <td>
+          <div class="skill-chips">
+            <span class="chip">LLMs</span><span class="chip">RAG</span><span class="chip">Prompt Engineering</span>
+            <span class="chip">Agentic Systems</span><span class="chip">Memory Architectures</span>
+            <span class="chip">Embeddings</span><span class="chip">OpenAI API</span><span class="chip">Claude API</span>
+            <span class="chip">LangChain</span><span class="chip">HuggingFace</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>ML / CV</td>
+        <td>
+          <div class="skill-chips">
+            <span class="chip">PyTorch</span><span class="chip">TensorFlow</span><span class="chip">scikit-learn</span>
+            <span class="chip">Computer Vision</span><span class="chip">NLP</span><span class="chip">Transformers</span>
+            <span class="chip">Reinforcement Learning</span><span class="chip">Fine-Tuning</span><span class="chip">Evaluation Pipelines</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>MLOps / Infra</td>
+        <td>
+          <div class="skill-chips">
+            <span class="chip">Docker</span><span class="chip">AWS EC2</span><span class="chip">MLflow</span>
+            <span class="chip">CI/CD</span><span class="chip">Linux</span><span class="chip">Git</span>
+            <span class="chip">Experiment Tracking</span><span class="chip">Drift Monitoring</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>HPC / Systems</td>
+        <td>
+          <div class="skill-chips">
+            <span class="chip">PySpark</span><span class="chip">Slurm</span><span class="chip">Darshan</span>
+            <span class="chip">LDMS</span><span class="chip">NVIDIA Nsight</span><span class="chip">CUDA concepts</span>
+            <span class="chip">GPU Profiling</span><span class="chip">Parallel Computing</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Data</td>
+        <td>
+          <div class="skill-chips">
+            <span class="chip">Pandas</span><span class="chip">NumPy</span><span class="chip">PostgreSQL</span>
+            <span class="chip">Statistical Analysis</span><span class="chip">Benchmarking</span><span class="chip">Error Analysis</span>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </section>
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+  <!-- EDUCATION -->
+  <section id="education">
+    <p class="section-label">§ 04 — education</p>
+    <h2 class="section-title">Education</h2>
 
-        const particles = [];
-        const particleCount = 100;
-        const connectionDistance = 120;
+    <div class="edu-list">
+      <div class="edu-item reveal">
+        <div class="edu-year">
+          <strong>May 2026</strong>
+          Northeastern Univ.
+        </div>
+        <div class="edu-content">
+          <h3>M.S. Electrical & Computer Engineering</h3>
+          <div class="edu-school">Northeastern University · Boston, MA</div>
+          <span class="gpa-badge">GPA 3.9 / 4.0</span>
+          <div class="edu-detail">
+            Concentration: Machine Learning, Computer Vision, Algorithms<br>
+            Coursework: Advanced ML, Advanced Computer Vision, MLOps, High Performance Computing, Parallel Processing for Data Analytics<br>
+            Leadership: IEEE Workshop Coordinator (Spring 2025) · Global Student Mentor (GSM Fall 2024)
+          </div>
+        </div>
+      </div>
 
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 0.4;
-                this.vy = (Math.random() - 0.5) * 0.4;
-                this.radius = Math.random() * 1.5 + 0.5;
-            }
+      <div class="edu-item reveal">
+        <div class="edu-year">
+          <strong>May 2024</strong>
+          G.H. Patel CoE
+        </div>
+        <div class="edu-content">
+          <h3>B.E. Electronics & Communication Engineering</h3>
+          <div class="edu-school">G H Patel College of Engineering · Anand, India</div>
+          <span class="gpa-badge">GPA 3.7 / 4.0</span>
+          <div class="edu-detail">
+            Relevant: Digital Image Processing, Information Theory, IoT, Python for Engineers<br>
+            Leadership: ISTE Documentation Head (2022–23) · IDEA Lab Co-Ambassador · TEDx Volunteer
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
+  <!-- CONTACT -->
+  <section id="contact">
+    <p class="section-label">§ 05 — reach out</p>
+    <h2 class="section-title">Let's talk.</h2>
 
-                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-            }
+    <p class="contact-blurb">
+      Looking for roles in <strong>AI engineering, ML engineering, forward deployed engineering, or SWE infra</strong> — anywhere in the US. I relocate. I ship on Day 1. If you're building something hard, let's talk.
+    </p>
 
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(192, 132, 252, 0.5)';
-                ctx.fill();
-            }
-        }
+    <div class="contact-grid">
+      <a href="mailto:patel.utt@northeastern.edu" class="contact-cell">
+        <div class="contact-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div>
+          <div class="c-label">email</div>
+          <div class="c-val">patel.utt@northeastern.edu</div>
+        </div>
+      </a>
+      <a href="tel:+16179619251" class="contact-cell">
+        <div class="contact-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 15a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.59 4.11h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 11.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 18.92z"/></svg>
+        </div>
+        <div>
+          <div class="c-label">phone</div>
+          <div class="c-val">(617) 961-9251</div>
+        </div>
+      </a>
+      <a href="https://www.linkedin.com/in/uttapreksha-patel/" target="_blank" class="contact-cell">
+        <div class="contact-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </div>
+        <div>
+          <div class="c-label">linkedin</div>
+          <div class="c-val">uttapreksha-patel ↗</div>
+        </div>
+      </a>
+      <a href="https://github.com/Uttaprexa" target="_blank" class="contact-cell">
+        <div class="contact-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        </div>
+        <div>
+          <div class="c-label">github</div>
+          <div class="c-val">Uttaprexa ↗</div>
+        </div>
+      </a>
+    </div>
+  </section>
+</div>
 
-        for (let i = 0; i < particleCount; i++) {
-            particles.push(new Particle());
-        }
+<footer>
+  <p>Uttapreksha Patel · Boston, MA · May 2026</p>
+  <p>Built with <a href="https://github.com/Uttaprexa">code</a> · <a href="mailto:patel.utt@northeastern.edu">hire me</a></p>
+</footer>
 
-        function animate() {
-            ctx.fillStyle = 'rgba(10, 14, 26, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+<script>
+  // Build log animation
+  window.addEventListener('load', () => {
+    const lines = document.querySelectorAll('.log-line');
+    lines.forEach(line => {
+      const delay = parseInt(line.dataset.delay) || 0;
+      setTimeout(() => line.classList.add('visible'), delay);
+    });
+  });
 
-            particles.forEach(particle => {
-                particle.update();
-                particle.draw();
-            });
+  // Project toggle
+  function toggle(el) {
+    const wasOpen = el.classList.contains('open');
+    document.querySelectorAll('.project-entry.open').forEach(e => {
+      e.classList.remove('open');
+      e.querySelector('.toggle-hint').textContent = '+ expand';
+    });
+    if (!wasOpen) {
+      el.classList.add('open');
+      el.querySelector('.toggle-hint').textContent = '− collapse';
+    }
+  }
 
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
+  // Scroll reveal
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in-view'); });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-                    if (distance < connectionDistance) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = `rgba(192, 132, 252, ${0.2 * (1 - distance / connectionDistance)})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-
-            requestAnimationFrame(animate);
-        }
-
-        animate();
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-
-        // Navbar scroll effect
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // Smooth scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // Intersection Observer for fade-in animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        // Observe all sections
-        document.querySelectorAll('.section, .project-card, .timeline-item, .education-card').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(el);
-        });
-    </script>
+  // Nav scroll effect
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    nav.style.boxShadow = window.scrollY > 20
+      ? '0 1px 12px rgba(0,0,0,0.06)'
+      : 'none';
+  });
+</script>
 </body>
 </html>
