@@ -166,7 +166,7 @@ h1 em { font-style: normal; color: var(--teal); }
   margin-bottom: 4px;
   letter-spacing: -.03em;
 }
-.hstat:first-child .hstat-val { font-size: 1.1rem; color: white; line-height: 1.5; font-family: var(--body); font-weight: 300; }
+
 .hstat-label { font-size: 10px; color: rgba(255,255,255,.35); letter-spacing: .08em; text-transform: uppercase; font-family: var(--mono); }
 
 /* ── SECTION SHARED ──────────────────────────── */
@@ -426,7 +426,7 @@ footer a { color: var(--teal); text-decoration: none; }
     <div class="hero-eyebrow">AI Engineer · May 2026 · Open to Relocate</div>
     <h1>Ships.<br><em>Evaluates.</em><br>Repeats.</h1>
     <p class="hero-desc">
-      I build production AI end-to-end, clinical pipelines, agentic systems, eval harnesses, RL post-training from scratch. <strong>Every system I ship has benchmarks.</strong> Every improvement is measured before it's merged. I don't wait to feel ready.
+      I build production AI end-to-end — clinical pipelines, agentic systems, eval harnesses, RL post-training from scratch. <strong>Every system I ship has benchmarks.</strong> Every improvement is measured before it's merged. I don't wait to feel ready.
     </p>
     <div class="hero-actions">
       <a href="mailto:patel.utt@northeastern.edu" class="btn-primary">Get in touch</a>
@@ -438,13 +438,13 @@ footer a { color: var(--teal); text-decoration: none; }
 
   <div class="hero-right">
     <div class="hero-stat-block">
-      <div class="hstat">
-        <div class="hstat-val">"I built an eval harness to catch hallucinations. Then it caught one; just not the one I expected."</div>
-        <div class="hstat-label" style="margin-top:12px">— from her Medium, on the clinical intake pipeline</div>
+      <div class="hstat" style="grid-column:1/-1">
+        <div class="hstat-val">90.6%</div>
+        <div class="hstat-label">extraction accuracy · clinical intake · Llama 3.1 8B</div>
       </div>
       <div class="hstat">
         <div class="hstat-val">0.916</div>
-        <div class="hstat-label">AUROC · arXiv published</div>
+        <div class="hstat-label">AUROC · arXiv</div>
       </div>
       <div class="hstat">
         <div class="hstat-val">3.9</div>
@@ -515,9 +515,9 @@ footer a { color: var(--teal); text-decoration: none; }
   <div class="projects-grid reveal">
 
     <div class="project-card">
-      <div class="proj-tag"><span class="proj-tag-pill">RL · From Scratch</span></div>
+      <div class="proj-tag"><span class="proj-tag-pill">RL · From Scratch · Open Source</span></div>
       <div class="proj-name">GRPO-LLM: RL Post-Training Framework</div>
-      <p class="proj-desc">Implemented GRPO from scratch without wrapping TRL — group-relative advantage estimation, KL-divergence penalty, clipped surrogate objective. Built sandboxed RL execution environment with subprocess isolation, memory limits, and timeouts. Identified reward sparsity as the core online RL bottleneck at small model scale through controlled 300-iteration ablation.</p>
+      <p class="proj-desc">Implemented GRPO from scratch without wrapping TRL — group-relative advantage estimation, KL-divergence penalty, clipped surrogate objective. Built sandboxed RL execution environment with subprocess isolation, memory limits, and timeouts to prevent environment failures from corrupting training. Identified reward sparsity as the core online RL bottleneck at small model scale through controlled 300-iteration ablation. Open-sourced with full AWS logs and blog documenting every engineering decision.</p>
       <div class="proj-metrics">
         <span class="proj-metric">DPO <span class="mv">29.5%</span></span>
         <span class="proj-metric">GRPO <span class="mv">28.5%</span></span>
@@ -525,14 +525,14 @@ footer a { color: var(--teal); text-decoration: none; }
         <span class="proj-metric">C++ speedup <span class="mv">1.7×</span></span>
         <span class="proj-metric">tests <span class="mv">25</span></span>
       </div>
-      <div class="proj-stack">PyTorch · GRPO · PPO · DPO · FSDP · Trio · Kubernetes · C++/pybind11 · AWS</div>
-      <a href="https://github.com/Uttaprexa" target="_blank" class="proj-link">GitHub ↗</a>
+      <div class="proj-stack">PyTorch · GRPO · PPO · DPO · FSDP · Trio · Kubernetes · C++/pybind11 · AWS · GSM8K</div>
+      <a href="https://github.com/Uttaprexa/grpo-llm" target="_blank" class="proj-link">GitHub ↗</a>
     </div>
 
     <div class="project-card">
       <div class="proj-tag"><span class="proj-tag-pill">LLM Agent · Evals</span></div>
-      <div class="proj-name">Full-Loop LLM Agent with Eval Framework</div>
-      <p class="proj-desc">LangGraph-orchestrated agent with tool use, adaptive memory classification, multi-step state management, guardrails, and fallback logic. Built evaluation framework from scratch: LLM-as-judge graders, regression tests catching regressions before deployment, failure mode taxonomy distinguishing policy violations from capability gaps.</p>
+      <div class="proj-name">Adaptive Long-Term Memory for LLM Agents</div>
+      <p class="proj-desc">Adaptive long-term memory for LLM dialogue agents using structured key-value slots with both rule-based and LLM-based selectors. LangGraph-orchestrated agent with tool use, adaptive memory classification (STORE/KEEP/DROP), multi-step state management, guardrails, and fallback logic. Evaluation framework built from scratch: LLM-as-judge graders, regression tests catching regressions before deployment, failure mode taxonomy distinguishing policy violations from capability gaps.</p>
       <div class="proj-metrics">
         <span class="proj-metric">accuracy <span class="mv">0.613→0.760</span></span>
         <span class="proj-metric">failures <span class="mv">−64%</span></span>
@@ -540,7 +540,7 @@ footer a { color: var(--teal); text-decoration: none; }
         <span class="proj-metric">dialogues <span class="mv">75</span></span>
       </div>
       <div class="proj-stack">Python · Claude API · OpenAI API · LangGraph · LangChain · RAG · FAISS · FastAPI · Docker</div>
-      <a href="https://github.com/Uttaprexa" target="_blank" class="proj-link">GitHub ↗</a>
+      <a href="https://github.com/Uttaprexa/adaptive-long-term-memory-llm-agents" target="_blank" class="proj-link">GitHub ↗</a>
     </div>
 
     <div class="project-card">
@@ -570,29 +570,45 @@ footer a { color: var(--teal); text-decoration: none; }
     </div>
 
     <div class="project-card">
-      <div class="proj-tag"><span class="proj-tag-pill">HPC · Data Pipeline</span></div>
-      <div class="proj-name">HPC Telemetry Pipeline — Sandia National Labs</div>
-      <p class="proj-desc">Deployed LDMS telemetry infrastructure across AWS EC2 and Explorer HPC cluster at 1-second collection intervals. Diagnosed and resolved critical buffer overflow failures. Quantified I/O contention: CPU interference reduced write bandwidth 95% (477→20 MB/s), memory interference 98.9% (4266→46 MB/s).</p>
+      <div class="proj-tag"><span class="proj-tag-pill">Data Engineering · MLOps</span></div>
+      <div class="proj-name">Climate & Time-Series Data Pipeline</div>
+      <p class="proj-desc">Production-style Python data pipeline ingesting real Boston weather data from two REST APIs (CSV + JSON formats). Cleans, validates, and aggregates 336 hourly records into 14 daily summaries, saves as Apache Parquet. Automated drift monitoring watchdog with 4 checks: completeness (±5% record count), schema drift detection via set operations, Z-score statistical drift vs saved JSON baseline, and domain-specific threshold alerts. Separate pipeline.log and monitor.log. Scheduled hourly via scheduler.py.</p>
       <div class="proj-metrics">
-        <span class="proj-metric">records <span class="mv">1M+</span></span>
-        <span class="proj-metric">reliability <span class="mv">+30%</span></span>
-        <span class="proj-metric">events <span class="mv">8 detected</span></span>
-        <span class="proj-metric">BW loss <span class="mv">95%</span></span>
+        <span class="proj-metric">monitoring checks <span class="mv">4</span></span>
+        <span class="proj-metric">schedule <span class="mv">hourly</span></span>
+        <span class="proj-metric">format <span class="mv">Parquet</span></span>
+        <span class="proj-metric">sources <span class="mv">2 APIs</span></span>
       </div>
-      <div class="proj-stack">Python · LDMS · Darshan · AWS EC2 · HPC · Slurm · Anomaly Detection</div>
+      <div class="proj-stack">Python · Pandas · NumPy · PyArrow · Parquet · Open-Meteo API · Z-score drift · Airflow (prod)</div>
+      <a href="https://github.com/Uttaprexa/climate-data-pipeline" target="_blank" class="proj-link">GitHub ↗</a>
+    </div>
+
+    <div class="project-card">
+      <div class="proj-tag"><span class="proj-tag-pill">Multimodal AI · MLOps · Team Project</span></div>
+      <div class="proj-name">PitchQuest: Multimodal Pitch Analysis</div>
+      <p class="proj-desc">End-to-end multimodal AI platform analyzing pitch presentations across content, delivery, and visual performance. Integrates 5 foundation models in parallel: Whisper (transcription), Wav2Vec2 (speech emotion), MediaPipe (pose), DeepFace (facial emotion), SmolVLM-500M fine-tuned on 500-1,000 labeled pitch deck slides via LoRA. FastAPI backend with Next.js frontend. Automated MLOps pipeline with Weights & Biases tracking, Evidently AI drift detection, and retraining triggered at 100 feedback corrections.</p>
+      <div class="proj-metrics">
+        <span class="proj-metric">latency <span class="mv">&lt;2 min</span></span>
+        <span class="proj-metric">agreement <span class="mv">85%+</span></span>
+        <span class="proj-metric">models <span class="mv">5</span></span>
+        <span class="proj-metric">presented <span class="mv">Google, Cambridge</span></span>
+      </div>
+      <div class="proj-stack">PyTorch · Whisper · Wav2Vec2 · MediaPipe · DeepFace · SmolVLM · LoRA · FastAPI · Next.js · W&B</div>
+      <a href="https://github.com/harshitashitut/MLOps-Project" target="_blank" class="proj-link">GitHub ↗</a>
     </div>
 
     <div class="project-card">
       <div class="proj-tag"><span class="proj-tag-pill">Distributed ML</span></div>
-      <div class="proj-name">Distributed Recommendation Engine (PySpark)</div>
-      <p class="proj-desc">ALS collaborative filtering on MovieLens 25M — 25M ratings, 162K users, 59K movies. Tuned parallelism, partition strategy, and executor memory across 1-8 cores. Analyzed scaling behavior to identify shuffle overhead bottlenecks.</p>
+      <div class="proj-name">Scalable Product Recommendation — PySpark</div>
+      <p class="proj-desc">ALS collaborative filtering on MovieLens 25M — 25M ratings, 162K users, 59K movies. Tuned parallelism, partition strategy, and executor memory across 1-8 cores on HPC cluster. Analyzed scaling behavior to identify shuffle overhead bottlenecks. Designed SQL-style transformations, schema validation, and feature engineering workflows with automated scaling tests confirming reproducibility.</p>
       <div class="proj-metrics">
         <span class="proj-metric">speedup <span class="mv">3.98×</span></span>
         <span class="proj-metric">time <span class="mv">129s→32s</span></span>
         <span class="proj-metric">RMSE <span class="mv">0.8131</span></span>
         <span class="proj-metric">P@10 <span class="mv">0.663</span></span>
       </div>
-      <div class="proj-stack">PySpark · Spark MLlib · ALS · Slurm · SQL · HPC</div>
+      <div class="proj-stack">PySpark · Spark MLlib · ALS · Slurm · SQL · HPC · Airflow</div>
+      <a href="https://github.com/Uttaprexa/Scalable-Product-Recommendation-System-using-PySpark" target="_blank" class="proj-link">GitHub ↗</a>
     </div>
 
   </div>
@@ -783,9 +799,9 @@ footer a { color: var(--teal); text-decoration: none; }
 // TICKER
 const ticks = [
   ['extraction_acc', '90.6%'],
-  ['hallucinations_caught', 'unexpected · summarization stage'],
+  ['hallucination_stage_found', 'summarization · unexpected'],
   ['query_accuracy', '0.613 → 0.760'],
-  ['failures_reduced', '−64%'],
+  ['agent_failures', '−64%'],
   ['AUROC_published', '0.916'],
   ['seg_AUROC', '0.907'],
   ['distributed_speedup', '3.98×'],
@@ -793,13 +809,17 @@ const ticks = [
   ['records_pipeline', '1M+'],
   ['reliability', '+30%'],
   ['BW_loss_detected', '95% (477→20 MB/s)'],
-  ['GRPO_vs_DPO', '28.5% vs 29.5%'],
+  ['GRPO_GSM8K', '28.5%'],
   ['C++_speedup', '1.7×'],
   ['rag_correctness', '+25%'],
-  ['rag_latency', '−22%'],
   ['rag_hallucinations', '−18%'],
+  ['rag_latency', '−22%'],
+  ['drift_checks', '4 · hourly'],
+  ['pitch_latency', '<2 min · 10-min video'],
+  ['pitch_human_agreement', '85%+'],
+  ['models_integrated', '5 foundation models'],
   ['GPA', '3.9/4.0'],
-  ['presented_at', 'Google Office, Cambridge'],
+  ['presented_at', 'Google Office · Cambridge'],
 ];
 
 const track = document.getElementById('ticker');
