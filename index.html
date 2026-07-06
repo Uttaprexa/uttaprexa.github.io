@@ -92,13 +92,13 @@ nav {
 
 /* ── HERO ────────────────────────────────────── */
 .hero {
-  padding: 80px 40px 72px;
-  max-width: 1240px;
+  padding: 80px 48px 72px;
+  max-width: 1160px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 240px 260px;
-  gap: 28px;
-  align-items: end;
+  grid-template-columns: 1fr 340px;
+  gap: 56px;
+  align-items: center;
   border-bottom: 1px solid var(--rule);
 }
 .hero-eyebrow {
@@ -143,25 +143,27 @@ h1 em { font-style: normal; color: var(--teal); }
 }
 .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
 
-/* hero photo */
-.hero-photo-wrap {
-  position: relative;
-  padding-bottom: 8px;
+/* hero right */
+.hero-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
+.hero-photo-wrap { }
 .hero-photo {
   width: 100%;
-  aspect-ratio: 3/4;
+  height: 220px;
   object-fit: cover;
-  object-position: center top;
+  object-position: center 20%;
   display: block;
   border-radius: 3px;
-  filter: grayscale(15%);
+  filter: grayscale(10%);
 }
 .hero-photo-caption {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 10px;
+  margin-top: 8px;
   font-family: var(--mono);
   font-size: 10px;
   color: var(--teal);
@@ -175,16 +177,13 @@ h1 em { font-style: normal; color: var(--teal); }
   background: var(--teal);
   flex-shrink: 0;
 }
-
-/* hero right */
-.hero-right { padding-bottom: 8px; }
 .hero-stat-block {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 1px;
-  background: var(--border);
+  background: var(--rule);
   border: 1px solid var(--rule);
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: hidden;
 }
 .hstat {
@@ -416,7 +415,6 @@ footer a { color: var(--teal); text-decoration: none; }
 /* ── RESPONSIVE ──────────────────────────────── */
 @media(max-width:1024px) {
   .hero { grid-template-columns: 1fr; }
-  .hero-photo-wrap { display: none; }
   .hero-right { display: none; }
   .featured-card { grid-template-columns: 1fr; }
   .skills-grid { grid-template-columns: repeat(2,1fr); }
@@ -475,20 +473,19 @@ footer a { color: var(--teal); text-decoration: none; }
     </div>
   </div>
 
-  <div class="hero-photo-wrap">
-    <img
-      src="https://uttaprexa.github.io/google.png"
-      alt="Uttapreksha at Northeastern × Google Innovation Day, Cambridge"
-      class="hero-photo"
-    >
-    <div class="hero-photo-caption">NEU × Google · Cambridge · Dec 2024</div>
-  </div>
-
   <div class="hero-right">
+    <div class="hero-photo-wrap">
+      <img
+        src="https://uttaprexa.github.io/google.png"
+        alt="Uttapreksha at NEU × Google Innovation Day, Cambridge"
+        class="hero-photo"
+      >
+      <div class="hero-photo-caption">NEU × Google · Cambridge · 2025</div>
+    </div>
     <div class="hero-stat-block">
       <div class="hstat">
         <div class="hstat-val">90.6%</div>
-        <div class="hstat-label">extraction acc · clinical AI</div>
+        <div class="hstat-label">extraction acc</div>
       </div>
       <div class="hstat">
         <div class="hstat-val">0.916</div>
@@ -504,7 +501,7 @@ footer a { color: var(--teal); text-decoration: none; }
       </div>
       <div class="hstat">
         <div class="hstat-val">3.98×</div>
-        <div class="hstat-label">distributed speedup</div>
+        <div class="hstat-label">speedup</div>
       </div>
       <div class="hstat">
         <div class="hstat-val">−64%</div>
@@ -680,31 +677,33 @@ footer a { color: var(--teal); text-decoration: none; }
       <div class="exp-date">
         <strong>2025 — now</strong>
         Feb 2025 – Present<br>
-        <span style="color:var(--teal);font-size:10px;margin-top:6px;display:block">Sandia National Laboratories collaboration</span>
+        <span style="color:var(--teal);font-size:10px;margin-top:6px;display:block">In collaboration with<br>Sandia National Laboratories</span>
       </div>
       <div>
-        <div class="exp-role">Research Assistant — ML Systems & Pipeline Engineering</div>
+        <div class="exp-role">Research Assistant — HPC Systems & ML Workload Analysis</div>
         <div class="exp-org">Northeastern University · Boston, MA</div>
         <ul class="exp-bullets">
-          <li>Deployed LDMS telemetry infrastructure across AWS EC2 and Explorer HPC cluster at 1-second collection intervals; diagnosed and resolved critical buffer overflow failures, traced to root cause, shipped fix, confirmed stability</li>
-          <li>Built Python analysis pipelines processing <strong>1M+ operation records</strong> with automated anomaly detection, temporal overlap analysis, and structured logging; identified 8 resource contention events with sub-second precision</li>
-          <li>Quantified I/O contention: CPU interference reduced write bandwidth <strong>95%</strong> (477→20 MB/s), memory interference <strong>98.9%</strong> (4266→46 MB/s)</li>
-          <li>Communicated findings to Sandia National Laboratories stakeholders via scorecards and technical documentation; findings directly informed strategic operational decisions</li>
+          <li>Deployed and configured <strong>LDMS (Lightweight Distributed Metric Service)</strong> telemetry infrastructure using aggregator-sampler daemon architecture across AWS EC2 and Northeastern's Explorer HPC cluster — collecting system-level metrics (memory bandwidth, CPU utilization, I/O throughput) at <strong>1-second intervals</strong> across distributed compute nodes, in collaboration with Sandia National Laboratories</li>
+          <li>Instrumented HPC workloads (<strong>IOR, VPIC, Darshan</strong>) to capture per-operation I/O traces, bandwidth utilization, and compute-to-memory ratios — built Python analysis pipelines processing <strong>1M+ telemetry records</strong> to identify I/O bottlenecks, temporal anomalies, and performance regressions; identified <strong>8 resource contention events with sub-second precision</strong></li>
+          <li>Quantified I/O interference through controlled experiments: CPU interference reduced write bandwidth <strong>95%</strong> (477→20 MB/s); memory interference reduced bandwidth <strong>98.9%</strong> (4266→46 MB/s); diagnosed and resolved critical LDMS <strong>buffer overflow failures</strong> through memory allocation tuning, restoring stable metric collection across multi-node environments</li>
+          <li>Deployed containerized ML workloads (miniGAN) via <strong>Docker on AWS EC2</strong>, building monitoring scripts to track performance metrics; improved pipeline reliability by <strong>30%</strong> through automated validation and structured logging</li>
+          <li>Produced workload characterization reports, performance scorecards, and technical documentation communicating bottleneck analysis and infrastructure findings to collaborators at Northeastern and <strong>Sandia National Laboratories</strong>; findings directly informed strategic operational decisions</li>
         </ul>
       </div>
     </div>
 
     <div class="exp-item reveal">
       <div class="exp-date">
-        <strong>2024</strong>
+        <strong>2023 — 2024</strong>
         Dec 2023 – Apr 2024
       </div>
       <div>
         <div class="exp-role">Python Development Intern</div>
         <div class="exp-org">TecUnique Pvt. Ltd. · Vadodara, India</div>
         <ul class="exp-bullets">
-          <li>Built Python REST API testing framework using Pytest achieving <strong>93% pass rate</strong> across 30 test cases; automated end-to-end validation with structured HTML/XML reports and bearer token authentication</li>
-          <li>Optimized SQL queries and numerical pipelines, <strong>reducing runtime 20%</strong>; managed source code in Git/Agile/Scrum with JIRA</li>
+          <li>Built a complete <strong>Python REST API test automation framework</strong> from scratch using Pytest for the Spectra product — automated end-to-end validation across GET, POST, PUT, PATCH, and DELETE endpoints with <strong>93% pass rate across 30 test cases</strong>; implemented bearer token authentication and structured HTML/XML test reports</li>
+          <li>Built <strong>data-driven test suites</strong> reading inputs from Excel and JSON files, enabling parameterized testing across multiple modules including ingest, discovery, and schema validation; implemented regression tracking to catch regressions before each release</li>
+          <li>Reduced manual testing from days to hours; managed source code with Git in an Agile/Scrum environment with JIRA — first production-quality Python codebase built entirely from scratch and relied on by the engineering team</li>
         </ul>
       </div>
     </div>
