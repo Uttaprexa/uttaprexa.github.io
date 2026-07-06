@@ -92,15 +92,50 @@ nav {
 
 /* ── HERO ────────────────────────────────────── */
 .hero {
-  padding: 40px 48px 56px;
   max-width: 1160px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 36px;
-  align-items: start;
+  padding: 0 48px;
   border-bottom: 1px solid var(--rule);
 }
+.hero-top {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 40px;
+  align-items: start;
+  padding: 48px 0 40px;
+  border-bottom: 1px solid var(--rule);
+}
+.hero-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+  padding: 40px 0 56px;
+}
+.hero-name {
+  font-family: var(--body);
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -.04em;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+.hero-headline-col h1 {
+  font-family: var(--body);
+  font-size: clamp(2.8rem, 5.5vw, 5rem);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -.04em;
+  color: var(--ink);
+  margin: 0;
+}
+.hero-headline-col h1 em {
+  font-style: normal;
+  color: var(--teal);
+}
+.hero-photo-col { }
+.hero-metrics-col { }
 .hero-eyebrow {
   font-family: var(--mono);
   font-size: 11px; color: var(--teal);
@@ -118,6 +153,7 @@ h1 {
   color: var(--ink);
   margin-bottom: 20px;
 }
+h1 em { font-style: normal; color: var(--teal); }
 h1 em { font-style: normal; color: var(--teal); }
 .hero-desc {
   font-size: 15px; color: var(--gray);
@@ -143,12 +179,8 @@ h1 em { font-style: normal; color: var(--teal); }
 }
 .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
 
-/* hero right */
-.hero-right {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+/* hero right (legacy) */
+.hero-right { display: flex; flex-direction: column; gap: 12px; }
 .hero-photo-wrap { }
 .hero-photo {
   width: 100%;
@@ -412,15 +444,20 @@ footer a { color: var(--teal); text-decoration: none; }
 
 /* ── RESPONSIVE ──────────────────────────────── */
 @media(max-width:1024px) {
-  .hero { grid-template-columns: 1fr; }
-  .hero-right { display: none; }
+  .hero-top { grid-template-columns: 1fr; }
+  .hero-bottom { grid-template-columns: 1fr; }
+  .hero-photo-col { display: none; }
   .featured-card { grid-template-columns: 1fr; }
   .skills-grid { grid-template-columns: repeat(2,1fr); }
 }
 @media(max-width:768px) {
   nav { padding: 0 20px; }
   .nav-links { display: none; }
-  .hero, .section { padding-left: 20px; padding-right: 20px; }
+  .hero { padding-left: 20px; padding-right: 20px; }
+  .section { padding-left: 20px; padding-right: 20px; }
+  .hero-top { grid-template-columns: 1fr; }
+  .hero-bottom { grid-template-columns: 1fr; }
+  .hero-photo-col { display: none; }
   .projects-grid { grid-template-columns: 1fr; }
   .exp-item { grid-template-columns: 1fr; gap: 8px; }
   .skills-grid { grid-template-columns: 1fr; }
@@ -457,22 +494,26 @@ footer a { color: var(--teal); text-decoration: none; }
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-left">
-    <div class="hero-eyebrow">AI Engineer · May 2026 · Open to Relocate</div>
-    <h1>Ships. <em>Evaluates.</em> Repeats.</h1>
-    <p class="hero-desc">
-      AI Engineer graduating May 2026 from Northeastern (GPA 3.9). I build production AI systems end-to-end and evaluate them rigorously — <strong>clinical intake pipelines, LLM agents, RL post-training from scratch, RAG systems, HPC infrastructure.</strong> Published on arXiv. Collaborated with Sandia National Labs. Presented at Google. Open to relocate anywhere.
-    </p>
-    <div class="hero-actions">
-      <a href="mailto:patel.utt@northeastern.edu" class="btn-primary">Get in touch</a>
-      <a href="https://github.com/Uttaprexa" target="_blank" class="btn-ghost">GitHub ↗</a>
-      <a href="https://linkedin.com/in/uttapreksha-patel" target="_blank" class="btn-ghost">LinkedIn ↗</a>
-      <a href="https://medium.com/@uttapreksha24" target="_blank" class="btn-ghost">Writing ↗</a>
-    </div>
-  </div>
 
-  <div class="hero-right">
-    <div class="hero-photo-wrap">
+  <!-- TOP ROW: name/bio left | photo right -->
+  <div class="hero-top">
+    <div class="hero-bio-col">
+      <div class="hero-eyebrow">AI Engineer · May 2026 · Open to Relocate</div>
+      <div class="hero-name">Uttapreksha<br>Patel</div>
+      <p class="hero-desc">
+        I build production AI systems end-to-end and evaluate them rigorously —
+        <strong>clinical pipelines, LLM agents, RL post-training, RAG systems, HPC infrastructure.</strong>
+        Published on arXiv. Collaborated with Sandia National Labs. Presented at Google.
+        M.S. ECE Northeastern, GPA 3.9. Open to relocate anywhere.
+      </p>
+      <div class="hero-actions">
+        <a href="mailto:patel.utt@northeastern.edu" class="btn-primary">Get in touch</a>
+        <a href="https://github.com/Uttaprexa" target="_blank" class="btn-ghost">GitHub ↗</a>
+        <a href="https://linkedin.com/in/uttapreksha-patel" target="_blank" class="btn-ghost">LinkedIn ↗</a>
+        <a href="https://medium.com/@uttapreksha24" target="_blank" class="btn-ghost">Writing ↗</a>
+      </div>
+    </div>
+    <div class="hero-photo-col">
       <img
         src="https://uttaprexa.github.io/google.png"
         alt="Uttapreksha at NEU × Google Innovation Day, Cambridge"
@@ -480,33 +521,43 @@ footer a { color: var(--teal); text-decoration: none; }
       >
       <div class="hero-photo-caption">NEU × Google · Cambridge · 2025</div>
     </div>
-    <div class="hero-stat-block">
-      <div class="hstat">
-        <div class="hstat-label">Clinical AI extraction</div>
-        <div class="hstat-val">90.6%</div>
-      </div>
-      <div class="hstat">
-        <div class="hstat-label">VLM paper AUROC</div>
-        <div class="hstat-val">0.916</div>
-      </div>
-      <div class="hstat">
-        <div class="hstat-label">GPA at Northeastern</div>
-        <div class="hstat-val">3.9 / 4.0</div>
-      </div>
-      <div class="hstat">
-        <div class="hstat-label">HPC pipeline records</div>
-        <div class="hstat-val">1M+</div>
-      </div>
-      <div class="hstat">
-        <div class="hstat-label">Distributed speedup</div>
-        <div class="hstat-val">3.98×</div>
-      </div>
-      <div class="hstat">
-        <div class="hstat-label">LLM agent failures</div>
-        <div class="hstat-val">−64%</div>
+  </div>
+
+  <!-- BOTTOM ROW: headline left | metrics right -->
+  <div class="hero-bottom">
+    <div class="hero-headline-col">
+      <h1>Ships.<br><em>Evaluates.</em><br>Repeats.</h1>
+    </div>
+    <div class="hero-metrics-col">
+      <div class="hero-stat-block">
+        <div class="hstat">
+          <div class="hstat-label">Clinical AI extraction</div>
+          <div class="hstat-val">90.6%</div>
+        </div>
+        <div class="hstat">
+          <div class="hstat-label">VLM AUROC · arXiv</div>
+          <div class="hstat-val">0.916</div>
+        </div>
+        <div class="hstat">
+          <div class="hstat-label">GPA · Northeastern</div>
+          <div class="hstat-val">3.9 / 4.0</div>
+        </div>
+        <div class="hstat">
+          <div class="hstat-label">HPC records / run</div>
+          <div class="hstat-val">1M+</div>
+        </div>
+        <div class="hstat">
+          <div class="hstat-label">Distributed speedup</div>
+          <div class="hstat-val">3.98×</div>
+        </div>
+        <div class="hstat">
+          <div class="hstat-label">LLM agent failures</div>
+          <div class="hstat-val">−64%</div>
+        </div>
       </div>
     </div>
   </div>
+
 </div>
 
 <!-- FEATURED PROJECT -->
