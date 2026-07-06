@@ -69,8 +69,8 @@ nav {
   display: flex; align-items: center; justify-content: space-between;
 }
 .nav-logo {
-  font-family: var(--display);
-  font-size: 15px; font-weight: 700;
+  font-family: var(--body);
+  font-size: 17px; font-weight: 700;
   color: var(--ink); text-decoration: none;
   letter-spacing: -.02em;
 }
@@ -188,11 +188,11 @@ h1 em { font-style: normal; color: var(--teal); }
 }
 .hstat {
   background: #111;
-  padding: 12px 10px;
+  padding: 12px 12px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  min-height: 72px;
+  justify-content: space-between;
+  min-height: 76px;
 }
 
 .hstat-val {
@@ -204,7 +204,7 @@ h1 em { font-style: normal; color: var(--teal); }
   white-space: nowrap;
 }
 
-.hstat-label { font-size: 9px; color: rgba(255,255,255,.35); letter-spacing: .06em; text-transform: uppercase; font-family: var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hstat-label { font-size: 9px; color: rgba(255,255,255,.4); letter-spacing: .05em; text-transform: uppercase; font-family: var(--mono); line-height: 1.3; margin-bottom: 4px; }
 
 /* ── SECTION SHARED ──────────────────────────── */
 .section { max-width: 1160px; margin: 0 auto; padding: 80px 48px; border-bottom: 1px solid var(--rule); }
@@ -463,7 +463,7 @@ footer a { color: var(--teal); text-decoration: none; }
     <div class="hero-eyebrow">AI Engineer · May 2026 · Open to Relocate</div>
     <h1>Ships. <em>Evaluates.</em> Repeats.</h1>
     <p class="hero-desc">
-      I build production AI end-to-end — clinical pipelines, agentic systems, eval harnesses, RL post-training from scratch. <strong>Every system I ship has benchmarks.</strong> Every improvement is measured before it's merged. I don't wait to feel ready.
+      AI Engineer graduating May 2026 from Northeastern (GPA 3.9). I build production AI systems end-to-end and evaluate them rigorously — <strong>clinical intake pipelines, LLM agents, RL post-training from scratch, RAG systems, HPC telemetry infrastructure.</strong> Published researcher. Collaborated with Sandia National Labs. Presented at Google. Open to relocate anywhere.
     </p>
     <div class="hero-actions">
       <a href="mailto:patel.utt@northeastern.edu" class="btn-primary">Get in touch</a>
@@ -484,28 +484,28 @@ footer a { color: var(--teal); text-decoration: none; }
     </div>
     <div class="hero-stat-block">
       <div class="hstat">
+        <div class="hstat-label">Clinical AI extraction</div>
         <div class="hstat-val">90.6%</div>
-        <div class="hstat-label">extraction acc</div>
       </div>
       <div class="hstat">
+        <div class="hstat-label">VLM paper AUROC</div>
         <div class="hstat-val">0.916</div>
-        <div class="hstat-label">AUROC · arXiv</div>
       </div>
       <div class="hstat">
-        <div class="hstat-val">3.9</div>
-        <div class="hstat-label">GPA / 4.0</div>
+        <div class="hstat-label">GPA at Northeastern</div>
+        <div class="hstat-val">3.9 / 4.0</div>
       </div>
       <div class="hstat">
+        <div class="hstat-label">HPC pipeline records</div>
         <div class="hstat-val">1M+</div>
-        <div class="hstat-label">records / pipeline</div>
       </div>
       <div class="hstat">
+        <div class="hstat-label">Distributed speedup</div>
         <div class="hstat-val">3.98×</div>
-        <div class="hstat-label">speedup</div>
       </div>
       <div class="hstat">
+        <div class="hstat-label">LLM agent failures</div>
         <div class="hstat-val">−64%</div>
-        <div class="hstat-label">agent failures</div>
       </div>
     </div>
   </div>
