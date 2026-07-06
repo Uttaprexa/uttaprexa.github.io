@@ -92,38 +92,37 @@ nav {
 
 /* ── HERO ────────────────────────────────────── */
 .hero {
-  padding: 80px 48px 72px;
+  padding: 52px 48px 64px;
   max-width: 1160px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 300px;
   gap: 40px;
-  align-items: center;
+  align-items: start;
   border-bottom: 1px solid var(--rule);
 }
 .hero-eyebrow {
   font-family: var(--mono);
   font-size: 11px; color: var(--teal);
   letter-spacing: .12em; text-transform: uppercase;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
   display: flex; align-items: center; gap: 8px;
 }
 .hero-eyebrow::before { content: ''; display: block; width: 24px; height: 1px; background: var(--teal); }
 h1 {
   font-family: var(--body);
-  font-size: clamp(2.8rem, 5vw, 4.2rem);
+  font-size: clamp(2rem, 3.8vw, 3.6rem);
   font-weight: 800;
-  line-height: 1.0;
-  letter-spacing: -.04em;
+  line-height: 1.05;
+  letter-spacing: -.03em;
   color: var(--ink);
-  margin-bottom: 24px;
-  white-space: nowrap;
+  margin-bottom: 20px;
 }
 h1 em { font-style: normal; color: var(--teal); }
 .hero-desc {
-  font-size: 17px; color: var(--gray);
-  line-height: 1.75; max-width: 520px;
-  margin-bottom: 36px;
+  font-size: 15px; color: var(--gray);
+  line-height: 1.7; max-width: 480px;
+  margin-bottom: 28px;
 }
 .hero-desc strong { color: var(--ink); font-weight: 500; }
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -153,7 +152,9 @@ h1 em { font-style: normal; color: var(--teal); }
 .hero-photo-wrap { }
 .hero-photo {
   width: 100%;
-  height: auto;
+  height: 340px;
+  object-fit: cover;
+  object-position: center 30%;
   display: block;
   border-radius: 3px;
   filter: grayscale(10%);
