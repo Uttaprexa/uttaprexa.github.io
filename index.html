@@ -96,8 +96,8 @@ nav {
   max-width: 1160px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 64px;
+  grid-template-columns: 1fr 280px 320px;
+  gap: 48px;
   align-items: end;
   border-bottom: 1px solid var(--rule);
 }
@@ -142,6 +142,39 @@ h1 em { font-style: normal; color: var(--teal); }
   font-family: var(--body);
 }
 .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+
+/* hero photo */
+.hero-photo-wrap {
+  position: relative;
+  padding-bottom: 8px;
+}
+.hero-photo {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  border-radius: 3px;
+  filter: grayscale(15%);
+}
+.hero-photo-caption {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--teal);
+  letter-spacing: .06em;
+}
+.hero-photo-caption::before {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 1px;
+  background: var(--teal);
+  flex-shrink: 0;
+}
 
 /* hero right */
 .hero-right { padding-bottom: 8px; }
@@ -383,6 +416,7 @@ footer a { color: var(--teal); text-decoration: none; }
 /* ── RESPONSIVE ──────────────────────────────── */
 @media(max-width:1024px) {
   .hero { grid-template-columns: 1fr; }
+  .hero-photo-wrap { display: none; }
   .hero-right { display: none; }
   .featured-card { grid-template-columns: 1fr; }
   .skills-grid { grid-template-columns: repeat(2,1fr); }
@@ -439,6 +473,15 @@ footer a { color: var(--teal); text-decoration: none; }
       <a href="https://linkedin.com/in/uttapreksha-patel" target="_blank" class="btn-ghost">LinkedIn ↗</a>
       <a href="https://medium.com/@uttapreksha24" target="_blank" class="btn-ghost">Writing ↗</a>
     </div>
+  </div>
+
+  <div class="hero-photo-wrap">
+    <img
+      src="https://uttaprexa.github.io/google.png"
+      alt="Uttapreksha at Northeastern × Google Innovation Day, Cambridge"
+      class="hero-photo"
+    >
+    <div class="hero-photo-caption">NEU × Google · Cambridge · Dec 2024</div>
   </div>
 
   <div class="hero-right">
