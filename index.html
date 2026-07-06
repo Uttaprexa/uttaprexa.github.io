@@ -110,13 +110,14 @@ nav {
 }
 .hero-eyebrow::before { content: ''; display: block; width: 24px; height: 1px; background: var(--teal); }
 h1 {
-  font-family: var(--display);
-  font-size: clamp(2.4rem, 4.5vw, 4rem);
+  font-family: var(--body);
+  font-size: clamp(2.8rem, 5vw, 4.2rem);
   font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -.03em;
+  line-height: 1.0;
+  letter-spacing: -.04em;
   color: var(--ink);
   margin-bottom: 24px;
+  white-space: nowrap;
 }
 h1 em { font-style: normal; color: var(--teal); }
 .hero-desc {
@@ -459,7 +460,7 @@ footer a { color: var(--teal); text-decoration: none; }
 <div class="hero">
   <div class="hero-left">
     <div class="hero-eyebrow">AI Engineer · May 2026 · Open to Relocate</div>
-    <h1>Ships.<br><em>Evaluates.</em><br>Repeats.</h1>
+    <h1>Ships. <em>Evaluates.</em> Repeats.</h1>
     <p class="hero-desc">
       I build production AI end-to-end — clinical pipelines, agentic systems, eval harnesses, RL post-training from scratch. <strong>Every system I ship has benchmarks.</strong> Every improvement is measured before it's merged. I don't wait to feel ready.
     </p>
