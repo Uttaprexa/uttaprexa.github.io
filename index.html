@@ -102,7 +102,7 @@ nav {
   grid-template-columns: 1fr 300px;
   gap: 40px;
   align-items: start;
-  padding: 48px 0 40px;
+  padding: 40px 0 28px;
   border-bottom: 1px solid var(--rule);
 }
 .hero-bottom {
@@ -110,22 +110,23 @@ nav {
   grid-template-columns: 1fr 1fr;
   gap: 40px;
   align-items: center;
-  padding: 40px 0 56px;
+  padding: 28px 0 48px;
 }
 .hero-name {
   font-family: var(--body);
-  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
   font-weight: 800;
-  line-height: 1.0;
-  letter-spacing: -.04em;
+  line-height: 1.05;
+  letter-spacing: -.03em;
   color: var(--ink);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  white-space: nowrap;
 }
 .hero-headline-col h1 {
   font-family: var(--body);
-  font-size: clamp(2.8rem, 5.5vw, 5rem);
+  font-size: clamp(3rem, 5.5vw, 5.4rem);
   font-weight: 800;
-  line-height: 1.0;
+  line-height: 0.95;
   letter-spacing: -.04em;
   color: var(--ink);
   margin: 0;
@@ -481,7 +482,7 @@ footer a { color: var(--teal); text-decoration: none; }
 
 <!-- NAV -->
 <nav>
-  <a href="#" class="nav-logo">Uttapreksha Patel</a>
+  <a href="#" class="nav-logo">UP<span style="color:var(--teal)">.</span></a>
   <ul class="nav-links">
     <li><a href="#work">Work</a></li>
     <li><a href="#projects">Projects</a></li>
@@ -847,8 +848,8 @@ footer a { color: var(--teal); text-decoration: none; }
   <div class="writing-grid reveal">
     <a href="https://medium.com/@uttapreksha24/i-built-a-clinical-intake-ai-pipeline-and-my-eval-harness-caught-a-hallucination-i-didnt-expect-b67ed732eb8b" target="_blank" class="article-card">
       <div class="article-tag">Clinical AI · Evals · Latest</div>
-      <div class="article-title">I Built a Clinical Intake AI Pipeline And My Eval Harness Caught a Hallucination I Didn't Expect</div>
-      <p class="article-desc">Built an eval harness to catch AI hallucinations in a clinical documentation pipeline. Then it caught one — just not the one expected. A story about what evals actually reveal.</p>
+      <div class="article-title">I Built a Clinical Intake AI Pipeline; Then Found the Blind Spot in My Own Eval Harness</div>
+      <p class="article-desc">Built a 6-step clinical pipeline with an eval harness designed to catch hallucinations. Llama 3.1 8B scored 90.6% extraction accuracy — but inferred a patient's age and gender from their name. The harness missed it. Finding that blind spot was more useful than a clean 100% would have been.</p>
     </a>
     <a href="https://medium.com/@uttapreksha24" target="_blank" class="article-card">
       <div class="article-tag">RL · Open Source</div>
