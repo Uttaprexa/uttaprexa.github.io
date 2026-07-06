@@ -146,28 +146,33 @@ h1 em { font-style: normal; color: var(--teal); }
 /* hero right */
 .hero-right { padding-bottom: 8px; }
 .hero-stat-block {
-  background: var(--ink);
-  padding: 32px;
-  border-radius: 4px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1px;
-  background: var(--ink);
+  background: var(--border);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
 }
 .hstat {
-  background: #151515;
-  padding: 20px;
+  background: #111;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 96px;
 }
 
 .hstat-val {
   font-family: var(--display);
-  font-size: 2.2rem; font-weight: 800;
+  font-size: 1.7rem; font-weight: 800;
   color: var(--teal); line-height: 1;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   letter-spacing: -.03em;
+  white-space: nowrap;
 }
 
-.hstat-label { font-size: 10px; color: rgba(255,255,255,.35); letter-spacing: .08em; text-transform: uppercase; font-family: var(--mono); }
+.hstat-label { font-size: 9px; color: rgba(255,255,255,.35); letter-spacing: .06em; text-transform: uppercase; font-family: var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ── SECTION SHARED ──────────────────────────── */
 .section { max-width: 1160px; margin: 0 auto; padding: 80px 48px; border-bottom: 1px solid var(--rule); }
