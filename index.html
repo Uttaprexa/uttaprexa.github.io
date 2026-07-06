@@ -502,7 +502,7 @@ footer a { color: var(--teal); text-decoration: none; }
       <div class="hero-eyebrow">AI Engineer · May 2026 · Open to Relocate</div>
       <div class="hero-name">Uttapreksha<br>Patel</div>
       <p class="hero-desc">
-        I build production AI systems end-to-end and evaluate them rigorously —
+        I build production AI systems end-to-end and evaluate them rigorously,
         <strong>clinical pipelines, LLM agents, RL post-training, RAG systems, HPC infrastructure.</strong>
         Published on arXiv. Collaborated with Sandia National Labs. Presented at Google.
         M.S. ECE Northeastern, GPA 3.9. Open to relocate anywhere.
@@ -658,7 +658,7 @@ footer a { color: var(--teal); text-decoration: none; }
     <div class="project-card">
       <div class="proj-tag"><span class="proj-tag-pill">Research · Published</span></div>
       <div class="proj-name">VLM Anomaly Detection — arXiv 2026</div>
-      <p class="proj-desc">Co-authored paper evaluating WinCLIP and AnomalyCLIP on MVTec AD and VisA benchmarks across 15 object categories. Designed reproducible evaluation pipelines with systematic failure mode analysis — chased down dataset-level failure patterns rather than reporting aggregate metrics.</p>
+      <p class="proj-desc">Co-authored paper evaluating WinCLIP and AnomalyCLIP on MVTec AD and VisA benchmarks across 15 object categories. Designed reproducible evaluation pipelines with systematic failure mode analysis, chased down dataset-level failure patterns rather than reporting aggregate metrics.</p>
       <div class="proj-metrics">
         <span class="proj-metric">cls AUROC <span class="mv">0.916</span></span>
         <span class="proj-metric">seg AUROC <span class="mv">0.907</span></span>
@@ -746,7 +746,7 @@ footer a { color: var(--teal); text-decoration: none; }
         <div class="exp-org">Northeastern University · Boston, MA</div>
         <ul class="exp-bullets">
           <li>Deployed and configured <strong>LDMS (Lightweight Distributed Metric Service)</strong> telemetry infrastructure using aggregator-sampler daemon architecture across AWS EC2 and Northeastern's Explorer HPC cluster — collecting system-level metrics (memory bandwidth, CPU utilization, I/O throughput) at <strong>1-second intervals</strong> across distributed compute nodes, in collaboration with Sandia National Laboratories</li>
-          <li>Instrumented HPC workloads (<strong>IOR, VPIC, Darshan</strong>) to capture per-operation I/O traces, bandwidth utilization, and compute-to-memory ratios — built Python analysis pipelines processing <strong>1M+ telemetry records</strong> to identify I/O bottlenecks, temporal anomalies, and performance regressions; identified <strong>8 resource contention events with sub-second precision</strong></li>
+          <li>Instrumented HPC workloads (<strong>IOR, VPIC, Darshan</strong>) to capture per-operation I/O traces, bandwidth utilization, and compute-to-memory ratios, built Python analysis pipelines processing <strong>1M+ telemetry records</strong> to identify I/O bottlenecks, temporal anomalies, and performance regressions; identified <strong>8 resource contention events with sub-second precision</strong></li>
           <li>Quantified I/O interference through controlled experiments: CPU interference reduced write bandwidth <strong>95%</strong> (477→20 MB/s); memory interference reduced bandwidth <strong>98.9%</strong> (4266→46 MB/s); diagnosed and resolved critical LDMS <strong>buffer overflow failures</strong> through memory allocation tuning, restoring stable metric collection across multi-node environments</li>
           <li>Deployed containerized ML workloads (miniGAN) via <strong>Docker on AWS EC2</strong>, building monitoring scripts to track performance metrics; improved pipeline reliability by <strong>30%</strong> through automated validation and structured logging</li>
           <li>Produced workload characterization reports, performance scorecards, and technical documentation communicating bottleneck analysis and infrastructure findings to collaborators at Northeastern and <strong>Sandia National Laboratories</strong>; findings directly informed strategic operational decisions</li>
@@ -763,9 +763,9 @@ footer a { color: var(--teal); text-decoration: none; }
         <div class="exp-role">Python Development Intern</div>
         <div class="exp-org">TecUnique Pvt. Ltd. · Vadodara, India</div>
         <ul class="exp-bullets">
-          <li>Built a complete <strong>Python REST API test automation framework</strong> from scratch using Pytest for the Spectra product — automated end-to-end validation across GET, POST, PUT, PATCH, and DELETE endpoints with <strong>93% pass rate across 30 test cases</strong>; implemented bearer token authentication and structured HTML/XML test reports</li>
+          <li>Built a complete <strong>Python REST API test automation framework</strong> from scratch using Pytest for the Spectra product, automated end-to-end validation across GET, POST, PUT, PATCH, and DELETE endpoints with <strong>93% pass rate across 30 test cases</strong>; implemented bearer token authentication and structured HTML/XML test reports</li>
           <li>Built <strong>data-driven test suites</strong> reading inputs from Excel and JSON files, enabling parameterized testing across multiple modules including ingest, discovery, and schema validation; implemented regression tracking to catch regressions before each release</li>
-          <li>Reduced manual testing from days to hours; managed source code with Git in an Agile/Scrum environment with JIRA — first production-quality Python codebase built entirely from scratch and relied on by the engineering team</li>
+          <li>Reduced manual testing from days to hours; managed source code with Git in an Agile/Scrum environment with JIRA, first production-quality Python codebase built entirely from scratch and relied on by the engineering team</li>
         </ul>
       </div>
     </div>
@@ -851,7 +851,7 @@ footer a { color: var(--teal); text-decoration: none; }
       <div class="article-title">I Built a Clinical Intake AI Pipeline; Then Found the Blind Spot in My Own Eval Harness</div>
       <p class="article-desc">Built a 6-step clinical pipeline with an eval harness designed to catch hallucinations. Llama 3.1 8B scored 90.6% extraction accuracy — but inferred a patient's age and gender from their name. The harness missed it. Finding that blind spot was more useful than a clean 100% would have been.</p>
     </a>
-    <a href="https://medium.com/@uttapreksha24" target="_blank" class="article-card">
+    <a href="https://medium.com/@uttapreksha24/grpo-vs-ppo-vs-dpo-on-gsm8k-what-i-learned-building-rl-training-from-scratch-f47701c637b9" target="_blank" class="article-card">
       <div class="article-tag">RL · Open Source</div>
       <div class="article-title">GRPO from Scratch: Engineering Decisions, Reward Sparsity, and What the Ablation Revealed</div>
       <p class="article-desc">Every engineering decision in the GRPO implementation documented. Why reward sparsity is a failure mode models cannot self-correct. Full AWS logs, reproducible configs.</p>
