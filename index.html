@@ -111,12 +111,12 @@ nav {
 .hero-eyebrow::before { content: ''; display: block; width: 24px; height: 1px; background: var(--teal); }
 h1 {
   font-family: var(--display);
-  font-size: clamp(3rem, 6vw, 5.5rem);
+  font-size: clamp(2.4rem, 4.5vw, 4rem);
   font-weight: 800;
-  line-height: .95;
-  letter-spacing: -.04em;
+  line-height: 1.05;
+  letter-spacing: -.03em;
   color: var(--ink);
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 h1 em { font-style: normal; color: var(--teal); }
 .hero-desc {
@@ -194,11 +194,11 @@ h1 em { font-style: normal; color: var(--teal); }
 }
 
 .hstat-val {
-  font-family: var(--display);
-  font-size: 1.25rem; font-weight: 800;
+  font-family: var(--mono);
+  font-size: 1.1rem; font-weight: 700;
   color: var(--teal); line-height: 1;
-  margin-bottom: 4px;
-  letter-spacing: -.02em;
+  margin-bottom: 5px;
+  letter-spacing: 0;
   white-space: nowrap;
 }
 
@@ -631,6 +631,18 @@ footer a { color: var(--teal); text-decoration: none; }
     </div>
 
     <div class="project-card">
+      <div class="proj-tag"><span class="proj-tag-pill">Robotics · CV · RL</span></div>
+      <div class="proj-name">Robotic Manipulation Policy Learning</div>
+      <p class="proj-desc">Developed PyTorch-based deep learning policies for object interaction and pick-and-place manipulation tasks using visual state representations and simulated environments. Trained CNN-based perception models that compress camera images into state vectors feeding a policy network predicting robot actions. Trained with behaviour cloning on augmented multi-object datasets with reproducible training, inference, temporal state evaluation, batch training, and policy validation workflows.</p>
+      <div class="proj-metrics">
+        <span class="proj-metric">action consistency <span class="mv">+22%</span></span>
+        <span class="proj-metric">unseen scenarios <span class="mv">generalizes</span></span>
+        <span class="proj-metric">training <span class="mv">behaviour cloning</span></span>
+      </div>
+      <div class="proj-stack">PyTorch · CNN · Reinforcement Learning · Simulation · Data Augmentation · Policy Gradient</div>
+    </div>
+
+    <div class="project-card">
       <div class="proj-tag"><span class="proj-tag-pill">Multimodal AI · MLOps · Team Project</span></div>
       <div class="proj-name">PitchQuest: Multimodal Pitch Analysis</div>
       <p class="proj-desc">End-to-end multimodal AI platform analyzing pitch presentations across content, delivery, and visual performance. Integrates 5 foundation models in parallel: Whisper (transcription), Wav2Vec2 (speech emotion), MediaPipe (pose), DeepFace (facial emotion), SmolVLM-500M fine-tuned on 500-1,000 labeled pitch deck slides via LoRA. FastAPI backend with Next.js frontend. Automated MLOps pipeline with Weights & Biases tracking, Evidently AI drift detection, and retraining triggered at 100 feedback corrections.</p>
@@ -717,41 +729,53 @@ footer a { color: var(--teal); text-decoration: none; }
     </div>
   </div>
 
-  <div class="skills-grid reveal">
-    <div class="skill-group">
-      <div class="skill-group-label">AI / LLMs / Agents</div>
-      <div class="skill-tags">
-        <span class="skill-tag">LangChain</span><span class="skill-tag">LangGraph</span><span class="skill-tag">Claude API</span><span class="skill-tag">OpenAI API</span><span class="skill-tag">RAG</span><span class="skill-tag">FAISS</span><span class="skill-tag">Agentic Pipelines</span><span class="skill-tag">Tool Use</span><span class="skill-tag">Guardrails</span><span class="skill-tag">Prompt Engineering</span>
-      </div>
-    </div>
-    <div class="skill-group">
-      <div class="skill-group-label">Evals / RL / Research</div>
-      <div class="skill-tags">
-        <span class="skill-tag">GRPO</span><span class="skill-tag">PPO</span><span class="skill-tag">DPO</span><span class="skill-tag">RLHF</span><span class="skill-tag">LLM-as-Judge</span><span class="skill-tag">Eval Harness Design</span><span class="skill-tag">Failure Mode Analysis</span><span class="skill-tag">Sandboxed RL Envs</span><span class="skill-tag">Ablations</span>
-      </div>
-    </div>
-    <div class="skill-group">
-      <div class="skill-group-label">ML / CV / Multimodal</div>
-      <div class="skill-tags">
-        <span class="skill-tag">PyTorch</span><span class="skill-tag">TensorFlow</span><span class="skill-tag">Transformers</span><span class="skill-tag">FSDP</span><span class="skill-tag">VLMs</span><span class="skill-tag">Whisper</span><span class="skill-tag">Wav2Vec2</span><span class="skill-tag">CLIP</span><span class="skill-tag">SmolVLM</span><span class="skill-tag">MLflow</span>
-      </div>
-    </div>
-    <div class="skill-group">
-      <div class="skill-group-label">Infrastructure / MLOps</div>
-      <div class="skill-tags">
-        <span class="skill-tag">Docker</span><span class="skill-tag">Kubernetes</span><span class="skill-tag">AWS EC2</span><span class="skill-tag">CI/CD</span><span class="skill-tag">FastAPI</span><span class="skill-tag">Celery</span><span class="skill-tag">Redis</span><span class="skill-tag">PostgreSQL</span><span class="skill-tag">Linux</span><span class="skill-tag">Git</span>
-      </div>
-    </div>
-    <div class="skill-group">
-      <div class="skill-group-label">HPC / Distributed</div>
-      <div class="skill-tags">
-        <span class="skill-tag">PySpark</span><span class="skill-tag">Slurm</span><span class="skill-tag">Darshan</span><span class="skill-tag">LDMS</span><span class="skill-tag">NVIDIA Nsight</span><span class="skill-tag">CUDA</span><span class="skill-tag">Trio (async)</span><span class="skill-tag">C++/pybind11</span>
-      </div>
-    </div>
+  <div class="skills-grid reveal" style="grid-template-columns:repeat(2,1fr)">
     <div class="skill-group">
       <div class="skill-group-label">Languages</div>
       <div class="skill-tags">
-        <span class="skill-tag">Python</span><span class="skill-tag">TypeScript</span><span class="skill-tag">JavaScript</span><span class="skill-tag">React</span><span class="skill-tag">C++</span><span class="skill-tag">SQL</span><span class="skill-tag">Bash</span>
+        <span class="skill-tag">Python (OOP, PEP8)</span><span class="skill-tag">TypeScript</span><span class="skill-tag">JavaScript</span><span class="skill-tag">C++ (pybind11)</span><span class="skill-tag">SQL</span><span class="skill-tag">Bash</span><span class="skill-tag">CUDA</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-label">AI / LLMs / Agents</div>
+      <div class="skill-tags">
+        <span class="skill-tag">LangChain</span><span class="skill-tag">LangGraph</span><span class="skill-tag">Claude API</span><span class="skill-tag">OpenAI API</span><span class="skill-tag">Llama</span><span class="skill-tag">RAG</span><span class="skill-tag">FAISS</span><span class="skill-tag">Embeddings</span><span class="skill-tag">Vector Search</span><span class="skill-tag">Agentic Pipelines</span><span class="skill-tag">Tool Use</span><span class="skill-tag">Adaptive Memory</span><span class="skill-tag">Guardrails</span><span class="skill-tag">Fallback Logic</span><span class="skill-tag">Prompt Engineering</span><span class="skill-tag">Few-Shot</span><span class="skill-tag">Chain-of-Thought</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-label">ML / Deep Learning / CV</div>
+      <div class="skill-tags">
+        <span class="skill-tag">PyTorch</span><span class="skill-tag">TensorFlow / Keras</span><span class="skill-tag">scikit-learn</span><span class="skill-tag">Transformers</span><span class="skill-tag">FSDP</span><span class="skill-tag">CNNs</span><span class="skill-tag">RNNs</span><span class="skill-tag">Computer Vision</span><span class="skill-tag">NLP</span><span class="skill-tag">Fine-Tuning</span><span class="skill-tag">LoRA</span><span class="skill-tag">Model Evaluation</span><span class="skill-tag">Experiment Tracking</span><span class="skill-tag">MLflow</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-label">Evals / RL / Safety</div>
+      <div class="skill-tags">
+        <span class="skill-tag">GRPO</span><span class="skill-tag">PPO</span><span class="skill-tag">DPO</span><span class="skill-tag">RLHF</span><span class="skill-tag">Policy Gradient</span><span class="skill-tag">KL Penalty</span><span class="skill-tag">Verifiable Rewards</span><span class="skill-tag">Sandboxed RL Envs</span><span class="skill-tag">LLM-as-Judge</span><span class="skill-tag">Eval Harness Design</span><span class="skill-tag">Regression Testing</span><span class="skill-tag">Failure Mode Taxonomy</span><span class="skill-tag">Ablations</span><span class="skill-tag">Controlled Experiments</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-label">Multimodal</div>
+      <div class="skill-tags">
+        <span class="skill-tag">VLMs</span><span class="skill-tag">CLIP</span><span class="skill-tag">WinCLIP</span><span class="skill-tag">AnomalyCLIP</span><span class="skill-tag">SmolVLM</span><span class="skill-tag">Whisper</span><span class="skill-tag">Wav2Vec2</span><span class="skill-tag">MediaPipe</span><span class="skill-tag">DeepFace</span><span class="skill-tag">Multimodal Inference</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-label">Backend / APIs / Data</div>
+      <div class="skill-tags">
+        <span class="skill-tag">FastAPI</span><span class="skill-tag">Flask</span><span class="skill-tag">React</span><span class="skill-tag">Next.js</span><span class="skill-tag">Celery</span><span class="skill-tag">Redis</span><span class="skill-tag">REST APIs</span><span class="skill-tag">Microservices</span><span class="skill-tag">PostgreSQL</span><span class="skill-tag">MySQL</span><span class="skill-tag">Schema Validation</span><span class="skill-tag">ETL Pipelines</span><span class="skill-tag">Apache Parquet</span><span class="skill-tag">Pandas</span><span class="skill-tag">NumPy</span><span class="skill-tag">SciPy</span><span class="skill-tag">Airflow</span><span class="skill-tag">PySpark</span><span class="skill-tag">Spark MLlib</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-label">MLOps / Cloud / Infra</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Docker</span><span class="skill-tag">Docker Compose</span><span class="skill-tag">Kubernetes</span><span class="skill-tag">AWS EC2</span><span class="skill-tag">AWS S3</span><span class="skill-tag">GitHub Actions</span><span class="skill-tag">CI/CD</span><span class="skill-tag">Monitoring</span><span class="skill-tag">Structured Logging</span><span class="skill-tag">Drift Detection</span><span class="skill-tag">Weights & Biases</span><span class="skill-tag">Evidently AI</span><span class="skill-tag">Git</span><span class="skill-tag">Linux</span><span class="skill-tag">Pytest</span><span class="skill-tag">Reproducible Workflows</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-label">HPC / Systems</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Slurm</span><span class="skill-tag">LDMS</span><span class="skill-tag">Darshan</span><span class="skill-tag">IOR</span><span class="skill-tag">VPIC</span><span class="skill-tag">NVIDIA Nsight</span><span class="skill-tag">CUDA Profiling</span><span class="skill-tag">GPU Benchmarking</span><span class="skill-tag">Trio (async)</span><span class="skill-tag">OpenMPI</span><span class="skill-tag">Distributed Training</span><span class="skill-tag">Subprocess Isolation</span><span class="skill-tag">Memory Profiling</span>
       </div>
     </div>
   </div>
