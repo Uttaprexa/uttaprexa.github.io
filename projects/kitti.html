@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D object detection on KITTI — how it works · Uttapreksha Patel</title>
+<meta name="description" content="Watch a LiDAR scan become pillars, a 2D feature image, candidate boxes and final 3D detections, seen from above.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Shared styles for the project pipeline pages.
+   Colors are semantic: blue = data in motion, green = pass/correct,
+   red = fail/wrong, amber = uncertain. Change them here once. */
+:root {
+  --paper: #F8F8F6;
+  --bench: #FFFFFF;
+  --ink: #0E0E0E;
+  --graphite: #6A6A6A;
+  --rule: #E2E2DE;
+  --signal: #00B4A0;
+  --signal-soft: #E0F5F3;
+  --pass: #2E7D32;
+  --pass-soft: #E4F2E5;
+  --fail: #c8372d;
+  --fail-soft: #f8dfdc;
+  --caution: #b57a06;
+  --caution-soft: #f8ecd2;
+  --sans: "Inter", system-ui, sans-serif;
+  --display: "Syne", "Inter", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--sans); font-size: 17px; line-height: 1.55;
+}
+a { color: var(--signal); }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; border-radius: 4px; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; padding: 22px 0; gap: 16px; flex-wrap: wrap; }
+.topbar a { text-decoration: none; font-weight: 600; color: var(--ink); }
+.topbar a:hover { color: var(--signal); }
+.topbar nav { display: flex; gap: 20px; font-size: 15px; }
+
+.intro { padding: 28px 0 22px; max-width: 760px; }
+.intro h1 { font-size: clamp(34px, 6vw, 58px); line-height: 1.02; letter-spacing: -0.025em; margin: 0 0 14px; font-weight: 700; }
+.intro p { margin: 0; font-size: 19px; color: var(--graphite); max-width: 640px; }
+
+/* ---------- The pipeline ---------- */
+.pipeline { background: #fff; border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; }
+
+.rail { display: flex; align-items: center; padding: 18px 20px; gap: 0; overflow-x: auto; border-bottom: 1px solid var(--rule); scrollbar-width: thin; }
+.rail-step { display: flex; align-items: center; flex: 1 0 auto; min-width: 0; }
+.rail-step:last-child { flex: 0 0 auto; }
+.rail-btn {
+  display: flex; align-items: center; gap: 8px; background: none; border: 0; padding: 6px 4px;
+  font: 600 14px/1.2 var(--sans); color: var(--graphite); cursor: pointer; white-space: nowrap;
+}
+.rail-num {
+  width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--rule); display: grid; place-items: center;
+  font-size: 12px; background: #fff; transition: background .25s, border-color .25s, color .25s;
+}
+.rail-btn.done .rail-num { border-color: var(--signal); color: var(--signal); }
+.rail-btn.active { color: var(--ink); }
+.rail-btn.active .rail-num { background: var(--signal); border-color: var(--signal); color: #fff; }
+.rail-wire { flex: 1; height: 2px; background: var(--rule); margin: 0 8px; min-width: 18px; position: relative; overflow: hidden; }
+.rail-wire i { position: absolute; inset: 0; background: var(--signal); transform-origin: left; transform: scaleX(0); }
+
+.bench {
+  position: relative; min-height: 400px; padding: 26px;
+  display: flex; flex-direction: column; justify-content: center;
+  background-color: var(--bench);
+  background-image: radial-gradient(var(--rule) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+.caption-bar { display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; padding: 18px 22px; border-top: 1px solid var(--rule); }
+.caption h2 { font-size: 20px; margin: 0 0 4px; letter-spacing: -0.01em; }
+.caption p { margin: 0; color: var(--graphite); max-width: 680px; }
+.controls { display: flex; gap: 8px; flex-shrink: 0; }
+.ctrl {
+  border: 1px solid var(--rule); background: #fff; color: var(--ink); border-radius: 8px;
+  padding: 8px 12px; font: 600 14px var(--sans); cursor: pointer; min-width: 44px; min-height: 40px;
+}
+.ctrl:hover { border-color: var(--signal); color: var(--signal); }
+.progress { height: 3px; background: var(--paper); }
+.progress i { display: block; height: 100%; width: 0; background: var(--signal); }
+
+/* ---------- Building blocks used inside the bench ---------- */
+.doc {
+  background: #fff; border: 1px solid var(--rule); border-radius: 8px; padding: 18px 20px;
+  font: 14px/1.75 var(--mono); color: var(--ink); box-shadow: 0 1px 0 var(--rule);
+}
+.doc .k { color: var(--graphite); }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+.panel-title { font: 600 14px var(--sans); color: var(--graphite); margin: 0 0 8px; }
+.redact { background: var(--ink); color: transparent; border-radius: 2px; transition: background .2s; }
+.tag { display: inline-block; font: 600 12px var(--sans); padding: 2px 8px; border-radius: 999px; }
+.tag.pass { background: var(--pass-soft); color: var(--pass); }
+.tag.fail { background: var(--fail-soft); color: var(--fail); }
+.tag.caution { background: var(--caution-soft); color: var(--caution); }
+.tag.signal { background: var(--signal-soft); color: var(--signal); }
+.row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--paper); }
+.row:last-child { border-bottom: 0; }
+.bar { flex: 1; height: 8px; background: var(--paper); border-radius: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; border-radius: 4px; background: var(--signal); }
+.mono { font-family: var(--mono); font-size: 14px; }
+.muted { color: var(--graphite); }
+.fade { opacity: 0; transition: opacity .35s; }
+.fade.on { opacity: 1; }
+.hl-fail { background: var(--fail-soft); color: var(--fail); border-bottom: 2px solid var(--fail); }
+.note {
+  border-left: 3px solid var(--fail); background: #fff; padding: 10px 14px; border-radius: 0 8px 8px 0;
+  font-size: 15px; box-shadow: 0 1px 0 var(--rule);
+}
+.note.signal { border-color: var(--signal); }
+.chart-row { display: grid; grid-template-columns: 130px 1fr 60px; gap: 12px; align-items: center; margin: 10px 0; font-size: 15px; }
+.chart-row .bar { height: 16px; border-radius: 3px; }
+.chart-row .bar i { border-radius: 3px; }
+canvas { display: block; max-width: 100%; }
+
+/* ---------- Below the pipeline ---------- */
+.facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin: 34px 0 10px; border-top: 2px solid var(--ink); }
+.fact { padding: 16px 18px 6px 0; }
+.fact b { display: block; font-size: 30px; letter-spacing: -0.02em; line-height: 1.1; }
+.fact span { color: var(--graphite); font-size: 15px; }
+.built { padding: 18px 0 70px; max-width: 760px; }
+.built h2 { font-size: 22px; margin: 26px 0 8px; }
+.built p { margin: 0 0 10px; }
+.stack { color: var(--graphite); }
+footer { border-top: 1px solid var(--rule); padding: 24px 0 40px; color: var(--graphite); font-size: 15px; }
+
+@media (max-width: 760px) {
+  body { font-size: 16px; }
+  .bench { padding: 16px; min-height: 380px; }
+  .cols { grid-template-columns: 1fr; }
+  .facts { grid-template-columns: repeat(2, 1fr); }
+  .caption-bar { flex-direction: column; }
+  .rail-btn .rail-label { display: none; }
+  .rail-btn.active .rail-label { display: inline; }
+  .chart-row { grid-template-columns: 96px 1fr 52px; font-size: 14px; }
+  .row { flex-wrap: wrap; gap: 4px 12px; }
+  .row .bar { flex: 1 1 100%; order: 5; }
+  .row > span[style*="width"] { width: auto !important; }
+  .doc { padding: 14px; font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+/* ---------- Project-specific pieces (moved from individual pages) ---------- */
+/* grpo */
+.answers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .ans { background: #fff; border: 1px solid var(--rule); border-radius: 8px; padding: 12px; font-size: 14px; min-height: 92px; transition: border-color .25s, background .25s; }
+  .ans .final { font: 500 20px var(--mono); margin-top: 6px; }
+  .ans.right { border-color: var(--pass); background: var(--pass-soft); }
+  .ans.wrong { border-color: var(--fail); background: var(--fail-soft); }
+  .ans .rw { float: right; font: 600 13px var(--mono); }
+  .adv { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; height: 220px; align-items: center; position: relative; }
+  .adv::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px dashed var(--graphite); }
+  .adv .col { position: relative; height: 100%; }
+  .adv .col i { position: absolute; left: 15%; right: 15%; border-radius: 3px; }
+  .adv .col span { position: absolute; left: 0; right: 0; text-align: center; font: 500 13px var(--mono); }
+  @media (max-width: 760px) { .answers { grid-template-columns: repeat(2, 1fr); } .adv { gap: 4px; } .adv .col span { font-size: 11px; } }
+/* memory */
+.chat { display: flex; flex-direction: column; gap: 10px; }
+  .turn { background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 10px 14px; max-width: 100%; }
+  .turn .who { font-size: 13px; color: var(--graphite); }
+  .turn .tag { margin-left: 8px; }
+  .slot { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--paper); font-family: var(--mono); font-size: 14px; }
+  .slot:last-child { border-bottom: 0; }
+  .old { text-decoration: line-through; color: var(--graphite); }
+  .flash { background: var(--signal-soft); border-radius: 4px; }
+/* kitti */
+.scene { position: relative; }
+  .scene canvas { width: 100%; background: #fff; border: 1px solid var(--rule); border-radius: 8px; }
+  .overlay { position: absolute; right: 14px; top: 14px; background: rgba(255,255,255,.94); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 14px; font-size: 14px; min-width: 210px; }
+  .overlay b { font-size: 22px; display: block; font-family: var(--mono); font-weight: 500; }
+  .bugs .row { align-items: flex-start; }
+  .bugs .row b { display: block; }
+  @media (max-width: 760px) { .overlay { position: static; margin-top: 10px; } }
+.rail { position: relative; }
+
+/* generic before → after visual */
+.io { display: grid; grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1.25fr); align-items: center; gap: 10px; }
+.io .card { background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; }
+.io .card.prev { opacity: .55; }
+.io .card.cur { border-color: var(--signal); box-shadow: 0 0 0 3px var(--signal-soft); }
+.io .card pre { margin: 6px 0 0; font: 14px/1.6 var(--mono); white-space: pre-wrap; word-break: break-word; min-height: 3.2em; }
+.io .arrow { height: 2px; background: var(--rule); position: relative; overflow: visible; }
+.io .arrow i { position: absolute; left: 0; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--signal); }
+@media (max-width: 760px) {
+  .io { grid-template-columns: 1fr; }
+  .io .arrow { width: 2px; height: 34px; margin: 0 auto; }
+  .io .arrow i { left: -4px; top: 0; }
+}
+
+/* generic pipeline chain */
+.chain { display: flex; align-items: stretch; gap: 0; width: 100%; }
+.link { flex: 1 1 0; min-width: 0; background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 12px; transition: border-color .3s, box-shadow .3s, opacity .3s; }
+.link pre { margin: 6px 0 0; font: 12.5px/1.55 var(--mono); white-space: pre-wrap; word-break: break-word; }
+.link-label { font: 600 13px var(--sans); color: var(--graphite); }
+.link.input { background: var(--paper); }
+.link.cur { border-color: var(--signal); box-shadow: 0 0 0 3px var(--signal-soft); }
+.link.cur .link-label { color: var(--signal); }
+.link.todo { background: transparent; border-style: dashed; opacity: .6; }
+.joint { flex: 0 0 22px; align-self: center; height: 2px; background: var(--rule); position: relative; }
+.joint i { position: absolute; right: -1px; top: -4px; border: 5px solid transparent; border-left: 6px solid var(--rule); }
+.joint.lit { background: var(--signal); }
+.joint.lit i { border-left-color: var(--signal); }
+@media (max-width: 900px) {
+  .chain { flex-direction: column; }
+  .joint { flex: 0 0 18px; width: 2px; height: auto; align-self: center; }
+  .joint i { right: auto; top: auto; bottom: -6px; left: -4px; border: 5px solid transparent; border-top: 6px solid var(--rule); }
+  .joint.lit i { border-top-color: var(--signal); border-left-color: transparent; }
+  .link.todo pre { display: none; }
+}
+
+
+/* match portfolio: Syne headings, square-ish corners */
+.intro h1, .head h2, .caption h2, .item h2 { font-family: var(--display); letter-spacing: -0.03em; }
+.pipeline, .doc, .link, .card, .ans, .turn, .ctrl, .chip, .pill, .note, .scene canvas, .overlay { border-radius: 3px !important; }
+.chip[aria-current="true"] { background: var(--teal, #00B4A0); border-color: #00B4A0; }
+.topbar a:first-child::before { content: ""; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <a href="../">← Back to portfolio</a>
+    <nav><a href="./#kitti">All projects</a><a href="https://github.com/Uttaprexa/kitti-3d-detection">Code</a></nav>
+  </header>
+
+  <section class="intro">
+    <h1>Finding cars in a laser scan</h1>
+    <p>A self-driving car's LiDAR returns a cloud of points. This PointPillars-style detector turns it into 3D boxes around cars. Everything here is seen from above, with the car scanning from the left edge.</p>
+  </section>
+
+  <div id="pipeline"></div>
+
+  <section class="facts" aria-label="Results">
+    <div class="fact"><b>15.6×</b><span>growth in near-range detection score over training</span></div>
+    <div class="fact"><b>16×</b><span>fewer candidate boxes after fixing the model head</span></div>
+    <div class="fact"><b>140</b><span>training epochs on 850 real KITTI scenes</span></div>
+    <div class="fact"><b>~$10</b><span>total cloud GPU cost</span></div>
+  </section>
+
+  <section class="built">
+    <h2>How it's built</h2>
+    <p>Points are grouped into vertical columns on a ground grid, a small network summarizes each column, and the result is laid out as a 2D image so a regular image network can process it. For every candidate box the model predicts a score and small corrections to position, size and heading. Overlap between boxes is measured exactly in 3D, and results are reported separately for near, mid-range and far objects.</p>
+    <p class="stack">Python · PyTorch · NumPy · AWS EC2 (T4 GPU) · Google Colab</p>
+    <h2>Honest scope</h2>
+    <p>Trained on 850 scenes without the heavy augmentation published systems use, and scored with a loose overlap threshold and distance buckets rather than the official KITTI protocol. The main result is a working, debugged pipeline on a small budget, not a leaderboard score.</p>
+  </section>
+</div>
+<footer><div class="wrap">Scan shown is a simplified illustration; numbers come from training on real KITTI data.</div></footer>
+
+<script>
+/* Tiny auto-playing pipeline engine.
+   Each stage = { label, title, caption, duration(ms), setup(bench) -> state, update(state, p) }
+   update() is called every frame with p from 0 to 1, so pause/replay are exact. */
+(function () {
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const H = {
+    el(tag, cls, html) {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (html != null) e.innerHTML = html;
+      return e;
+    },
+    // map p into a sub-window [a, b] of the stage, clamped to 0..1
+    seg(p, a, b) { return Math.max(0, Math.min(1, (p - a) / (b - a))); },
+    ease(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; },
+    show(node, on) { node.classList.toggle("on", !!on); },
+    type(node, text, t) { node.textContent = text.slice(0, Math.round(text.length * t)); },
+    // simple seeded random, so canvases look the same every loop
+    rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); },
+    reduce,
+  };
+  window.PipeHelpers = H;
+
+  window.Pipeline = function (root, stages) {
+    root = typeof root === "string" ? document.querySelector(root) : root;
+    root.classList.add("pipeline");
+    root.innerHTML = "";
+
+    const rail = H.el("div", "rail");
+    rail.setAttribute("role", "tablist");
+    rail.setAttribute("aria-label", "Pipeline steps");
+    const btns = [], wires = [];
+    stages.forEach((s, i) => {
+      const step = H.el("div", "rail-step");
+      const b = H.el("button", "rail-btn", `<span class="rail-num">${i + 1}</span><span class="rail-label">${s.label}</span>`);
+      b.type = "button";
+      b.setAttribute("aria-label", `Step ${i + 1}: ${s.label}`);
+      b.addEventListener("click", () => go(i, true));
+      step.appendChild(b); btns.push(b);
+      if (i < stages.length - 1) { const w = H.el("div", "rail-wire", "<i></i>"); step.appendChild(w); wires.push(w.firstChild); }
+      rail.appendChild(step);
+    });
+
+    const bench = H.el("div", "bench");
+    bench.setAttribute("aria-live", "off");
+    const bar = H.el("div", "caption-bar");
+    const cap = H.el("div", "caption", "<h2></h2><p></p>");
+    cap.setAttribute("aria-live", "polite");
+    const ctr = H.el("div", "controls");
+    const playBtn = H.el("button", "ctrl", "Pause");
+    const againBtn = H.el("button", "ctrl", "Replay");
+    playBtn.type = againBtn.type = "button";
+    ctr.append(playBtn, againBtn);
+    bar.append(cap, ctr);
+    const prog = H.el("div", "progress", "<i></i>");
+    root.append(rail, bench, bar, prog);
+
+    let idx = 0, t = 0, state = null, playing = true, last = null, alive = true;
+    const HOLD = reduce ? 2600 : 1100;
+
+    function go(i, user) {
+      idx = (i + stages.length) % stages.length; t = 0;
+      const s = stages[idx];
+      bench.innerHTML = "";
+      state = s.setup(bench) || {};
+      cap.querySelector("h2").textContent = `${idx + 1}. ${s.title}`;
+      cap.querySelector("p").textContent = s.caption;
+      btns.forEach((b, j) => {
+        b.classList.toggle("active", j === idx);
+        b.classList.toggle("done", j < idx);
+        b.setAttribute("aria-selected", j === idx ? "true" : "false");
+      });
+      wires.forEach((w, j) => { w.style.transform = `scaleX(${j < idx ? 1 : 0})`; });
+      const bl = btns[idx].parentNode.offsetLeft - rail.clientWidth / 2 + 60; rail.scrollTo({ left: Math.max(0, bl), behavior: reduce ? "auto" : "smooth" });
+      s.update(state, reduce ? 1 : 0);
+      if (user && !playing) render();
+    }
+
+    function render() {
+      const s = stages[idx];
+      const p = reduce ? 1 : Math.min(1, t / s.duration);
+      s.update(state, p);
+      prog.firstChild.style.width = `${Math.min(1, t / (s.duration + HOLD)) * 100}%`;
+      if (idx < wires.length) wires[idx].style.transform = `scaleX(${H.seg(t, s.duration, s.duration + HOLD)})`;
+    }
+
+    function frame(now) {
+      if (!alive) return;
+      if (last == null) last = now;
+      const dt = Math.min(64, now - last); last = now;
+      if (playing && !document.hidden) {
+        t += dt;
+        const s = stages[idx];
+        const end = s.duration + HOLD + (idx === stages.length - 1 ? 2200 : 0);
+        render();
+        if (t >= end) go(idx + 1);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    playBtn.addEventListener("click", () => { playing = !playing; playBtn.textContent = playing ? "Pause" : "Play"; });
+    againBtn.addEventListener("click", () => { playing = true; playBtn.textContent = "Pause"; go(0); });
+
+    go(0);
+    requestAnimationFrame(frame);
+    return { stop() { alive = false; root.innerHTML = ""; } };
+  };
+})();
+
+</script>
+<script>
+window.PROJECT_STAGES = window.PROJECT_STAGES || {};
+(function () {
+
+const { el, seg, ease, show, rng } = PipeHelpers;
+
+// ---- build one synthetic bird's-eye scene (meters): x forward 0..72, y left/right -18..18
+const R = rng(7);
+const CARS = [
+  { x: 11, y: -4.2, h: 0.05, d: "near" }, { x: 23, y: 3.4, h: -0.08, d: "near" },
+  { x: 41, y: -6.5, h: 0.12, d: "mid" }, { x: 61, y: 2.5, h: 0, d: "far" },
+];
+const PTS = [];
+for (let i = 0; i < 1400; i++) {               // ground rings, denser near the sensor
+  const r = 3 + Math.pow(R(), 1.8) * 70, a = (R() - 0.5) * 1.1;
+  PTS.push({ x: r * Math.cos(a), y: r * Math.sin(a), g: 1 });
+}
+for (let i = 0; i < 520; i++) {                // building walls on both sides
+  const x = 6 + R() * 66, side = R() < 0.5 ? -15.5 : 15.5;
+  if (R() < 1.4 - x / 60) PTS.push({ x, y: side + (R() - 0.5) * 0.6, g: 0 });
+}
+CARS.forEach(c => {                            // visible car surfaces; fewer points farther away
+  c.n = Math.round(900 / c.x);
+  for (let i = 0; i < c.n; i++) {
+    const u = R(), lx = (u - 0.5) * 3.9, ly = R() < 0.6 ? -0.8 * Math.sign(c.y) : (R() - 0.5) * 1.6;
+    const ca = Math.cos(c.h), sa = Math.sin(c.h);
+    PTS.push({ x: c.x + lx * ca - ly * sa, y: c.y + lx * sa + ly * ca, g: 0, car: c });
+  }
+});
+PTS.forEach(p => (p.ang = Math.atan2(p.y, p.x)));
+
+function sceneSetup(b, overlayHTML) {
+  const wrap = el("div", "scene");
+  const c = el("canvas"); wrap.appendChild(c);
+  let ov = null;
+  if (overlayHTML) { ov = el("div", "overlay fade", overlayHTML); wrap.appendChild(ov); }
+  b.appendChild(wrap);
+  const dpr = window.devicePixelRatio || 1;
+  const W = Math.max(300, wrap.clientWidth), Hh = Math.round(Math.min(380, W * 0.5));
+  c.width = W * dpr; c.height = Hh * dpr; c.style.height = Hh + "px";
+  const ctx = c.getContext("2d"); ctx.scale(dpr, dpr);
+  const sx = W / 74, sy = Hh / 38;
+  const P = (x, y) => [10 + x * sx, Hh / 2 - y * sy];
+  return { ctx, W, Hh, P, sx, sy, ov };
+}
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function drawEgo(S) {
+  const [x, y] = S.P(0, 0); S.ctx.fillStyle = css("--ink");
+  S.ctx.fillRect(x - 8, y - 4, 12, 8);
+}
+function drawPoints(S, alpha, sweep) {
+  const ctx = S.ctx;
+  PTS.forEach(p => {
+    if (sweep != null && p.ang > sweep) return;
+    const [x, y] = S.P(p.x, p.y);
+    ctx.fillStyle = p.car ? `rgba(0,180,160,${alpha})` : `rgba(91,101,119,${alpha * (p.g ? 0.45 : 0.8)})`;
+    ctx.fillRect(x - 1, y - 1, p.car ? 2.4 : 1.8, p.car ? 2.4 : 1.8);
+  });
+}
+function box(S, c, color, dash, lw, dx = 0, dy = 0, dh = 0) {
+  const ctx = S.ctx, ca = Math.cos(c.h + dh), sa = Math.sin(c.h + dh);
+  const corners = [[-1.95, -0.8], [1.95, -0.8], [1.95, 0.8], [-1.95, 0.8]].map(([lx, ly]) => S.P(c.x + dx + lx * ca - ly * sa, c.y + dy + lx * sa + ly * ca));
+  ctx.beginPath(); corners.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath();
+  ctx.setLineDash(dash || []); ctx.strokeStyle = color; ctx.lineWidth = lw || 2; ctx.stroke(); ctx.setLineDash([]);
+}
+const CELL = 2; // meters per drawn pillar cell (illustrative; real grid is finer)
+function cells() {
+  const m = new Map();
+  PTS.forEach(p => { const k = `${Math.floor(p.x / CELL)},${Math.floor(p.y / CELL)}`; m.set(k, (m.get(k) || 0) + 1); });
+  return m;
+}
+const CELLS = cells();
+function drawCells(S, t, heat) {
+  const ctx = S.ctx;
+  CELLS.forEach((n, k) => {
+    const [i, j] = k.split(",").map(Number);
+    const [x, y] = S.P(i * CELL, (j + 1) * CELL);
+    const a = Math.min(1, n / 10) * t;
+    ctx.fillStyle = heat ? `rgba(0,180,160,${0.15 + a * 0.75})` : `rgba(0,180,160,${a * 0.35})`;
+    ctx.fillRect(x, y, CELL * S.sx - 1, CELL * S.sy - 1);
+  });
+}
+function drawGrid(S, step, alpha) {
+  const ctx = S.ctx; ctx.strokeStyle = `rgba(203,211,221,${alpha})`; ctx.lineWidth = 1;
+  for (let x = 0; x <= 72; x += step) { const [a] = S.P(x, 0); ctx.beginPath(); ctx.moveTo(a, 0); ctx.lineTo(a, S.Hh); ctx.stroke(); }
+  for (let y = -18; y <= 18; y += step) { const [, b] = S.P(0, y); ctx.beginPath(); ctx.moveTo(0, b); ctx.lineTo(S.W, b); ctx.stroke(); }
+}
+function clear(S) { S.ctx.clearRect(0, 0, S.W, S.Hh); }
+
+window.PROJECT_STAGES.kitti = [
+  {
+    label: "Scan", title: "The laser scan arrives as points",
+    caption: "Each point is a spot where a laser pulse bounced back. A real KITTI scan has 100,000–120,000. Notice how far cars get only a handful.",
+    duration: 4200,
+    setup(b) { return sceneSetup(b, '<span class="muted">Points on cars</span><b class="n">0</b><span class="muted">near car vs far car: ' + CARS[0].n + " vs " + CARS[3].n + "</span>"); },
+    update(S, p) {
+      clear(S); drawEgo(S);
+      const sweep = -0.6 + 1.2 * ease(seg(p, 0, 0.75));
+      drawPoints(S, 1, sweep);
+      show(S.ov, p > 0.75);
+      S.ov.querySelector(".n").textContent = CARS.reduce((a, c) => a + c.n, 0);
+    }
+  },
+  {
+    label: "Pillars", title: "Group points into columns on a ground grid",
+    caption: "The ground is divided into a grid, and all points above each cell form one vertical column, or pillar. Empty cells are skipped.",
+    duration: 4000,
+    setup(b) { return sceneSetup(b); },
+    update(S, p) {
+      clear(S); drawGrid(S, CELL, seg(p, 0, 0.3)); drawCells(S, ease(seg(p, 0.25, 0.8)), false);
+      drawPoints(S, 1 - 0.6 * seg(p, 0.3, 0.9)); drawEgo(S);
+    }
+  },
+  {
+    label: "Encode", title: "Summarize each pillar and lay them out as an image",
+    caption: "A small network turns each pillar's points into one feature vector. Placed back on the grid, they form a 2D image that a standard image network can read fast.",
+    duration: 4000,
+    setup(b) { return sceneSetup(b, '<span class="muted">Each cell now holds</span><b>64 features</b><span class="muted">instead of raw points</span>'); },
+    update(S, p) {
+      clear(S); drawPoints(S, 0.4 * (1 - seg(p, 0, 0.5)));
+      drawCells(S, 0.4 + 0.6 * ease(seg(p, 0.1, 0.7)), true); drawEgo(S);
+      show(S.ov, p > 0.5);
+    }
+  },
+  {
+    label: "Candidates", title: "Propose template boxes everywhere",
+    caption: "At each grid location the model scores two template car boxes, one per heading. My first version did this at full resolution: 440,000 boxes per scene. Downsampling the feature map cut it to 27,500.",
+    duration: 5000,
+    setup(b) { return sceneSetup(b, '<span class="muted">Candidate boxes per scene</span><b class="n">440,000</b>'); },
+    update(S, p) {
+      clear(S); drawCells(S, 0.5, true);
+      const coarse = p > 0.5, step = coarse ? 8 : 3;
+      const ctx = S.ctx; ctx.strokeStyle = "rgba(23,32,51,.32)"; ctx.lineWidth = 1;
+      for (let x = 2; x < 72; x += step) for (let y = -16; y < 17; y += step) {
+        [0, Math.PI / 2].forEach(h => { const ca = Math.cos(h), sa = Math.sin(h);
+          const pts = [[-1.95, -0.8], [1.95, -0.8], [1.95, 0.8], [-1.95, 0.8]].map(([a, c]) => S.P(x + a * ca - c * sa, y + a * sa + c * ca));
+          ctx.beginPath(); pts.forEach(([u, v], i) => (i ? ctx.lineTo(u, v) : ctx.moveTo(u, v))); ctx.closePath(); ctx.stroke(); });
+      }
+      drawEgo(S);
+      show(S.ov, true);
+      const t = seg(p, 0.45, 0.7);
+      S.ov.querySelector(".n").textContent = Math.round(440000 - (440000 - 27500) * ease(t)).toLocaleString("en-US");
+    }
+  },
+  {
+    label: "Detect", title: "Keep confident boxes, then remove duplicates",
+    caption: "Many overlapping boxes fire around each car. Non-maximum suppression keeps the best one per object. The farthest car has too few points to be found.",
+    duration: 5200,
+    setup(b) {
+      const S = sceneSetup(b);
+      const r = rng(3);
+      S.cands = [];
+      CARS.slice(0, 3).forEach(c => { for (let i = 0; i < 6; i++) S.cands.push({ c, dx: (r() - 0.5) * 1.6, dy: (r() - 0.5) * 1.0, dh: (r() - 0.5) * 0.5 }); });
+      return S;
+    },
+    update(S, p) {
+      clear(S); drawPoints(S, 0.9); drawEgo(S);
+      const showC = p > 0.1, nms = p > 0.55;
+      if (showC && !nms) S.cands.forEach(o => box(S, o.c, "rgba(181,122,6,.75)", null, 1.3, o.dx, o.dy, o.dh));
+      if (nms) {
+        CARS.slice(0, 3).forEach(c => box(S, c, css("--pass"), null, 2.6));
+        if (p > 0.7) box(S, CARS[3], css("--fail"), [5, 4], 2);
+      }
+    }
+  },
+  {
+    label: "Score", title: "Score near, mid-range and far separately",
+    caption: "Averages hide where a detector fails. Broken out by distance, near cars are found far more reliably; far cars plateau because the sensor gives them so few points.",
+    duration: 5200,
+    setup(b) { return sceneSetup(b, '<span class="muted">Detection score (AP) after 140 epochs</span><div class="row"><span style="flex:1">0–30 m</span><span class="mono">0.359</span></div><div class="row"><span style="flex:1">30–50 m</span><span class="mono">0.094</span></div><div class="row"><span style="flex:1">50 m +</span><span class="mono">0.009</span></div>'); },
+    update(S, p) {
+      clear(S);
+      const ctx = S.ctx, [ox, oy] = S.P(0, 0);
+      [[30, "30 m"], [50, "50 m"]].forEach(([r, lab], i) => {
+        const t = ease(seg(p, 0.05 + i * 0.15, 0.35 + i * 0.15));
+        ctx.beginPath(); ctx.ellipse(ox, oy, r * S.sx, r * S.sy, 0, -Math.PI / 2 * t, Math.PI / 2 * t);
+        ctx.strokeStyle = css("--graphite"); ctx.setLineDash([4, 4]); ctx.lineWidth = 1.2; ctx.stroke(); ctx.setLineDash([]);
+        if (t > 0.9) { ctx.fillStyle = css("--graphite"); ctx.font = "13px Schibsted Grotesk, sans-serif"; ctx.fillText(lab, ox + r * S.sx - 30, oy - r * S.sy + 18); }
+      });
+      drawPoints(S, 0.8); drawEgo(S);
+      CARS.slice(0, 3).forEach(c => box(S, c, css("--pass"), null, 2.4));
+      box(S, CARS[3], css("--fail"), [5, 4], 2);
+      show(S.ov, p > 0.5);
+    }
+  },
+  {
+    label: "Fixes", title: "What it took to make training run at all",
+    caption: "Four performance bugs, each found by measuring before changing anything. Every rewrite was checked to give identical results to the code it replaced.",
+    duration: 5600,
+    setup(b) {
+      const box = el("div", "doc bugs"); box.style.fontFamily = "var(--sans)";
+      const rows = [
+        ["Box matching never finished", "2.2 million exact overlap calculations per scene. A quick distance filter now skips boxes that can't overlap."],
+        ["440,000 candidate boxes", "The head ran at full resolution. Downsampling to 1/4 cut it to 27,500."],
+        ["GPU sat mostly idle", "240,000 tiny GPU-to-CPU round trips per scene. Rewrote that step as whole-array operations."],
+        ["Evaluation hung for hours", "Duplicate removal compared thousands of boxes pairwise. Now only the top 300 are compared."],
+      ].map(([a, c]) => { const r = el("div", "row fade", `<span class="tag pass" style="margin-top:3px">fixed</span><span><b>${a}</b><span class="muted">${c}</span></span>`); box.appendChild(r); return r; });
+      b.appendChild(box);
+      return { rows };
+    },
+    update(st, p) { st.rows.forEach((r, i) => show(r, p > 0.05 + i * 0.2)); }
+  },
+];
+
+})();
+
+</script>
+<script>Pipeline("#pipeline", PROJECT_STAGES.kitti);</script>
+</body>
+</html>

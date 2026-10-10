@@ -1,0 +1,2134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visualize my projects · Uttapreksha Patel</title>
+<meta name="description" content="Animated walkthroughs of every project: what goes in, what comes out, how it flows, the stack, the results and what's next.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Shared styles for the project pipeline pages.
+   Colors are semantic: blue = data in motion, green = pass/correct,
+   red = fail/wrong, amber = uncertain. Change them here once. */
+:root {
+  --paper: #F8F8F6;
+  --bench: #FFFFFF;
+  --ink: #0E0E0E;
+  --graphite: #6A6A6A;
+  --rule: #E2E2DE;
+  --signal: #00B4A0;
+  --signal-soft: #E0F5F3;
+  --pass: #2E7D32;
+  --pass-soft: #E4F2E5;
+  --fail: #c8372d;
+  --fail-soft: #f8dfdc;
+  --caution: #b57a06;
+  --caution-soft: #f8ecd2;
+  --sans: "Inter", system-ui, sans-serif;
+  --display: "Syne", "Inter", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--sans); font-size: 17px; line-height: 1.55;
+}
+a { color: var(--signal); }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; border-radius: 4px; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; padding: 22px 0; gap: 16px; flex-wrap: wrap; }
+.topbar a { text-decoration: none; font-weight: 600; color: var(--ink); }
+.topbar a:hover { color: var(--signal); }
+.topbar nav { display: flex; gap: 20px; font-size: 15px; }
+
+.intro { padding: 28px 0 22px; max-width: 760px; }
+.intro h1 { font-size: clamp(34px, 6vw, 58px); line-height: 1.02; letter-spacing: -0.025em; margin: 0 0 14px; font-weight: 700; }
+.intro p { margin: 0; font-size: 19px; color: var(--graphite); max-width: 640px; }
+
+/* ---------- The pipeline ---------- */
+.pipeline { background: #fff; border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; }
+
+.rail { display: flex; align-items: center; padding: 18px 20px; gap: 0; overflow-x: auto; border-bottom: 1px solid var(--rule); scrollbar-width: thin; }
+.rail-step { display: flex; align-items: center; flex: 1 0 auto; min-width: 0; }
+.rail-step:last-child { flex: 0 0 auto; }
+.rail-btn {
+  display: flex; align-items: center; gap: 8px; background: none; border: 0; padding: 6px 4px;
+  font: 600 14px/1.2 var(--sans); color: var(--graphite); cursor: pointer; white-space: nowrap;
+}
+.rail-num {
+  width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--rule); display: grid; place-items: center;
+  font-size: 12px; background: #fff; transition: background .25s, border-color .25s, color .25s;
+}
+.rail-btn.done .rail-num { border-color: var(--signal); color: var(--signal); }
+.rail-btn.active { color: var(--ink); }
+.rail-btn.active .rail-num { background: var(--signal); border-color: var(--signal); color: #fff; }
+.rail-wire { flex: 1; height: 2px; background: var(--rule); margin: 0 8px; min-width: 18px; position: relative; overflow: hidden; }
+.rail-wire i { position: absolute; inset: 0; background: var(--signal); transform-origin: left; transform: scaleX(0); }
+
+.bench {
+  position: relative; min-height: 400px; padding: 26px;
+  display: flex; flex-direction: column; justify-content: center;
+  background-color: var(--bench);
+  background-image: radial-gradient(var(--rule) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+.caption-bar { display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; padding: 18px 22px; border-top: 1px solid var(--rule); }
+.caption h2 { font-size: 20px; margin: 0 0 4px; letter-spacing: -0.01em; }
+.caption p { margin: 0; color: var(--graphite); max-width: 680px; }
+.controls { display: flex; gap: 8px; flex-shrink: 0; }
+.ctrl {
+  border: 1px solid var(--rule); background: #fff; color: var(--ink); border-radius: 8px;
+  padding: 8px 12px; font: 600 14px var(--sans); cursor: pointer; min-width: 44px; min-height: 40px;
+}
+.ctrl:hover { border-color: var(--signal); color: var(--signal); }
+.progress { height: 3px; background: var(--paper); }
+.progress i { display: block; height: 100%; width: 0; background: var(--signal); }
+
+/* ---------- Building blocks used inside the bench ---------- */
+.doc {
+  background: #fff; border: 1px solid var(--rule); border-radius: 8px; padding: 18px 20px;
+  font: 14px/1.75 var(--mono); color: var(--ink); box-shadow: 0 1px 0 var(--rule);
+}
+.doc .k { color: var(--graphite); }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+.panel-title { font: 600 14px var(--sans); color: var(--graphite); margin: 0 0 8px; }
+.redact { background: var(--ink); color: transparent; border-radius: 2px; transition: background .2s; }
+.tag { display: inline-block; font: 600 12px var(--sans); padding: 2px 8px; border-radius: 999px; }
+.tag.pass { background: var(--pass-soft); color: var(--pass); }
+.tag.fail { background: var(--fail-soft); color: var(--fail); }
+.tag.caution { background: var(--caution-soft); color: var(--caution); }
+.tag.signal { background: var(--signal-soft); color: var(--signal); }
+.row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--paper); }
+.row:last-child { border-bottom: 0; }
+.bar { flex: 1; height: 8px; background: var(--paper); border-radius: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; border-radius: 4px; background: var(--signal); }
+.mono { font-family: var(--mono); font-size: 14px; }
+.muted { color: var(--graphite); }
+.fade { opacity: 0; transition: opacity .35s; }
+.fade.on { opacity: 1; }
+.hl-fail { background: var(--fail-soft); color: var(--fail); border-bottom: 2px solid var(--fail); }
+.note {
+  border-left: 3px solid var(--fail); background: #fff; padding: 10px 14px; border-radius: 0 8px 8px 0;
+  font-size: 15px; box-shadow: 0 1px 0 var(--rule);
+}
+.note.signal { border-color: var(--signal); }
+.chart-row { display: grid; grid-template-columns: 130px 1fr 60px; gap: 12px; align-items: center; margin: 10px 0; font-size: 15px; }
+.chart-row .bar { height: 16px; border-radius: 3px; }
+.chart-row .bar i { border-radius: 3px; }
+canvas { display: block; max-width: 100%; }
+
+/* ---------- Below the pipeline ---------- */
+.facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin: 34px 0 10px; border-top: 2px solid var(--ink); }
+.fact { padding: 16px 18px 6px 0; }
+.fact b { display: block; font-size: 30px; letter-spacing: -0.02em; line-height: 1.1; }
+.fact span { color: var(--graphite); font-size: 15px; }
+.built { padding: 18px 0 70px; max-width: 760px; }
+.built h2 { font-size: 22px; margin: 26px 0 8px; }
+.built p { margin: 0 0 10px; }
+.stack { color: var(--graphite); }
+footer { border-top: 1px solid var(--rule); padding: 24px 0 40px; color: var(--graphite); font-size: 15px; }
+
+@media (max-width: 760px) {
+  body { font-size: 16px; }
+  .bench { padding: 16px; min-height: 380px; }
+  .cols { grid-template-columns: 1fr; }
+  .facts { grid-template-columns: repeat(2, 1fr); }
+  .caption-bar { flex-direction: column; }
+  .rail-btn .rail-label { display: none; }
+  .rail-btn.active .rail-label { display: inline; }
+  .chart-row { grid-template-columns: 96px 1fr 52px; font-size: 14px; }
+  .row { flex-wrap: wrap; gap: 4px 12px; }
+  .row .bar { flex: 1 1 100%; order: 5; }
+  .row > span[style*="width"] { width: auto !important; }
+  .doc { padding: 14px; font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+/* ---------- Project-specific pieces (moved from individual pages) ---------- */
+/* grpo */
+.answers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .ans { background: #fff; border: 1px solid var(--rule); border-radius: 8px; padding: 12px; font-size: 14px; min-height: 92px; transition: border-color .25s, background .25s; }
+  .ans .final { font: 500 20px var(--mono); margin-top: 6px; }
+  .ans.right { border-color: var(--pass); background: var(--pass-soft); }
+  .ans.wrong { border-color: var(--fail); background: var(--fail-soft); }
+  .ans .rw { float: right; font: 600 13px var(--mono); }
+  .adv { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; height: 220px; align-items: center; position: relative; }
+  .adv::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px dashed var(--graphite); }
+  .adv .col { position: relative; height: 100%; }
+  .adv .col i { position: absolute; left: 15%; right: 15%; border-radius: 3px; }
+  .adv .col span { position: absolute; left: 0; right: 0; text-align: center; font: 500 13px var(--mono); }
+  @media (max-width: 760px) { .answers { grid-template-columns: repeat(2, 1fr); } .adv { gap: 4px; } .adv .col span { font-size: 11px; } }
+/* memory */
+.chat { display: flex; flex-direction: column; gap: 10px; }
+  .turn { background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 10px 14px; max-width: 100%; }
+  .turn .who { font-size: 13px; color: var(--graphite); }
+  .turn .tag { margin-left: 8px; }
+  .slot { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--paper); font-family: var(--mono); font-size: 14px; }
+  .slot:last-child { border-bottom: 0; }
+  .old { text-decoration: line-through; color: var(--graphite); }
+  .flash { background: var(--signal-soft); border-radius: 4px; }
+/* kitti */
+.scene { position: relative; }
+  .scene canvas { width: 100%; background: #fff; border: 1px solid var(--rule); border-radius: 8px; }
+  .overlay { position: absolute; right: 14px; top: 14px; background: rgba(255,255,255,.94); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 14px; font-size: 14px; min-width: 210px; }
+  .overlay b { font-size: 22px; display: block; font-family: var(--mono); font-weight: 500; }
+  .bugs .row { align-items: flex-start; }
+  .bugs .row b { display: block; }
+  @media (max-width: 760px) { .overlay { position: static; margin-top: 10px; } }
+.rail { position: relative; }
+
+/* generic before → after visual */
+.io { display: grid; grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1.25fr); align-items: center; gap: 10px; }
+.io .card { background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; }
+.io .card.prev { opacity: .55; }
+.io .card.cur { border-color: var(--signal); box-shadow: 0 0 0 3px var(--signal-soft); }
+.io .card pre { margin: 6px 0 0; font: 14px/1.6 var(--mono); white-space: pre-wrap; word-break: break-word; min-height: 3.2em; }
+.io .arrow { height: 2px; background: var(--rule); position: relative; overflow: visible; }
+.io .arrow i { position: absolute; left: 0; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--signal); }
+@media (max-width: 760px) {
+  .io { grid-template-columns: 1fr; }
+  .io .arrow { width: 2px; height: 34px; margin: 0 auto; }
+  .io .arrow i { left: -4px; top: 0; }
+}
+
+/* generic pipeline chain */
+.chain { display: flex; align-items: stretch; gap: 0; width: 100%; }
+.link { flex: 1 1 0; min-width: 0; background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 12px; transition: border-color .3s, box-shadow .3s, opacity .3s; }
+.link pre { margin: 6px 0 0; font: 12.5px/1.55 var(--mono); white-space: pre-wrap; word-break: break-word; }
+.link-label { font: 600 13px var(--sans); color: var(--graphite); }
+.link.input { background: var(--paper); }
+.link.cur { border-color: var(--signal); box-shadow: 0 0 0 3px var(--signal-soft); }
+.link.cur .link-label { color: var(--signal); }
+.link.todo { background: transparent; border-style: dashed; opacity: .6; }
+.joint { flex: 0 0 22px; align-self: center; height: 2px; background: var(--rule); position: relative; }
+.joint i { position: absolute; right: -1px; top: -4px; border: 5px solid transparent; border-left: 6px solid var(--rule); }
+.joint.lit { background: var(--signal); }
+.joint.lit i { border-left-color: var(--signal); }
+@media (max-width: 900px) {
+  .chain { flex-direction: column; }
+  .joint { flex: 0 0 18px; width: 2px; height: auto; align-self: center; }
+  .joint i { right: auto; top: auto; bottom: -6px; left: -4px; border: 5px solid transparent; border-top: 6px solid var(--rule); }
+  .joint.lit i { border-top-color: var(--signal); border-left-color: transparent; }
+  .link.todo pre { display: none; }
+}
+
+
+/* match portfolio: Syne headings, square-ish corners */
+.intro h1, .head h2, .caption h2, .item h2 { font-family: var(--display); letter-spacing: -0.03em; }
+.pipeline, .doc, .link, .card, .ans, .turn, .ctrl, .chip, .pill, .note, .scene canvas, .overlay { border-radius: 3px !important; }
+.chip[aria-current="true"] { background: var(--teal, #00B4A0); border-color: #00B4A0; }
+.topbar a:first-child::before { content: ""; }
+</style>
+<style>
+  .switcher { position: sticky; top: 0; z-index: 10; background: rgba(248,248,246,.94); backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule); }
+  .switcher .wrap { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 12px; padding-bottom: 12px; }
+  @media (max-width: 760px) { .switcher { position: static; } .chip { font-size: 13px; padding: 6px 11px; } }
+  .chip { flex: 0 0 auto; border: 1px solid var(--rule); background: #fff; color: var(--ink); border-radius: 999px; padding: 7px 14px; font: 600 14px var(--sans); cursor: pointer; text-decoration: none; white-space: nowrap; }
+  .chip:hover { border-color: var(--signal); color: var(--signal); }
+  .chip[aria-current="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .head { padding: 34px 0 18px; }
+  .head .count { color: var(--graphite); font-size: 15px; margin: 0 0 6px; }
+  .head h2 { font-size: clamp(30px, 5vw, 46px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 10px; }
+  .head p { margin: 0; color: var(--graphite); font-size: 18px; max-width: 720px; }
+  .sec { padding: 26px 0 4px; border-bottom: 1px solid var(--rule); }
+  .sec h3 { font-size: 15px; color: var(--graphite); font-weight: 600; margin: 0 0 10px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill { background: #fff; border: 1px solid var(--rule); border-radius: 6px; padding: 4px 10px; font-size: 15px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .two p { margin: 0 0 14px; max-width: 520px; }
+  .facts { margin: 4px 0 14px; border-top: 0; }
+  ol.steps, ul.next { margin: 0 0 16px; padding-left: 22px; max-width: 760px; }
+  ol.steps li, ul.next li { margin: 6px 0; }
+  .links { display: flex; flex-wrap: wrap; gap: 10px; padding-bottom: 20px; }
+  .links a { border: 1px solid var(--ink); border-radius: 8px; padding: 8px 14px; text-decoration: none; color: var(--ink); font-weight: 600; }
+  .links a:hover { background: var(--ink); color: #fff; }
+  .links .none { color: var(--graphite); }
+  #project:focus { outline: none; }
+  .pager { display: flex; justify-content: space-between; gap: 12px; padding: 28px 0 70px; }
+  .pager button { background: none; border: 0; padding: 0; font: 600 16px var(--sans); color: var(--signal); cursor: pointer; text-align: left; }
+  .pager button:last-child { text-align: right; }
+  .pager small { display: block; color: var(--graphite); font-weight: 400; }
+  @media (max-width: 760px) { .two { grid-template-columns: 1fr; gap: 0; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <a href="../">← Back to portfolio</a>
+    <nav><a href="https://github.com/Uttaprexa">GitHub</a><a href="https://medium.com/@uttapreksha24">Writing</a></nav>
+  </header>
+  <section class="intro" style="padding-bottom:16px">
+    <h1>Visualize my projects</h1>
+    <p>13 projects. Each one plays an example through the system. Pick any project below.</p>
+  </section>
+</div>
+
+<nav class="switcher" aria-label="Projects"><div class="wrap" id="chips"></div></nav>
+
+<main class="wrap" id="project" tabindex="-1">
+  <header class="head">
+    <p class="count" id="p-count"></p>
+    <h2 id="p-name"></h2>
+    <p id="p-tagline"></p>
+  </header>
+  <div id="pipeline"></div>
+  <p class="muted" id="p-detail" style="font-size:15px;margin:10px 0 0"></p>
+
+  <section class="sec"><h3>Stack</h3><div class="pills" id="p-stack"></div><div style="height:18px"></div></section>
+  <section class="sec two">
+    <div><h3>Input</h3><p id="p-in"></p></div>
+    <div><h3>Output</h3><p id="p-out"></p></div>
+  </section>
+  <section class="sec"><h3>Numbers</h3><div class="facts" id="p-num"></div></section>
+  <section class="sec"><h3>Flow</h3><ol class="steps" id="p-flow"></ol></section>
+  <section class="sec"><h3>Next steps</h3><ul class="next" id="p-future"></ul></section>
+  <section class="sec" style="border-bottom:0"><h3>Links</h3><div class="links" id="p-links"></div></section>
+  <nav class="pager" aria-label="Previous and next project"><button type="button" id="prev"></button><button type="button" id="next"></button></nav>
+</main>
+<footer><div class="wrap">Examples inside the animations are illustrative; numbers under “Numbers” are measured results.</div></footer>
+
+<script>
+/* Tiny auto-playing pipeline engine.
+   Each stage = { label, title, caption, duration(ms), setup(bench) -> state, update(state, p) }
+   update() is called every frame with p from 0 to 1, so pause/replay are exact. */
+(function () {
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const H = {
+    el(tag, cls, html) {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (html != null) e.innerHTML = html;
+      return e;
+    },
+    // map p into a sub-window [a, b] of the stage, clamped to 0..1
+    seg(p, a, b) { return Math.max(0, Math.min(1, (p - a) / (b - a))); },
+    ease(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; },
+    show(node, on) { node.classList.toggle("on", !!on); },
+    type(node, text, t) { node.textContent = text.slice(0, Math.round(text.length * t)); },
+    // simple seeded random, so canvases look the same every loop
+    rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); },
+    reduce,
+  };
+  window.PipeHelpers = H;
+
+  window.Pipeline = function (root, stages) {
+    root = typeof root === "string" ? document.querySelector(root) : root;
+    root.classList.add("pipeline");
+    root.innerHTML = "";
+
+    const rail = H.el("div", "rail");
+    rail.setAttribute("role", "tablist");
+    rail.setAttribute("aria-label", "Pipeline steps");
+    const btns = [], wires = [];
+    stages.forEach((s, i) => {
+      const step = H.el("div", "rail-step");
+      const b = H.el("button", "rail-btn", `<span class="rail-num">${i + 1}</span><span class="rail-label">${s.label}</span>`);
+      b.type = "button";
+      b.setAttribute("aria-label", `Step ${i + 1}: ${s.label}`);
+      b.addEventListener("click", () => go(i, true));
+      step.appendChild(b); btns.push(b);
+      if (i < stages.length - 1) { const w = H.el("div", "rail-wire", "<i></i>"); step.appendChild(w); wires.push(w.firstChild); }
+      rail.appendChild(step);
+    });
+
+    const bench = H.el("div", "bench");
+    bench.setAttribute("aria-live", "off");
+    const bar = H.el("div", "caption-bar");
+    const cap = H.el("div", "caption", "<h2></h2><p></p>");
+    cap.setAttribute("aria-live", "polite");
+    const ctr = H.el("div", "controls");
+    const playBtn = H.el("button", "ctrl", "Pause");
+    const againBtn = H.el("button", "ctrl", "Replay");
+    playBtn.type = againBtn.type = "button";
+    ctr.append(playBtn, againBtn);
+    bar.append(cap, ctr);
+    const prog = H.el("div", "progress", "<i></i>");
+    root.append(rail, bench, bar, prog);
+
+    let idx = 0, t = 0, state = null, playing = true, last = null, alive = true;
+    const HOLD = reduce ? 2600 : 1100;
+
+    function go(i, user) {
+      idx = (i + stages.length) % stages.length; t = 0;
+      const s = stages[idx];
+      bench.innerHTML = "";
+      state = s.setup(bench) || {};
+      cap.querySelector("h2").textContent = `${idx + 1}. ${s.title}`;
+      cap.querySelector("p").textContent = s.caption;
+      btns.forEach((b, j) => {
+        b.classList.toggle("active", j === idx);
+        b.classList.toggle("done", j < idx);
+        b.setAttribute("aria-selected", j === idx ? "true" : "false");
+      });
+      wires.forEach((w, j) => { w.style.transform = `scaleX(${j < idx ? 1 : 0})`; });
+      const bl = btns[idx].parentNode.offsetLeft - rail.clientWidth / 2 + 60; rail.scrollTo({ left: Math.max(0, bl), behavior: reduce ? "auto" : "smooth" });
+      s.update(state, reduce ? 1 : 0);
+      if (user && !playing) render();
+    }
+
+    function render() {
+      const s = stages[idx];
+      const p = reduce ? 1 : Math.min(1, t / s.duration);
+      s.update(state, p);
+      prog.firstChild.style.width = `${Math.min(1, t / (s.duration + HOLD)) * 100}%`;
+      if (idx < wires.length) wires[idx].style.transform = `scaleX(${H.seg(t, s.duration, s.duration + HOLD)})`;
+    }
+
+    function frame(now) {
+      if (!alive) return;
+      if (last == null) last = now;
+      const dt = Math.min(64, now - last); last = now;
+      if (playing && !document.hidden) {
+        t += dt;
+        const s = stages[idx];
+        const end = s.duration + HOLD + (idx === stages.length - 1 ? 2200 : 0);
+        render();
+        if (t >= end) go(idx + 1);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    playBtn.addEventListener("click", () => { playing = !playing; playBtn.textContent = playing ? "Pause" : "Play"; });
+    againBtn.addEventListener("click", () => { playing = true; playBtn.textContent = "Pause"; go(0); });
+
+    go(0);
+    requestAnimationFrame(frame);
+    return { stop() { alive = false; root.innerHTML = ""; } };
+  };
+})();
+
+</script>
+<script>
+window.PROJECT_STAGES = window.PROJECT_STAGES || {};
+(function () {
+
+const { el, seg, ease, show, type } = PipeHelpers;
+
+const FORM = [
+  ["Patient name", "Aisha Patel", false],
+  ["Date of birth", "03/14/1977", false],
+  ["Phone", "(617) 555-0142", true],
+  ["Address", "41 Elm St, Boston MA", true],
+  ["Record ID", "MRN-0048213", true],
+  ["Chief complaint", "Recurrent migraines, about 3 per week", false],
+  ["Medications", "Sumatriptan 50 mg, as needed", false],
+  ["Allergies", "Penicillin (rash)", false],
+];
+
+function formDoc(bench, redactOn) {
+  const d = el("div", "doc");
+  const lines = FORM.map(([k, v, phi]) => {
+    const line = el("div", "", `<span class="k">${k}:</span> <span class="v">${v}</span>`);
+    if (phi && redactOn) line.querySelector(".v").classList.add("phi");
+    d.appendChild(line);
+    return line;
+  });
+  bench.appendChild(d);
+  return { d, lines };
+}
+
+const FIELDS = [
+  ["date_of_birth", "1977-03-14", 0.99],
+  ["chief_complaint", "recurrent migraines", 0.97],
+  ["frequency", "~3 per week", 0.62],
+  ["medication", "sumatriptan 50 mg PRN", 0.93],
+  ["allergy", "penicillin (rash)", 0.95],
+];
+
+window.PROJECT_STAGES.clinical = [
+  {
+    label: "Ingest", title: "Read the form",
+    caption: "The upload becomes plain text. Image-only PDFs are rejected with a clear error instead of guessed at.",
+    duration: 4200,
+    setup(b) {
+      const wrap = el("div", "", '<p class="panel-title">intake_form.pdf → text</p>');
+      b.appendChild(wrap);
+      const f = formDoc(wrap, false);
+      f.lines.forEach(l => { l.dataset.full = l.textContent; l.style.minHeight = "1.75em"; });
+      return f;
+    },
+    update(s, p) {
+      s.lines.forEach((l, i) => {
+        const t = seg(p, i * 0.1, i * 0.1 + 0.2);
+        l.style.opacity = t > 0 ? 1 : 0.15;
+        if (t < 1) l.textContent = l.dataset.full.slice(0, Math.round(l.dataset.full.length * t));
+        else if (!l.querySelector(".k")) { const [k, v] = FORM[i]; l.innerHTML = `<span class="k">${k}:</span> <span class="v">${v}</span>`; }
+      });
+    }
+  },
+  {
+    label: "Redact", title: "Strip identifiers before any model sees them",
+    caption: "Phone numbers, addresses and record IDs are removed first, so the least possible personal data ever reaches a model.",
+    duration: 3800,
+    setup(b) {
+      const wrap = el("div", "", '<p class="panel-title">Pattern matching, then one model pass</p>');
+      b.appendChild(wrap);
+      const f = formDoc(wrap, true);
+      const tags = [...f.d.querySelectorAll(".phi")].map(v => { const t = el("span", "tag fail fade", "removed"); t.style.marginLeft = "10px"; v.after(t); return t; });
+      return { phis: [...f.d.querySelectorAll(".phi")], tags };
+    },
+    update(s, p) {
+      s.phis.forEach((v, i) => {
+        const t = seg(p, 0.15 + i * 0.22, 0.3 + i * 0.22);
+        v.classList.toggle("redact", t >= 1);
+        show(s.tags[i], t >= 1);
+      });
+    }
+  },
+  {
+    label: "Extract", title: "Pull out structured fields, each with a confidence score",
+    caption: "The model returns every field with how sure it is and the exact text it came from, so any value can be checked in one click.",
+    duration: 4600,
+    setup(b) {
+      const wrap = el("div", "", '<p class="panel-title">Extracted fields</p>');
+      const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+      const rows = FIELDS.map(([k, v, c]) => {
+        const r = el("div", "row fade", `<span class="mono" style="width:150px">${k}</span><span style="width:190px">${v}</span><span class="bar"><i></i></span><span class="mono" style="width:40px;text-align:right">${c.toFixed(2)}</span>`);
+        box.appendChild(r);
+        return { r, i: r.querySelector(".bar i"), c };
+      });
+      wrap.appendChild(box); b.appendChild(wrap);
+      return { rows };
+    },
+    update(s, p) {
+      s.rows.forEach((o, i) => {
+        const t = seg(p, i * 0.14, i * 0.14 + 0.3);
+        show(o.r, t > 0);
+        o.i.style.width = `${ease(t) * o.c * 100}%`;
+        o.i.style.background = o.c < 0.8 ? "var(--caution)" : "var(--signal)";
+      });
+    }
+  },
+  {
+    label: "Validate", title: "Check with plain rules, not another model",
+    caption: "Rules are repeatable and easy to audit. A model here would add a second chance to make things up. Uncertain fields go to a person.",
+    duration: 4400,
+    setup(b) {
+      const cols = el("div", "cols");
+      const left = el("div", "", '<p class="panel-title">Rule checks</p>');
+      const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+      const checks = [
+        ["Date of birth is a real date", true], ["Required fields present", true],
+        ["Dosage has a unit", true], ["Every field ≥ 0.80 confidence", false],
+      ].map(([t, ok]) => {
+        const r = el("div", "row", `<span style="flex:1">${t}</span><span class="tag ${ok ? "pass" : "caution"} fade">${ok ? "passed" : "1 field below"}</span>`);
+        box.appendChild(r); return r.querySelector(".tag");
+      });
+      left.appendChild(box);
+      const right = el("div", "fade", '<p class="panel-title">Sent to the review screen</p>');
+      right.appendChild(el("div", "note signal", '<b>frequency: “~3 per week”</b><br><span class="muted">Confidence 0.62. A clinician confirms or edits it before export.</span>'));
+      cols.append(left, right); b.appendChild(cols);
+      return { checks, right };
+    },
+    update(s, p) {
+      s.checks.forEach((c, i) => show(c, p > 0.15 + i * 0.17));
+      show(s.right, p > 0.85);
+    }
+  },
+  {
+    label: "Summarize", title: "Write the note from the fields, not the raw form",
+    caption: "The note-writer only sees what extraction captured, which leaves far less room to invent details.",
+    duration: 4600,
+    setup(b) {
+      const wrap = el("div", "", '<p class="panel-title">Clinician note (generated)</p>');
+      const d = el("div", "doc"); d.style.fontFamily = "var(--sans)"; d.style.fontSize = "17px"; d.style.lineHeight = "1.7";
+      const span = el("span"); d.appendChild(span); wrap.appendChild(d); b.appendChild(wrap);
+      return { span, text: "Aisha Patel is a 44-year-old female presenting with recurrent migraines, about three per week. She takes sumatriptan 50 mg as needed. Allergy: penicillin (rash)." };
+    },
+    update(s, p) { type(s.span, s.text, seg(p, 0.05, 0.9)); }
+  },
+  {
+    label: "Export", title: "Package it for the health record",
+    caption: "Fields are mapped to FHIR, the standard format for exchanging health data, as a bundle of resources.",
+    duration: 4000,
+    setup(b) {
+      const wrap = el("div", "", '<p class="panel-title">fhir_bundle.json</p>');
+      const d = el("pre", "doc"); d.style.margin = "0"; d.style.whiteSpace = "pre-wrap";
+      wrap.appendChild(d); b.appendChild(wrap);
+      return { d, text:
+`{ "resourceType": "Bundle",
+  "entry": [
+    { "resourceType": "Patient", "birthDate": "1977-03-14" },
+    { "resourceType": "Condition", "code": { "text": "recurrent migraines" } },
+    { "resourceType": "MedicationStatement", "medication": "sumatriptan 50 mg PRN" },
+    { "resourceType": "AllergyIntolerance", "code": { "text": "penicillin" } }
+  ] }` };
+    },
+    update(s, p) { type(s.d, s.text, seg(p, 0.05, 0.85)); }
+  },
+  {
+    label: "Evaluate", title: "The checks passed. Reading the output found what they missed",
+    caption: "The harness graded extraction only. The form never stated age or gender. The model guessed both from the name and birth year, and got the age wrong. Next: grade every claim in the note against the fields.",
+    duration: 6200,
+    setup(b) {
+      const cols = el("div", "cols");
+      const left = el("div", "", '<p class="panel-title">Automated eval, 4 synthetic forms</p>');
+      const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+      const r1 = el("div", "row", '<span style="flex:1">Extraction accuracy</span><b class="mono n1">0.0%</b><span class="tag pass fade">pass</span>');
+      const r2 = el("div", "row", '<span style="flex:1">Extraction hallucination</span><b class="mono">0%</b><span class="tag pass fade">pass</span>');
+      const r3 = el("div", "row", '<span style="flex:1">CI regression suite</span><span class="tag pass fade">passed</span>');
+      box.append(r1, r2, r3); left.appendChild(box);
+      const right = el("div", "fade", '<p class="panel-title">Manual review of the note</p>');
+      const d = el("div", "doc"); d.style.fontFamily = "var(--sans)"; d.style.fontSize = "17px";
+      d.innerHTML = 'Aisha Patel is a <span class="hl">44-year-old female</span> presenting with recurrent migraines…';
+      const note = el("div", "note fade", "Not in the form. The harness never looked at summaries.");
+      note.style.marginTop = "12px";
+      right.append(d, note);
+      cols.append(left, right); b.appendChild(cols);
+      return { n1: r1.querySelector(".n1"), tags: [...box.querySelectorAll(".tag")], right, hl: d.querySelector(".hl"), note };
+    },
+    update(s, p) {
+      s.n1.textContent = (90.6 * ease(seg(p, 0, 0.3))).toFixed(1) + "%";
+      s.tags.forEach((t, i) => show(t, p > 0.3 + i * 0.07));
+      show(s.right, p > 0.55);
+      s.hl.classList.toggle("hl-fail", p > 0.72);
+      show(s.note, p > 0.8);
+    }
+  },
+];
+
+})();
+
+</script>
+<script>
+window.PROJECT_STAGES = window.PROJECT_STAGES || {};
+(function () {
+
+const { el, seg, ease, show, type } = PipeHelpers;
+const Q = "A baker makes 24 muffins and sells 3/4 of them. Then she bakes 10 more. How many muffins does she have now?";
+const GOOD = [16, 18, 16, 14, 26, 16, 6, 18];
+const REW = GOOD.map(a => (a === 16 ? 1 : 0));
+const mean = REW.reduce((a, b) => a + b) / 8;
+const std = Math.sqrt(REW.reduce((a, r) => a + (r - mean) ** 2, 0) / 7);
+const ADV = REW.map(r => (r - mean) / (std + 1e-8));
+const WORK = [
+  "24 × 3/4 = 18 sold, 6 left. 6 + 10 =", "Sold 18, so she has", "6 left after selling, plus 10 =", "24 − 18 = 6… 6 + 8 =",
+  "24 + 10 − 8 =", "Left: 24 − 18 = 6. Then 6 + 10 =", "24 × 1/4 =", "She sold",
+];
+
+function problem(b) {
+  const d = el("div", "doc"); d.style.fontFamily = "var(--sans)"; d.style.fontSize = "17px"; d.style.marginBottom = "16px";
+  d.innerHTML = `<span class="muted">Problem</span><br>${Q}`;
+  b.appendChild(d);
+  return d;
+}
+function answers(b, finals) {
+  const g = el("div", "answers");
+  const cards = finals.map((f, i) => {
+    const c = el("div", "ans fade", `<span class="muted">Answer ${i + 1}</span><span class="rw"></span><div class="muted" style="font-size:13px">${WORK[i]}</div><div class="final">#### ${f}</div>`);
+    g.appendChild(c); return c;
+  });
+  b.appendChild(g);
+  return cards;
+}
+function advChart(b, adv) {
+  const g = el("div", "adv");
+  const cols = adv.map(a => {
+    const c = el("div", "col", "<i></i><span></span>"); g.appendChild(c); return { c, i: c.firstChild, s: c.lastChild, a };
+  });
+  b.appendChild(g);
+  return cols;
+}
+function drawAdv(cols, t) {
+  const H = 80; // px per unit of advantage
+  cols.forEach(o => {
+    const h = Math.abs(o.a) * H * ease(t);
+    o.i.style.height = h + "px";
+    o.i.style.background = o.a > 0 ? "var(--pass)" : o.a < 0 ? "var(--fail)" : "var(--graphite)";
+    if (o.a >= 0) { o.i.style.bottom = "50%"; o.i.style.top = ""; o.s.style.bottom = `calc(50% + ${h + 4}px)`; o.s.style.top = ""; }
+    else { o.i.style.top = "50%"; o.i.style.bottom = ""; o.s.style.top = `calc(50% + ${h + 4}px)`; o.s.style.bottom = ""; }
+    o.s.textContent = t > 0.6 ? (o.a > 0 ? "+" : "") + o.a.toFixed(2) : "";
+  });
+}
+
+window.PROJECT_STAGES.grpo = [
+  {
+    label: "Problem", title: "Start with a problem that has a checkable answer",
+    caption: "Math word problems have one correct number, so a program can score every attempt. No human labels, no reward model.",
+    duration: 3600,
+    setup(b) { const d = problem(b); const s = el("span"); d.innerHTML = '<span class="muted">Problem</span><br>'; d.appendChild(s); return { s }; },
+    update(st, p) { type(st.s, Q, seg(p, 0.05, 0.8)); }
+  },
+  {
+    label: "Sample 8", title: "Ask the model the same question 8 times",
+    caption: "Sampling with some randomness gives eight different attempts. This group is what GRPO learns from.",
+    duration: 4200,
+    setup(b) { problem(b); return { cards: answers(b, GOOD) }; },
+    update(st, p) { st.cards.forEach((c, i) => show(c, p > 0.06 + i * 0.1)); }
+  },
+  {
+    label: "Score", title: "Check each final answer: 1 if right, 0 if wrong",
+    caption: "The checker finds the final number (it handles four answer formats) and compares it to 16. Three of eight are correct.",
+    duration: 4200,
+    setup(b) { problem(b); const cards = answers(b, GOOD); cards.forEach(c => c.classList.add("on")); return { cards }; },
+    update(st, p) {
+      st.cards.forEach((c, i) => {
+        const on = p > 0.08 + i * 0.1;
+        c.classList.toggle("right", on && REW[i] === 1);
+        c.classList.toggle("wrong", on && REW[i] === 0);
+        c.querySelector(".rw").textContent = on ? `reward ${REW[i]}` : "";
+      });
+    }
+  },
+  {
+    label: "Compare", title: "Compare each answer to its own group",
+    caption: `Advantage = (reward − group average) ÷ group spread. Average here is ${mean.toFixed(3)}. Right answers score above it and wrong ones below. No separate critic model is needed: the group is the baseline.`,
+    duration: 4800,
+    setup(b) {
+      const t = el("p", "panel-title", "Advantage for each of the 8 answers");
+      b.appendChild(t);
+      return { cols: advChart(b, ADV) };
+    },
+    update(st, p) { drawAdv(st.cols, seg(p, 0.1, 0.7)); }
+  },
+  {
+    label: "Update", title: "Nudge the model toward the better answers, gently",
+    caption: "Right answers become more likely and wrong ones less likely. Clipping caps how far one step can move, and a KL penalty keeps the model close to where it started.",
+    duration: 5000,
+    setup(b) {
+      const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+      box.appendChild(el("p", "panel-title", "Probability of producing each answer (illustrative)"));
+      const rows = GOOD.map((a, i) => {
+        const r = el("div", "chart-row", `<span>Answer ${i + 1} <span class="mono muted">(${a})</span></span><span class="bar"><i></i></span><span class="mono pct"></span>`);
+        box.appendChild(r);
+        return { i: r.querySelector("i"), pct: r.querySelector(".pct"), base: 0.12, adv: ADV[i] };
+      });
+      b.appendChild(box);
+      const leash = el("div", "note signal fade", "Clip range ±20% per step, KL coefficient 0.01, learning rate 1e-6");
+      leash.style.marginTop = "12px"; b.appendChild(leash);
+      return { rows, leash };
+    },
+    update(st, p) {
+      const t = ease(seg(p, 0.15, 0.8));
+      st.rows.forEach(o => {
+        const v = o.base * (1 + Math.max(-0.2, Math.min(0.2, o.adv * 0.2)) * t);
+        o.i.style.width = v * 600 + "%";
+        o.i.style.background = o.adv > 0 ? "var(--pass)" : "var(--fail)";
+        o.pct.textContent = (v * 100).toFixed(1) + "%";
+      });
+      show(st.leash, p > 0.6);
+    }
+  },
+  {
+    label: "All wrong", title: "When all 8 answers are wrong, nothing is learned",
+    caption: "Every reward is 0, so the average is 0, every advantage is 0, and the update is zero. A small model gets most hard problems wrong, so many steps are wasted. That's reward sparsity.",
+    duration: 5200,
+    setup(b) {
+      const finals = [18, 14, 26, 6, 18, 20, 12, 8];
+      const cards = answers(b, finals);
+      cards.forEach(c => c.classList.add("on"));
+      const t = el("p", "panel-title fade", "Advantages: all zero");
+      t.style.margin = "18px 0 0";
+      b.appendChild(t);
+      const cols = advChart(b, new Array(8).fill(0));
+      cols.forEach(o => (o.a = 0));
+      return { cards, t, cols };
+    },
+    update(st, p) {
+      st.cards.forEach((c, i) => { const on = p > 0.05 + i * 0.05; c.classList.toggle("wrong", on); c.querySelector(".rw").textContent = on ? "reward 0" : ""; });
+      show(st.t, p > 0.55);
+      st.cols.forEach(o => { o.s.textContent = p > 0.65 ? "0.00" : ""; o.s.style.bottom = "calc(50% + 4px)"; });
+    }
+  },
+  {
+    label: "Results", title: "Same model, same data, three algorithms",
+    caption: "All three roughly tripled the starting model. DPO matched GRPO in about two-thirds of the time; the 1-point gap is two problems, so treat them as tied. PPO trailed.",
+    duration: 5200,
+    setup(b) {
+      const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+      box.appendChild(el("p", "panel-title", "GSM8K accuracy, 200 held-out problems (training time)"));
+      const data = [["Starting model", 8.7, "", "var(--graphite)"], ["PPO", 25.0, "191 min", "var(--signal)"], ["GRPO", 28.5, "188 min", "var(--signal)"], ["DPO", 29.5, "120 min", "var(--pass)"]];
+      const rows = data.map(([n, v, tm, c]) => {
+        const r = el("div", "chart-row", `<span>${n}<br><span class="muted" style="font-size:13px">${tm}</span></span><span class="bar"><i></i></span><span class="mono v"></span>`);
+        box.appendChild(r);
+        const i = r.querySelector("i"); i.style.background = c;
+        return { i, v: r.querySelector(".v"), val: v };
+      });
+      b.appendChild(box);
+      return { rows };
+    },
+    update(st, p) {
+      st.rows.forEach((o, k) => {
+        const t = ease(seg(p, k * 0.12, k * 0.12 + 0.45));
+        o.i.style.width = (o.val / 35) * 100 * t + "%";
+        o.v.textContent = (o.val * t).toFixed(1) + "%";
+      });
+    }
+  },
+];
+
+})();
+
+</script>
+<script>
+window.PROJECT_STAGES = window.PROJECT_STAGES || {};
+(function () {
+
+const { el, seg, ease, show } = PipeHelpers;
+
+const TURNS = [
+  { n: 3,  text: "I'm vegetarian, by the way.", act: "Store", cls: "signal", slot: ["diet", "vegetarian"] },
+  { n: 8,  text: "Haha, that's hilarious.", act: "Drop", cls: "fail" },
+  { n: 15, text: "My friend Maya is vegan.", act: "Drop: about someone else", cls: "fail" },
+  { n: 22, text: "Let's plan the trip later.", act: "Keep for now", cls: "caution" },
+  { n: 40, text: "I've gone fully vegan now.", act: "Store: update", cls: "signal", slot: ["diet", "vegan"] },
+  { n: 57, text: "I only drink caffeine-free stuff these days.", act: "Store: reworded", cls: "signal", slot: ["drink", "decaf"] },
+];
+
+function layout(b) {
+  const cols = el("div", "cols");
+  const left = el("div", "", '<p class="panel-title">Conversation</p>');
+  const chat = el("div", "chat"); left.appendChild(chat);
+  const right = el("div", "", '<p class="panel-title">Memory slots</p>');
+  const mem = el("div", "doc"); mem.style.minHeight = "120px"; right.appendChild(mem);
+  cols.append(left, right); b.appendChild(cols);
+  return { chat, mem };
+}
+function turnNode(t) {
+  return el("div", "turn fade", `<div class="who">User, turn ${t.n}<span class="tag ${t.cls} fade">${t.act}</span></div>${t.text}`);
+}
+function slotNode(k, v) { return el("div", "slot fade", `<span>${k}</span><span class="val">${v}</span>`); }
+
+// each stage shows a window of turns; memory state is rebuilt from what came before
+function stage(range, opts) {
+  return {
+    setup(b) {
+      const L = layout(b);
+      const mem = {};
+      TURNS.slice(0, range[0]).forEach(t => { if (t.slot) mem[t.slot[0]] = t.slot[1]; });
+      const slots = {};
+      Object.entries(mem).forEach(([k, v]) => { const s = slotNode(k, v); s.classList.add("on"); L.mem.appendChild(s); slots[k] = s; });
+      const items = TURNS.slice(range[0], range[1]).map(t => {
+        const node = turnNode(t); L.chat.appendChild(node);
+        let s = null, oldVal = null;
+        if (t.slot) {
+          if (slots[t.slot[0]]) { s = slots[t.slot[0]]; oldVal = s.querySelector(".val").textContent; }
+          else { s = slotNode(t.slot[0], t.slot[1]); L.mem.appendChild(s); slots[t.slot[0]] = s; }
+        }
+        return { t, node, tag: node.querySelector(".tag"), s, oldVal };
+      });
+      if (!Object.keys(slots).length) L.mem.appendChild(el("p", "muted", "Empty"));
+      return { items, L };
+    },
+    update(st, p) {
+      const n = st.items.length;
+      st.items.forEach((o, i) => {
+        const a = 0.05 + (i / n) * 0.8, w = 0.8 / n;
+        show(o.node, p > a);
+        show(o.tag, p > a + w * 0.4);
+        if (o.s) {
+          const done = p > a + w * 0.7;
+          if (o.oldVal) {
+            o.s.querySelector(".val").innerHTML = done ? `<span class="old">${o.oldVal}</span> ${o.t.slot[1]}` : o.oldVal;
+          } else show(o.s, done);
+          o.s.classList.toggle("flash", done && p < a + w * 1.2);
+        }
+        const empty = st.L.mem.querySelector("p.muted");
+        if (empty && o.s && p > a + w * 0.7) empty.remove();
+      });
+    },
+    ...opts,
+  };
+}
+
+window.PROJECT_STAGES.memory = [
+  stage([0, 2], {
+    label: "Decide", title: "Every message gets one of three decisions",
+    caption: "Store it as a fact, keep it briefly in recent context, or drop it. A durable preference is stored; small talk is dropped.",
+    duration: 4200,
+  }),
+  stage([2, 4], {
+    label: "Filter", title: "Facts about other people aren't yours",
+    caption: "“My friend Maya is vegan” mentions a diet but isn't about you, so it's not stored. Plans in progress stay in short-term context only.",
+    duration: 4200,
+  }),
+  stage([4, 5], {
+    label: "Update", title: "A newer statement replaces the old one",
+    caption: "Diet changes from vegetarian to vegan. The slot is overwritten, so the agent never mixes old and new.",
+    duration: 3800,
+  }),
+  stage([5, 6], {
+    label: "Reword", title: "Reworded facts still land in the right slot",
+    caption: "No keyword like “I prefer” here. Keyword rules miss this; the model-based selector understands it means decaf.",
+    duration: 3800,
+  }),
+  {
+    label: "Recall", title: "Ninety turns later, the answer uses what was kept",
+    caption: "The prompt is built from the memory slots, not the whole conversation, so old facts never fall out of view.",
+    duration: 5200,
+    setup(b) {
+      const L = layout(b);
+      [["diet", "vegan"], ["drink", "decaf"]].forEach(([k, v]) => { const s = slotNode(k, v); s.classList.add("on"); L.mem.appendChild(s); });
+      const q = el("div", "turn fade", '<div class="who">User, turn 93</div>Can you suggest dinner and a drink for tonight?');
+      const a = el("div", "turn fade", '<div class="who">Agent</div><span class="ans"></span>');
+      a.style.borderColor = "var(--pass)";
+      L.chat.append(q, a);
+      return { q, a, span: a.querySelector(".ans"), slots: [...L.mem.children], text: "How about a chickpea and spinach curry with coconut rice — fully vegan — and a decaf chai to go with it?" };
+    },
+    update(st, p) {
+      show(st.q, p > 0.05);
+      st.slots.forEach(s => s.classList.toggle("flash", p > 0.25 && p < 0.55));
+      show(st.a, p > 0.4);
+      st.span.textContent = st.text.slice(0, Math.round(st.text.length * seg(p, 0.45, 0.9)));
+    }
+  },
+  {
+    label: "Results", title: "Compared with four other ways to remember",
+    caption: "Similarity search finds turns that look like the question, including stale or someone else's facts. Structured slots always hold the latest value.",
+    duration: 5600,
+    setup(b) {
+      const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+      box.appendChild(el("p", "panel-title", "Answer accuracy across 75 conversations"));
+      const data = [["This agent", 0.76, "var(--pass)"], ["Similarity search", 0.613, "var(--signal)"], ["Rolling summary", 0.493, "var(--signal)"], ["Keyword rules", 0.453, "var(--signal)"], ["Recent turns only", 0.0, "var(--graphite)"]];
+      const rows = data.map(([n, v, c]) => {
+        const r = el("div", "chart-row", `<span>${n}</span><span class="bar"><i></i></span><span class="mono v"></span>`);
+        box.appendChild(r); const i = r.querySelector("i"); i.style.background = c;
+        return { i, v: r.querySelector(".v"), val: v };
+      });
+      b.appendChild(box);
+      return { rows };
+    },
+    update(st, p) {
+      st.rows.forEach((o, k) => {
+        const t = ease(seg(p, k * 0.1, k * 0.1 + 0.45));
+        o.i.style.width = o.val * 100 * t + "%";
+        o.v.textContent = (o.val * t).toFixed(3);
+      });
+    }
+  },
+];
+
+})();
+
+</script>
+<script>
+window.PROJECT_STAGES = window.PROJECT_STAGES || {};
+(function () {
+
+const { el, seg, ease, show, rng } = PipeHelpers;
+
+// ---- build one synthetic bird's-eye scene (meters): x forward 0..72, y left/right -18..18
+const R = rng(7);
+const CARS = [
+  { x: 11, y: -4.2, h: 0.05, d: "near" }, { x: 23, y: 3.4, h: -0.08, d: "near" },
+  { x: 41, y: -6.5, h: 0.12, d: "mid" }, { x: 61, y: 2.5, h: 0, d: "far" },
+];
+const PTS = [];
+for (let i = 0; i < 1400; i++) {               // ground rings, denser near the sensor
+  const r = 3 + Math.pow(R(), 1.8) * 70, a = (R() - 0.5) * 1.1;
+  PTS.push({ x: r * Math.cos(a), y: r * Math.sin(a), g: 1 });
+}
+for (let i = 0; i < 520; i++) {                // building walls on both sides
+  const x = 6 + R() * 66, side = R() < 0.5 ? -15.5 : 15.5;
+  if (R() < 1.4 - x / 60) PTS.push({ x, y: side + (R() - 0.5) * 0.6, g: 0 });
+}
+CARS.forEach(c => {                            // visible car surfaces; fewer points farther away
+  c.n = Math.round(900 / c.x);
+  for (let i = 0; i < c.n; i++) {
+    const u = R(), lx = (u - 0.5) * 3.9, ly = R() < 0.6 ? -0.8 * Math.sign(c.y) : (R() - 0.5) * 1.6;
+    const ca = Math.cos(c.h), sa = Math.sin(c.h);
+    PTS.push({ x: c.x + lx * ca - ly * sa, y: c.y + lx * sa + ly * ca, g: 0, car: c });
+  }
+});
+PTS.forEach(p => (p.ang = Math.atan2(p.y, p.x)));
+
+function sceneSetup(b, overlayHTML) {
+  const wrap = el("div", "scene");
+  const c = el("canvas"); wrap.appendChild(c);
+  let ov = null;
+  if (overlayHTML) { ov = el("div", "overlay fade", overlayHTML); wrap.appendChild(ov); }
+  b.appendChild(wrap);
+  const dpr = window.devicePixelRatio || 1;
+  const W = Math.max(300, wrap.clientWidth), Hh = Math.round(Math.min(380, W * 0.5));
+  c.width = W * dpr; c.height = Hh * dpr; c.style.height = Hh + "px";
+  const ctx = c.getContext("2d"); ctx.scale(dpr, dpr);
+  const sx = W / 74, sy = Hh / 38;
+  const P = (x, y) => [10 + x * sx, Hh / 2 - y * sy];
+  return { ctx, W, Hh, P, sx, sy, ov };
+}
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function drawEgo(S) {
+  const [x, y] = S.P(0, 0); S.ctx.fillStyle = css("--ink");
+  S.ctx.fillRect(x - 8, y - 4, 12, 8);
+}
+function drawPoints(S, alpha, sweep) {
+  const ctx = S.ctx;
+  PTS.forEach(p => {
+    if (sweep != null && p.ang > sweep) return;
+    const [x, y] = S.P(p.x, p.y);
+    ctx.fillStyle = p.car ? `rgba(0,180,160,${alpha})` : `rgba(91,101,119,${alpha * (p.g ? 0.45 : 0.8)})`;
+    ctx.fillRect(x - 1, y - 1, p.car ? 2.4 : 1.8, p.car ? 2.4 : 1.8);
+  });
+}
+function box(S, c, color, dash, lw, dx = 0, dy = 0, dh = 0) {
+  const ctx = S.ctx, ca = Math.cos(c.h + dh), sa = Math.sin(c.h + dh);
+  const corners = [[-1.95, -0.8], [1.95, -0.8], [1.95, 0.8], [-1.95, 0.8]].map(([lx, ly]) => S.P(c.x + dx + lx * ca - ly * sa, c.y + dy + lx * sa + ly * ca));
+  ctx.beginPath(); corners.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath();
+  ctx.setLineDash(dash || []); ctx.strokeStyle = color; ctx.lineWidth = lw || 2; ctx.stroke(); ctx.setLineDash([]);
+}
+const CELL = 2; // meters per drawn pillar cell (illustrative; real grid is finer)
+function cells() {
+  const m = new Map();
+  PTS.forEach(p => { const k = `${Math.floor(p.x / CELL)},${Math.floor(p.y / CELL)}`; m.set(k, (m.get(k) || 0) + 1); });
+  return m;
+}
+const CELLS = cells();
+function drawCells(S, t, heat) {
+  const ctx = S.ctx;
+  CELLS.forEach((n, k) => {
+    const [i, j] = k.split(",").map(Number);
+    const [x, y] = S.P(i * CELL, (j + 1) * CELL);
+    const a = Math.min(1, n / 10) * t;
+    ctx.fillStyle = heat ? `rgba(0,180,160,${0.15 + a * 0.75})` : `rgba(0,180,160,${a * 0.35})`;
+    ctx.fillRect(x, y, CELL * S.sx - 1, CELL * S.sy - 1);
+  });
+}
+function drawGrid(S, step, alpha) {
+  const ctx = S.ctx; ctx.strokeStyle = `rgba(203,211,221,${alpha})`; ctx.lineWidth = 1;
+  for (let x = 0; x <= 72; x += step) { const [a] = S.P(x, 0); ctx.beginPath(); ctx.moveTo(a, 0); ctx.lineTo(a, S.Hh); ctx.stroke(); }
+  for (let y = -18; y <= 18; y += step) { const [, b] = S.P(0, y); ctx.beginPath(); ctx.moveTo(0, b); ctx.lineTo(S.W, b); ctx.stroke(); }
+}
+function clear(S) { S.ctx.clearRect(0, 0, S.W, S.Hh); }
+
+window.PROJECT_STAGES.kitti = [
+  {
+    label: "Scan", title: "The laser scan arrives as points",
+    caption: "Each point is a spot where a laser pulse bounced back. A real KITTI scan has 100,000–120,000. Notice how far cars get only a handful.",
+    duration: 4200,
+    setup(b) { return sceneSetup(b, '<span class="muted">Points on cars</span><b class="n">0</b><span class="muted">near car vs far car: ' + CARS[0].n + " vs " + CARS[3].n + "</span>"); },
+    update(S, p) {
+      clear(S); drawEgo(S);
+      const sweep = -0.6 + 1.2 * ease(seg(p, 0, 0.75));
+      drawPoints(S, 1, sweep);
+      show(S.ov, p > 0.75);
+      S.ov.querySelector(".n").textContent = CARS.reduce((a, c) => a + c.n, 0);
+    }
+  },
+  {
+    label: "Pillars", title: "Group points into columns on a ground grid",
+    caption: "The ground is divided into a grid, and all points above each cell form one vertical column, or pillar. Empty cells are skipped.",
+    duration: 4000,
+    setup(b) { return sceneSetup(b); },
+    update(S, p) {
+      clear(S); drawGrid(S, CELL, seg(p, 0, 0.3)); drawCells(S, ease(seg(p, 0.25, 0.8)), false);
+      drawPoints(S, 1 - 0.6 * seg(p, 0.3, 0.9)); drawEgo(S);
+    }
+  },
+  {
+    label: "Encode", title: "Summarize each pillar and lay them out as an image",
+    caption: "A small network turns each pillar's points into one feature vector. Placed back on the grid, they form a 2D image that a standard image network can read fast.",
+    duration: 4000,
+    setup(b) { return sceneSetup(b, '<span class="muted">Each cell now holds</span><b>64 features</b><span class="muted">instead of raw points</span>'); },
+    update(S, p) {
+      clear(S); drawPoints(S, 0.4 * (1 - seg(p, 0, 0.5)));
+      drawCells(S, 0.4 + 0.6 * ease(seg(p, 0.1, 0.7)), true); drawEgo(S);
+      show(S.ov, p > 0.5);
+    }
+  },
+  {
+    label: "Candidates", title: "Propose template boxes everywhere",
+    caption: "At each grid location the model scores two template car boxes, one per heading. My first version did this at full resolution: 440,000 boxes per scene. Downsampling the feature map cut it to 27,500.",
+    duration: 5000,
+    setup(b) { return sceneSetup(b, '<span class="muted">Candidate boxes per scene</span><b class="n">440,000</b>'); },
+    update(S, p) {
+      clear(S); drawCells(S, 0.5, true);
+      const coarse = p > 0.5, step = coarse ? 8 : 3;
+      const ctx = S.ctx; ctx.strokeStyle = "rgba(23,32,51,.32)"; ctx.lineWidth = 1;
+      for (let x = 2; x < 72; x += step) for (let y = -16; y < 17; y += step) {
+        [0, Math.PI / 2].forEach(h => { const ca = Math.cos(h), sa = Math.sin(h);
+          const pts = [[-1.95, -0.8], [1.95, -0.8], [1.95, 0.8], [-1.95, 0.8]].map(([a, c]) => S.P(x + a * ca - c * sa, y + a * sa + c * ca));
+          ctx.beginPath(); pts.forEach(([u, v], i) => (i ? ctx.lineTo(u, v) : ctx.moveTo(u, v))); ctx.closePath(); ctx.stroke(); });
+      }
+      drawEgo(S);
+      show(S.ov, true);
+      const t = seg(p, 0.45, 0.7);
+      S.ov.querySelector(".n").textContent = Math.round(440000 - (440000 - 27500) * ease(t)).toLocaleString("en-US");
+    }
+  },
+  {
+    label: "Detect", title: "Keep confident boxes, then remove duplicates",
+    caption: "Many overlapping boxes fire around each car. Non-maximum suppression keeps the best one per object. The farthest car has too few points to be found.",
+    duration: 5200,
+    setup(b) {
+      const S = sceneSetup(b);
+      const r = rng(3);
+      S.cands = [];
+      CARS.slice(0, 3).forEach(c => { for (let i = 0; i < 6; i++) S.cands.push({ c, dx: (r() - 0.5) * 1.6, dy: (r() - 0.5) * 1.0, dh: (r() - 0.5) * 0.5 }); });
+      return S;
+    },
+    update(S, p) {
+      clear(S); drawPoints(S, 0.9); drawEgo(S);
+      const showC = p > 0.1, nms = p > 0.55;
+      if (showC && !nms) S.cands.forEach(o => box(S, o.c, "rgba(181,122,6,.75)", null, 1.3, o.dx, o.dy, o.dh));
+      if (nms) {
+        CARS.slice(0, 3).forEach(c => box(S, c, css("--pass"), null, 2.6));
+        if (p > 0.7) box(S, CARS[3], css("--fail"), [5, 4], 2);
+      }
+    }
+  },
+  {
+    label: "Score", title: "Score near, mid-range and far separately",
+    caption: "Averages hide where a detector fails. Broken out by distance, near cars are found far more reliably; far cars plateau because the sensor gives them so few points.",
+    duration: 5200,
+    setup(b) { return sceneSetup(b, '<span class="muted">Detection score (AP) after 140 epochs</span><div class="row"><span style="flex:1">0–30 m</span><span class="mono">0.359</span></div><div class="row"><span style="flex:1">30–50 m</span><span class="mono">0.094</span></div><div class="row"><span style="flex:1">50 m +</span><span class="mono">0.009</span></div>'); },
+    update(S, p) {
+      clear(S);
+      const ctx = S.ctx, [ox, oy] = S.P(0, 0);
+      [[30, "30 m"], [50, "50 m"]].forEach(([r, lab], i) => {
+        const t = ease(seg(p, 0.05 + i * 0.15, 0.35 + i * 0.15));
+        ctx.beginPath(); ctx.ellipse(ox, oy, r * S.sx, r * S.sy, 0, -Math.PI / 2 * t, Math.PI / 2 * t);
+        ctx.strokeStyle = css("--graphite"); ctx.setLineDash([4, 4]); ctx.lineWidth = 1.2; ctx.stroke(); ctx.setLineDash([]);
+        if (t > 0.9) { ctx.fillStyle = css("--graphite"); ctx.font = "13px Schibsted Grotesk, sans-serif"; ctx.fillText(lab, ox + r * S.sx - 30, oy - r * S.sy + 18); }
+      });
+      drawPoints(S, 0.8); drawEgo(S);
+      CARS.slice(0, 3).forEach(c => box(S, c, css("--pass"), null, 2.4));
+      box(S, CARS[3], css("--fail"), [5, 4], 2);
+      show(S.ov, p > 0.5);
+    }
+  },
+  {
+    label: "Fixes", title: "What it took to make training run at all",
+    caption: "Four performance bugs, each found by measuring before changing anything. Every rewrite was checked to give identical results to the code it replaced.",
+    duration: 5600,
+    setup(b) {
+      const box = el("div", "doc bugs"); box.style.fontFamily = "var(--sans)";
+      const rows = [
+        ["Box matching never finished", "2.2 million exact overlap calculations per scene. A quick distance filter now skips boxes that can't overlap."],
+        ["440,000 candidate boxes", "The head ran at full resolution. Downsampling to 1/4 cut it to 27,500."],
+        ["GPU sat mostly idle", "240,000 tiny GPU-to-CPU round trips per scene. Rewrote that step as whole-array operations."],
+        ["Evaluation hung for hours", "Duplicate removal compared thousands of boxes pairwise. Now only the top 300 are compared."],
+      ].map(([a, c]) => { const r = el("div", "row fade", `<span class="tag pass" style="margin-top:3px">fixed</span><span><b>${a}</b><span class="muted">${c}</span></span>`); box.appendChild(r); return r; });
+      b.appendChild(box);
+      return { rows };
+    },
+    update(st, p) { st.rows.forEach((r, i) => show(r, p > 0.05 + i * 0.2)); }
+  },
+];
+
+})();
+
+</script>
+<script>
+window.PROJECT_STAGES = window.PROJECT_STAGES || {};
+(function () {
+  const { el, seg, ease, show, type, rng } = PipeHelpers;
+  const NS = "http://www.w3.org/2000/svg";
+  const C = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const svg = (w, h, inner) => { const s = document.createElementNS(NS, "svg"); s.setAttribute("viewBox", `0 0 ${w} ${h}`); s.setAttribute("width", "100%"); s.style.maxHeight = "360px"; s.style.display = "block"; s.innerHTML = inner; return s; };
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  // Reusable bar chart: rows = [label, value, color?, note?]
+  function bars(b, title, rows, max, fmt) {
+    const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+    if (title) box.appendChild(el("p", "panel-title", title));
+    const rs = rows.map(([n, v, c, note]) => {
+      const r = el("div", "chart-row", `<span>${n}${note ? `<br><span class="muted" style="font-size:13px">${note}</span>` : ""}</span><span class="bar"><i></i></span><span class="mono v"></span>`);
+      box.appendChild(r); const i = r.querySelector("i"); i.style.background = c || "var(--signal)";
+      return { i, v: r.querySelector(".v"), val: v };
+    });
+    b.appendChild(box);
+    return (t, stagger = 0.12) => rs.forEach((o, k) => {
+      const u = ease(seg(t, k * stagger, k * stagger + 0.45));
+      o.i.style.width = (o.val / max) * 100 * u + "%";
+      o.v.textContent = fmt(o.val * u, o.val);
+    });
+  }
+  const title = (b, t) => { const p = el("p", "panel-title", t); b.appendChild(p); return p; };
+
+  /* ============================ VLM ============================ */
+  const DEF = { x: 196, y: 118 };
+  function bottle() {
+    return `<rect width="300" height="300" fill="#e9ebe8"/>
+      <circle cx="150" cy="150" r="118" fill="#cfd4cf"/><circle cx="150" cy="150" r="96" fill="#b8bfb8"/>
+      <circle cx="150" cy="150" r="62" fill="#9aa39a"/><circle cx="150" cy="150" r="40" fill="#5f685f"/>
+      <path d="M186 108 l9 6 l6 -3 l4 9 l-7 5 l3 8 l-10 -3 l-6 6 l-2 -10 l-8 -3 z" fill="#3a2e22" opacity=".85"/>`;
+  }
+  window.PROJECT_STAGES.vlm = [
+    {
+      label: "Image", title: "A product photo, with no defect examples to learn from",
+      caption: "Factories rarely have enough photos of every defect. These methods judge an image using only descriptions in words.",
+      duration: 3600,
+      setup(b) {
+        const cols = el("div", "cols");
+        const left = el("div"); left.appendChild(el("p", "panel-title", "bottle_017.png (top view)"));
+        const s = svg(300, 300, bottle()); s.style.maxWidth = "320px"; left.appendChild(s);
+        const right = el("div", "fade"); right.innerHTML = '<p class="panel-title">Can you spot it?</p><div class="note signal">There is a small chip on the rim. The model has never seen a labeled defect, only normal-looking products and words.</div>';
+        cols.append(left, right); b.appendChild(cols);
+        return { right };
+      },
+      update(s, p) { show(s.right, p > 0.4); },
+    },
+    {
+      label: "Describe", title: "Describe normal and damaged in words",
+      caption: "Text replaces training examples. AnomalyCLIP learns one generic pair of prompts that works for any product.",
+      duration: 4000,
+      setup(b) {
+        const box = el("div", "doc"); box.style.fontFamily = "var(--mono)";
+        const a = el("div", "row", '<span class="tag pass">normal</span><span class="t"></span>');
+        const c = el("div", "row", '<span class="tag fail">damaged</span><span class="t"></span>');
+        box.append(a, c); b.appendChild(box);
+        return { a: a.querySelector(".t"), c: c.querySelector(".t") };
+      },
+      update(s, p) { type(s.a, "a photo of a flawless bottle", seg(p, 0.05, 0.45)); type(s.c, "a photo of a damaged bottle", seg(p, 0.5, 0.9)); },
+    },
+    {
+      label: "Compare", title: "Which description is the image closer to?",
+      caption: "CLIP puts images and text in the same space. Closer to “damaged” than to “flawless” means a high anomaly score.",
+      duration: 4400,
+      setup(b) {
+        const up = bars(b, "Similarity between the image and each description (example)", [["flawless", 0.21, "var(--pass)"], ["damaged", 0.27, "var(--fail)"]], 0.32, (v) => v.toFixed(2));
+        const g = el("div", "note fade", 'Anomaly score: <b class="mono">0.81</b>, flagged as defective'); g.style.marginTop = "12px"; b.appendChild(g);
+        return { up, g };
+      },
+      update(s, p) { s.up(seg(p, 0, 0.7), 0.2); show(s.g, p > 0.75); },
+    },
+    {
+      label: "Localize", title: "Score every patch to find where",
+      caption: "Each small patch gets its own score. AnomalyCLIP keeps patch features sharp by having each patch attend mostly to itself.",
+      duration: 5000,
+      setup(b) {
+        let cells = "";
+        const N = 12, W = 300 / N;
+        for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) {
+          const cx = i * W + W / 2, cy = j * W + W / 2;
+          const d = Math.hypot(cx - DEF.x, cy - DEF.y);
+          const v = Math.max(0, 1 - d / 70);
+          cells += `<rect class="hc" data-i="${i + j}" x="${i * W}" y="${j * W}" width="${W}" height="${W}" fill="rgb(200,55,45)" fill-opacity="0" data-v="${v.toFixed(3)}"/>`;
+        }
+        let grid = "";
+        for (let k = 1; k < N; k++) grid += `<line x1="${k * W}" y1="0" x2="${k * W}" y2="300" stroke="#fff" stroke-opacity=".35"/><line x1="0" y1="${k * W}" x2="300" y2="${k * W}" stroke="#fff" stroke-opacity=".35"/>`;
+        const cols = el("div", "cols");
+        const left = el("div"); left.appendChild(el("p", "panel-title", "Defect heatmap"));
+        const s = svg(300, 300, bottle() + grid + cells); s.style.maxWidth = "320px"; left.appendChild(s);
+        const right = el("div", "fade", '<p class="panel-title">Result</p><div class="note">Hot patches sit exactly on the chipped rim. This map is the segmentation output, scored with pixel-level AUROC and AUPRO.</div>');
+        cols.append(left, right); b.appendChild(cols);
+        return { cells: [...s.querySelectorAll(".hc")], right };
+      },
+      update(s, p) {
+        const sweep = seg(p, 0.05, 0.7) * 24;
+        s.cells.forEach((c) => { const on = +c.dataset.i < sweep; c.setAttribute("fill-opacity", on ? (+c.dataset.v * 0.75).toFixed(3) : 0); });
+        show(s.right, p > 0.72);
+      },
+    },
+    {
+      label: "Analyze", title: "Break results down instead of reporting one average",
+      caption: "AnomalyCLIP (authors' released weights) scored 0.916 image AUROC on MVTec AD. Low-contrast defects and missing parts were hardest.",
+      duration: 5600,
+      setup(b) {
+        const cols = el("div", "cols");
+        const l = el("div"), r = el("div"); cols.append(l, r); b.appendChild(cols);
+        const a = bars(l, "AnomalyCLIP image AUROC by product type", [["Textures", 0.989], ["Rigid objects", 0.870], ["Flexible / complex", 0.875]], 1, (v) => v.toFixed(3));
+        const c = bars(r, "By how visible the defect is", [["High contrast", 0.939, "var(--pass)"], ["Medium", 0.900], ["Low contrast", 0.768, "var(--caution)"]], 1, (v) => v.toFixed(3));
+        return { a, c };
+      },
+      update(s, p) { s.a(seg(p, 0, 0.6)); s.c(seg(p, 0.3, 0.95)); },
+    },
+  ];
+
+  /* ============================ RAG ============================ */
+  const Q = "What are common side effects of metformin?";
+  const R = rng(11);
+  const QP = { x: 330, y: 120 };
+  const DOCS = Array.from({ length: 90 }, () => ({ x: 20 + R() * 460, y: 20 + R() * 220 })).filter((d) => Math.hypot(d.x - QP.x, d.y - QP.y) > 75).slice(0, 66);
+  DOCS.push({ x: QP.x - 52, y: QP.y - 30 }, { x: QP.x + 50, y: QP.y - 34 }, { x: QP.x + 6, y: QP.y + 50 });
+  const NEAR = [DOCS.length - 3, DOCS.length - 2, DOCS.length - 1];
+  window.PROJECT_STAGES.rag = [
+    {
+      label: "Ask", title: "A question comes in through the API",
+      caption: "A FastAPI endpoint receives the question. Answers must come only from indexed documents.",
+      duration: 3400,
+      setup(b) { const d = el("div", "doc"); d.style.fontSize = "18px"; d.style.fontFamily = "var(--sans)"; d.innerHTML = '<span class="muted" style="font-size:14px">POST /query</span><br><span class="q"></span>'; b.appendChild(d); return { q: d.querySelector(".q") }; },
+      update(s, p) { type(s.q, Q, seg(p, 0.05, 0.8)); },
+    },
+    {
+      label: "Embed", title: "Turn the question into a vector",
+      caption: "The same embedding model used on the 50,000+ documents encodes the question as a list of numbers that captures its meaning.",
+      duration: 3800,
+      setup(b) {
+        title(b, "Question → 384 numbers (first 32 shown)");
+        const row = el("div"); row.style.cssText = "display:flex;align-items:center;gap:4px;height:160px;border-bottom:1px solid var(--rule)";
+        const r = rng(5);
+        const vals = Array.from({ length: 32 }, () => r() * 2 - 1);
+        const bs = vals.map(() => { const i = el("i"); i.style.cssText = "flex:1;background:var(--signal);border-radius:2px;align-self:flex-end"; row.appendChild(i); return i; });
+        b.appendChild(row);
+        return { bs, vals };
+      },
+      update(s, p) { s.bs.forEach((i, k) => { const t = ease(seg(p, k * 0.015, k * 0.015 + 0.4)); i.style.height = Math.abs(s.vals[k]) * 140 * t + 6 + "px"; i.style.opacity = s.vals[k] > 0 ? 1 : 0.45; }); },
+    },
+    {
+      label: "Retrieve", title: "Find the closest document chunks",
+      caption: "Each dot is a chunk of text. FAISS finds the chunks whose vectors sit nearest the question's.",
+      duration: 4800,
+      setup(b) {
+        let dots = DOCS.map((d, i) => `<circle class="d" data-i="${i}" cx="${d.x}" cy="${d.y}" r="5" fill="${C("--rule")}"/>`).join("");
+        const lines = NEAR.map((i, k) => `<line class="ln" x1="${QP.x}" y1="${QP.y}" x2="${DOCS[i].x}" y2="${DOCS[i].y}" stroke="${C("--signal")}" stroke-width="2" opacity="0"/><text class="lb" x="${DOCS[i].x + 9}" y="${DOCS[i].y - 8}" font-size="13" fill="${C("--ink")}" opacity="0">#${k + 1}</text>`).join("");
+        const s = svg(500, 260, `<rect width="500" height="260" fill="#fff"/>${lines}${dots}<circle class="q" cx="${QP.x}" cy="${QP.y}" r="0" fill="${C("--ink")}"/><text class="qt" x="${QP.x + 10}" y="${QP.y + 22}" font-size="13" opacity="0">question</text>`);
+        title(b, "50,000+ documents, split into chunks and indexed");
+        b.appendChild(s);
+        return { s, near: NEAR };
+      },
+      update(st, p) {
+        const q = st.s.querySelector(".q"); q.setAttribute("r", 8 * ease(seg(p, 0.1, 0.25)));
+        st.s.querySelector(".qt").setAttribute("opacity", p > 0.25 ? 1 : 0);
+        st.s.querySelectorAll(".ln").forEach((l, k) => l.setAttribute("opacity", p > 0.35 + k * 0.12 ? 1 : 0));
+        st.s.querySelectorAll(".lb").forEach((l, k) => l.setAttribute("opacity", p > 0.4 + k * 0.12 ? 1 : 0));
+        st.s.querySelectorAll(".d").forEach((d) => { const hit = st.near.includes(+d.dataset.i) && p > 0.4; d.setAttribute("fill", hit ? C("--signal") : C("--rule")); d.setAttribute("r", hit ? 8 : 5); });
+      },
+    },
+    {
+      label: "Ground", title: "Pull the exact passages and their sources",
+      caption: "PostgreSQL stores each chunk's text, document and section, so every passage can be traced back.",
+      duration: 4400,
+      setup(b) {
+        const srcs = [["[1] Drug label: metformin, §6", "…the most common reactions are <mark>nausea and diarrhea</mark>…"], ["[2] Diabetes care guide, §4.2", "…long-term use may <mark>lower vitamin B12</mark> levels…"], ["[3] Patient FAQ: medications", "…take with meals to reduce stomach upset…"]];
+        const cards = srcs.map(([h, t]) => { const c = el("div", "doc fade", `<b style="font-family:var(--sans);font-size:14px">${h}</b><div style="font-family:var(--sans)">${t}</div>`); c.style.marginBottom = "10px"; b.appendChild(c); return c; });
+        return { cards };
+      },
+      update(s, p) { s.cards.forEach((c, i) => show(c, p > 0.1 + i * 0.22)); },
+    },
+    {
+      label: "Answer", title: "Answer only from the sources, and cite them",
+      caption: "The model must cite a source for every claim and may say “not found”. Citations are checked before the answer is returned.",
+      duration: 5000,
+      setup(b) {
+        const d = el("div", "doc"); d.style.fontFamily = "var(--sans)"; d.style.fontSize = "18px";
+        const span = el("span"); d.appendChild(span); b.appendChild(d);
+        const tags = el("div", "fade", '<span class="tag pass">citation [1] verified</span> <span class="tag pass">citation [2] verified</span>'); tags.style.marginTop = "12px"; b.appendChild(tags);
+        return { span, tags, text: "Common side effects include nausea and diarrhea [1]. Long-term use can lower vitamin B12 levels [2]." };
+      },
+      update(s, p) { type(s.span, s.text, seg(p, 0.05, 0.75)); show(s.tags, p > 0.8); },
+    },
+  ];
+
+  /* ============================ PitchQuest ============================ */
+  window.PROJECT_STAGES.pitchquest = [
+    {
+      label: "Upload", title: "A founder uploads a 10-minute pitch",
+      caption: "The goal: coach-quality feedback on what they said, how they said it, and how it looked.",
+      duration: 3400,
+      setup(b) {
+        const d = el("div", "doc"); d.style.fontFamily = "var(--sans)";
+        d.innerHTML = '<p class="panel-title">pitch_video.mp4</p><div style="position:relative;height:150px;background:#1c1c1c;border-radius:3px;display:grid;place-items:center;color:#fff;font-size:42px">▶</div><div class="bar" style="margin-top:12px"><i></i></div><div class="muted mono t" style="margin-top:6px">0:00 / 10:00</div>';
+        b.appendChild(d); return { i: d.querySelector(".bar i"), t: d.querySelector(".t") };
+      },
+      update(s, p) { const u = seg(p, 0.1, 0.9); s.i.style.width = u * 100 + "%"; const sec = Math.round(u * 600); s.t.textContent = `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")} / 10:00`; },
+    },
+    {
+      label: "Split", title: "Separate it into audio, video frames and slides",
+      caption: "Each stream goes to models that understand it. Frames are sampled rather than analyzed one by one, which keeps it fast.",
+      duration: 4200,
+      setup(b) {
+        const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+        const lane = (name, inner) => { const r = el("div", "row fade", `<span style="width:90px;font-weight:600">${name}</span><div style="flex:1;display:flex;gap:3px;align-items:center;height:44px">${inner}</div>`); box.appendChild(r); return r; };
+        const r = rng(2);
+        const wave = Array.from({ length: 60 }, () => `<i style="flex:1;height:${8 + r() * 36}px;background:var(--signal);border-radius:1px"></i>`).join("");
+        const frames = Array.from({ length: 12 }, () => '<i style="flex:1;height:36px;background:#d9dcd8;border-radius:2px"></i>').join("");
+        const slides = Array.from({ length: 6 }, () => '<i style="flex:1;height:36px;background:#fff;border:1px solid var(--rule);border-radius:2px"></i>').join("");
+        const lanes = [lane("Audio", wave), lane("Frames", frames), lane("Slides", slides)];
+        b.appendChild(box); return { lanes };
+      },
+      update(s, p) { s.lanes.forEach((l, i) => show(l, p > 0.1 + i * 0.22)); },
+    },
+    {
+      label: "Analyze", title: "Five models run at the same time",
+      caption: "Running in parallel is what keeps a 10-minute video under 2 minutes. SmolVLM was fine-tuned with LoRA on about a thousand labeled slides.",
+      duration: 5200,
+      setup(b) {
+        const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+        box.appendChild(el("p", "panel-title", "Processing (illustrative timing)"));
+        const ms = [["Whisper", "speech → transcript", 0.75], ["Wav2Vec2", "voice → emotion", 0.55], ["MediaPipe", "frames → posture", 0.65], ["DeepFace", "faces → expression", 0.7], ["SmolVLM + LoRA", "slides → quality", 0.9]];
+        const rows = ms.map(([n, d, sp]) => { const r = el("div", "chart-row", `<span><b>${n}</b><br><span class="muted" style="font-size:13px">${d}</span></span><span class="bar"><i></i></span><span class="mono v"></span>`); box.appendChild(r); return { i: r.querySelector("i"), v: r.querySelector(".v"), sp }; });
+        const clock = el("div", "mono", ""); clock.style.marginTop = "10px"; box.appendChild(clock);
+        b.appendChild(box); return { rows, clock };
+      },
+      update(s, p) {
+        const t = seg(p, 0.05, 0.9);
+        s.rows.forEach((o) => { const u = Math.min(1, t / o.sp); o.i.style.width = u * 100 + "%"; o.i.style.background = u >= 1 ? "var(--pass)" : "var(--signal)"; o.v.textContent = u >= 1 ? "done" : Math.round(u * 100) + "%"; });
+        const sec = Math.round(t * 108); s.clock.textContent = `elapsed ${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}  (target: under 2:00)`;
+      },
+    },
+    {
+      label: "Report", title: "Turn signals into feedback a founder can act on",
+      caption: "Scores come with reasons, like which minute had the most filler words, so the advice is specific.",
+      duration: 4800,
+      setup(b) {
+        const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+        box.appendChild(el("p", "panel-title", "Feedback report (example)"));
+        const items = [["Story clarity", "Problem and solution are clear", "pass", "strong"], ["Pace", "168 words/min, a bit fast", "caution", "slow down"], ["Filler words", "14 “um”s, mostly in minute 1", "fail", "practice opening"], ["Posture and eye contact", "Steady, facing camera", "pass", "good"], ["Slide 4", "Chart too dense to read", "caution", "simplify"]];
+        const rows = items.map(([a, d, c, t]) => { const r = el("div", "row fade", `<span style="flex:1"><b>${a}</b><br><span class="muted">${d}</span></span><span class="tag ${c}">${t}</span>`); box.appendChild(r); return r; });
+        b.appendChild(box); return { rows };
+      },
+      update(s, p) { s.rows.forEach((r, i) => show(r, p > 0.08 + i * 0.15)); },
+    },
+    {
+      label: "Improve", title: "User corrections retrain the slide model",
+      caption: "Corrections are stored. After 100 of them, retraining runs automatically, tracked in Weights & Biases, with Evidently watching for data drift.",
+      duration: 4600,
+      setup(b) {
+        const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+        box.innerHTML = '<p class="panel-title">Feedback corrections collected</p><div class="bar" style="height:16px"><i></i></div><div class="mono n" style="margin-top:8px"></div>';
+        const done = el("div", "note signal fade", "100 reached: retraining the LoRA adapter, then validating before it replaces the current model."); done.style.marginTop = "12px";
+        b.append(box, done); return { i: box.querySelector("i"), n: box.querySelector(".n"), done };
+      },
+      update(s, p) { const u = seg(p, 0.05, 0.7); s.i.style.width = u * 100 + "%"; s.n.textContent = `${Math.round(u * 100)} / 100`; show(s.done, p > 0.72); },
+    },
+  ];
+
+  /* ============================ Robotics ============================ */
+  function drawScene(ctx, W, H, blockColor, grip, carry) {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "#e9e6df"; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = "#d6d1c6"; for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+    ctx.fillStyle = "rgba(0,0,0,.08)"; ctx.fillRect(W * 0.72, H * 0.6, 60, 60); // target zone
+    ctx.strokeStyle = "#999"; ctx.setLineDash([4, 4]); ctx.strokeRect(W * 0.72, H * 0.6, 60, 60); ctx.setLineDash([]);
+    if (!carry) { ctx.fillStyle = blockColor; ctx.fillRect(W * 0.55, H * 0.32, 34, 34); }
+    // gripper
+    ctx.fillStyle = "#333"; ctx.fillRect(grip.x - 22, grip.y - 6, 44, 10);
+    ctx.fillRect(grip.x - 22, grip.y + 4, 6, 18); ctx.fillRect(grip.x + 16, grip.y + 4, 6, 18);
+    if (carry) { ctx.fillStyle = blockColor; ctx.fillRect(grip.x - 17, grip.y + 6, 34, 34); }
+  }
+  function sceneCanvas(b, h) {
+    const c = el("canvas"); c.style.width = "100%"; c.style.border = "1px solid var(--rule)"; c.style.borderRadius = "3px";
+    b.appendChild(c);
+    const W = Math.max(280, c.clientWidth || b.clientWidth - 52), H = h;
+    const dpr = window.devicePixelRatio || 1; c.width = W * dpr; c.height = H * dpr; c.style.height = H + "px";
+    const ctx = c.getContext("2d"); ctx.scale(dpr, dpr);
+    return { ctx, W, H };
+  }
+  window.PROJECT_STAGES.robotics = [
+    {
+      label: "See", title: "The robot only gets pixels",
+      caption: "A 64×64 color camera image is 12,288 numbers. The block might be a few hundred of them; the rest is table and background.",
+      duration: 3800,
+      setup(b) {
+        const cols = el("div", "cols"); const l = el("div"), r = el("div");
+        l.appendChild(el("p", "panel-title", "What the camera sees"));
+        const S = sceneCanvas(l, 230); drawScene(S.ctx, S.W, S.H, "#c8372d", { x: S.W * 0.25, y: S.H * 0.2 }, false);
+        r.appendChild(el("p", "panel-title", "What the model receives (8×8 crop of the numbers)"));
+        const g = el("pre", "doc fade"); g.style.margin = "0"; g.style.fontSize = "13px";
+        const rr = rng(4); let txt = ""; for (let i = 0; i < 8; i++) { for (let j = 0; j < 8; j++) txt += String(Math.floor(140 + rr() * 90)).padStart(4); txt += "\n"; }
+        g.textContent = txt; r.appendChild(g); cols.append(l, r); b.appendChild(cols); return { g };
+      },
+      update(s, p) { show(s.g, p > 0.35); },
+    },
+    {
+      label: "Encode", title: "A CNN compresses the image into 256 numbers",
+      caption: "Two convolution layers find edges, then shapes. A linear layer squeezes everything into a 256-number description of the scene.",
+      duration: 5000,
+      setup(b) {
+        const layers = [["Image", "3 × 64 × 64", 120, 120], ["Conv 3→32", "32 × 64 × 64", 110, 110], ["Max pool", "32 × 32 × 32", 80, 80], ["Conv 32→64", "64 × 32 × 32", 80, 90], ["Avg pool", "64 × 4 × 4", 40, 60], ["Flatten", "1,024", 14, 130], ["Linear", "256 (state)", 14, 70]];
+        const wrap = el("div"); wrap.style.cssText = "display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;justify-content:center";
+        const items = layers.map(([n, sh, w, h], i) => { const d = el("div", "fade"); d.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;text-align:center"; d.innerHTML = `<div style="width:${w}px;height:${h}px;background:${i === 6 ? "var(--signal)" : i === 0 ? "#d8d4ca" : "var(--signal-soft)"};border:1px solid ${i === 6 ? "var(--signal)" : "var(--rule)"};border-radius:3px"></div><b>${n}</b><span class="mono muted">${sh}</span>`; wrap.appendChild(d); return d; });
+        b.appendChild(wrap);
+        const n = el("p", "muted fade", "349,126 parameters in total. Feeding raw pixels straight into the same linear layer would need 3.1 million for that layer alone."); n.style.marginTop = "16px"; b.appendChild(n);
+        return { items, n };
+      },
+      update(s, p) { s.items.forEach((d, i) => show(d, p > 0.04 + i * 0.1)); show(s.n, p > 0.8); },
+    },
+    {
+      label: "Decide", title: "Score six possible actions and pick the best",
+      caption: "A small network maps the 256 numbers to a score per action. It learned by copying a scripted expert's choices.",
+      duration: 4400,
+      setup(b) {
+        const up = bars(b, "Action probabilities", [["Move left", 0.03], ["Move right", 0.81, "var(--pass)"], ["Move forward", 0.06], ["Move back", 0.02], ["Down + grab", 0.05], ["Up + release", 0.03]], 1, (v) => (v * 100).toFixed(0) + "%");
+        const n = el("div", "note signal fade", "Chosen: move right"); n.style.marginTop = "10px"; b.appendChild(n);
+        return { up, n };
+      },
+      update(s, p) { s.up(seg(p, 0, 0.7), 0.06); show(s.n, p > 0.75); },
+    },
+    {
+      label: "Act", title: "Repeat every step until the task is done",
+      caption: "Each new image gives a new decision: right, forward, grab, move, release. One wrong step can derail the task, which is why per-step accuracy matters.",
+      duration: 6200,
+      setup(b) {
+        const cols = el("div", "cols"); const l = el("div"), r = el("div");
+        const S = sceneCanvas(l, 240);
+        r.appendChild(el("p", "panel-title", "Actions taken"));
+        const log = el("div", "doc"); log.style.fontFamily = "var(--mono)"; r.appendChild(log);
+        cols.append(l, r); b.appendChild(cols); return { S, log };
+      },
+      update(s, p) {
+        const { ctx, W, H } = s.S;
+        const start = { x: W * 0.25, y: H * 0.2 }, above = { x: W * 0.55 + 17, y: H * 0.2 }, at = { x: W * 0.55 + 17, y: H * 0.32 - 6 }, drop = { x: W * 0.72 + 30, y: H * 0.6 - 2 };
+        const steps = ["move right", "down + grab", "move right / forward", "up + release"];
+        let g = start, carry = false, k = 0;
+        const t = seg(p, 0.05, 0.95);
+        if (t < 0.25) { g = { x: lerp(start.x, above.x, ease(t / 0.25)), y: start.y }; k = 1; }
+        else if (t < 0.45) { g = { x: above.x, y: lerp(above.y, at.y, ease((t - 0.25) / 0.2)) }; k = 2; carry = t > 0.42; }
+        else if (t < 0.8) { const u = ease((t - 0.45) / 0.35); g = { x: lerp(at.x, drop.x, u), y: lerp(at.y, drop.y, u) }; carry = true; k = 3; }
+        else { g = drop; carry = t < 0.88; k = 4; }
+        drawScene(ctx, W, H, "#c8372d", g, carry);
+        if (!carry && t >= 0.88) { ctx.fillStyle = "#c8372d"; ctx.fillRect(drop.x - 17, drop.y + 6, 34, 34); }
+        s.log.innerHTML = steps.slice(0, k).map((a, i) => `<div>${i + 1}. ${a}${i === k - 1 && t < 0.99 ? " …" : " ✓"}</div>`).join("");
+      },
+    },
+    {
+      label: "Generalize", title: "Does it work on objects it never saw?",
+      caption: "Trained on some objects, tested on others, like blue blocks after red ones. The CNN encoder plus image augmentation raised accuracy by 22 points.",
+      duration: 5000,
+      setup(b) {
+        const up = bars(b, "Action accuracy on unseen objects", [["Raw pixels → MLP", 58, "var(--graphite)", "baseline"], ["CNN encoder + augmentation", 80, "var(--pass)", "random crops, color changes, flips"]], 100, (v) => Math.round(v) + "%");
+        return { up };
+      },
+      update(s, p) { s.up(seg(p, 0, 0.8), 0.25); },
+    },
+  ];
+
+  /* ============================ PySpark ============================ */
+  function matrix(rows, cols, seed, w, h) {
+    const r = rng(seed); let s = "";
+    const cw = w / cols, ch = h / rows;
+    for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) {
+      const filled = r() < 0.22;
+      s += `<rect class="m" data-r="${i}" x="${j * cw + 1}" y="${i * ch + 1}" width="${cw - 2}" height="${ch - 2}" rx="1" fill="${filled ? "rgba(0,180,160," + (0.3 + r() * 0.7).toFixed(2) + ")" : "#f1f1ee"}"/>`;
+    }
+    return s;
+  }
+  const BAND = ["#00B4A0", "#2E7D32", "#B57A06", "#C8372D", "#5B6577", "#7b3f8c", "#2457d6", "#0E0E0E"];
+  window.PROJECT_STAGES.pyspark = [
+    {
+      label: "Ratings", title: "25 million ratings, mostly empty",
+      caption: "Rows are users, columns are movies, and color is the rating. Most users have rated only a tiny fraction of the 59,047 movies.",
+      duration: 4000,
+      setup(b) { title(b, "User × movie ratings (a small corner of the 162,541 × 59,047 grid)"); const s = svg(600, 260, matrix(16, 40, 9, 600, 260)); b.appendChild(s); return { cells: [...s.querySelectorAll(".m")] }; },
+      update(s, p) { const n = Math.round(s.cells.length * seg(p, 0, 0.7)); s.cells.forEach((c, i) => c.setAttribute("opacity", i < n ? 1 : 0)); },
+    },
+    {
+      label: "Partition", title: "Spark splits the data across cores",
+      caption: "Each partition is processed by a different core at the same time. On the HPC cluster, Slurm gives the job a node with 8 cores.",
+      duration: 4200,
+      setup(b) { title(b, "Partitions, one color per core"); const s = svg(600, 300, matrix(16, 40, 9, 600, 260)); b.appendChild(s); return { cells: [...s.querySelectorAll(".m")] }; },
+      update(s, p) {
+        const t = ease(seg(p, 0.1, 0.7));
+        s.cells.forEach((c) => { const r = +c.dataset.r, band = Math.floor(r / 2); c.setAttribute("transform", `translate(0,${band * 5 * t})`); c.setAttribute("stroke", p > 0.5 ? BAND[band] : "none"); c.setAttribute("stroke-width", 1.2); });
+      },
+    },
+    {
+      label: "Factorize", title: "Learn hidden taste factors for users and movies",
+      caption: "ALS gives every user and every movie 10 numbers, then alternates: fix movies and solve for users, fix users and solve for movies. Each user's solve is independent, so it parallelizes well.",
+      duration: 5600,
+      setup(b) {
+        const s = svg(600, 240, `
+          <text x="10" y="18" font-size="14" fill="${C("--graphite")}">Ratings R</text><rect x="10" y="30" width="200" height="180" fill="#f1f1ee" stroke="${C("--rule")}"/>
+          <text x="232" y="130" font-size="28">≈</text>
+          <text x="275" y="18" font-size="14" fill="${C("--graphite")}">Users</text><rect class="U" x="275" y="30" width="40" height="180" fill="${C("--signal-soft")}" stroke="${C("--signal")}"/>
+          <text x="330" y="130" font-size="24">×</text>
+          <text x="360" y="18" font-size="14" fill="${C("--graphite")}">Movies (10 factors each)</text><rect class="V" x="360" y="30" width="220" height="40" fill="${C("--signal-soft")}" stroke="${C("--signal")}"/>
+          <text class="it" x="360" y="120" font-size="16" font-family="monospace"></text><text class="ph" x="360" y="150" font-size="14" fill="${C("--graphite")}"></text>`);
+        b.appendChild(s); return { s };
+      },
+      update(st, p) {
+        const t = seg(p, 0.05, 0.95), it = Math.min(10, Math.floor(t * 10) + 1), half = (t * 10) % 1 < 0.5;
+        st.s.querySelector(".U").setAttribute("fill", half ? C("--signal") : C("--signal-soft"));
+        st.s.querySelector(".V").setAttribute("fill", half ? C("--signal-soft") : C("--signal"));
+        st.s.querySelector(".it").textContent = `iteration ${it} / 10`;
+        st.s.querySelector(".ph").textContent = half ? "solving users (movies fixed)" : "solving movies (users fixed)";
+      },
+    },
+    {
+      label: "Scale", title: "More cores, less time, but diminishing returns",
+      caption: "Going from 1 to 8 cores cut training from 129 s to 32 s, a 3.98× speedup. Efficiency fell to about 50% because every step shuffles data between cores.",
+      duration: 5600,
+      setup(b) {
+        const up = bars(b, "ALS training time on MovieLens 25M", [["1 core", 129.2, "var(--graphite)", "1.00×"], ["2 cores", 70.49, "var(--signal)", "1.83×, 92% efficient"], ["4 cores", 44.88, "var(--signal)", "2.88×, 72%"], ["8 cores", 32.48, "var(--pass)", "3.98×, 50%"]], 130, (v) => v.toFixed(1) + " s");
+        return { up };
+      },
+      update(s, p) { s.up(seg(p, 0, 0.85), 0.18); },
+    },
+    {
+      label: "Accuracy", title: "Better predictions than simple averages",
+      caption: "Prediction error (RMSE, lower is better) on held-out ratings: ALS beat the best baseline by 14.6%, and 66% of top-10 recommendations were relevant.",
+      duration: 4600,
+      setup(b) {
+        const up = bars(b, "RMSE on held-out ratings (lower is better)", [["Global average", 1.0603, "var(--graphite)"], ["Item average", 0.9597, "var(--graphite)"], ["User average", 0.9538, "var(--graphite)"], ["ALS", 0.8149, "var(--pass)"]], 1.1, (v) => v.toFixed(4));
+        return { up };
+      },
+      update(s, p) { s.up(seg(p, 0, 0.85), 0.15); },
+    },
+  ];
+
+  /* ============================ GPU ============================ */
+  const GPUS = [["P100", "2016, no tensor cores", 167], ["V100", "2017, 1st-gen tensor cores", 111], ["H100", "2022, 4th-gen tensor cores", 88]];
+  window.PROJECT_STAGES.gpu = [
+    {
+      label: "Race", title: "Same training, three GPU generations",
+      caption: "ResNet-50 on an ImageNet subset at batch size 128, each GPU on its own node. Bars show progress through one epoch (times read from our charts).",
+      duration: 6000,
+      setup(b) {
+        const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+        box.appendChild(el("p", "panel-title", "One training epoch"));
+        const rows = GPUS.map(([n, d, sec]) => { const r = el("div", "chart-row", `<span><b>${n}</b><br><span class="muted" style="font-size:13px">${d}</span></span><span class="bar"><i></i></span><span class="mono v"></span>`); box.appendChild(r); return { i: r.querySelector("i"), v: r.querySelector(".v"), sec }; });
+        b.appendChild(box); return { rows };
+      },
+      update(s, p) {
+        const clock = seg(p, 0.05, 0.95) * 175;
+        s.rows.forEach((o) => { const u = Math.min(1, clock / o.sec); o.i.style.width = u * 100 + "%"; o.i.style.background = u >= 1 ? "var(--pass)" : "var(--signal)"; o.v.textContent = u >= 1 ? `${o.sec} s` : Math.round(clock) + " s"; });
+      },
+    },
+    {
+      label: "Profile", title: "Where does the time actually go?",
+      caption: "Nsight Systems records every CUDA call. On P100 and V100 most API time was spent blocked in stream synchronization, waiting.",
+      duration: 5200,
+      setup(b) {
+        const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+        box.appendChild(el("p", "panel-title", "Share of CUDA API time, ImageNet (approximate)"));
+        const data = [["P100", 87, 6, 5], ["V100", 81, 8, 9], ["H100", 43, 27, 19]];
+        const rows = data.map(([n, a, k, m]) => { const r = el("div", "chart-row", `<span><b>${n}</b></span><span class="bar" style="display:flex;background:var(--paper)"><i style="background:var(--fail)"></i><i style="background:var(--signal)"></i><i style="background:var(--caution)"></i></span><span class="mono v"></span>`); box.appendChild(r); return { is: r.querySelectorAll("i"), v: r.querySelector(".v"), parts: [a, k, m] }; });
+        const key = el("div", "", '<span class="tag fail">waiting (sync)</span> <span class="tag signal">launching kernels</span> <span class="tag caution">copying data</span>'); key.style.marginTop = "10px"; box.appendChild(key);
+        b.appendChild(box); return { rows };
+      },
+      update(s, p) { s.rows.forEach((o, k) => { const u = ease(seg(p, k * 0.15, k * 0.15 + 0.5)); o.is.forEach((i, j) => { i.style.width = o.parts[j] * u + "%"; i.style.borderRadius = "0"; }); o.v.textContent = Math.round(o.parts[0] * u) + "%"; }); },
+    },
+    {
+      label: "Memory", title: "Same memory use, very different headroom",
+      caption: "Memory depends on the model and batch size, not the GPU, so all three used about 11 GB at batch 128. That nearly fills a 16 GB P100 but is a small slice of an 80 GB H100.",
+      duration: 4800,
+      setup(b) {
+        const up = bars(b, "~11 GB used at batch size 128, as a share of each GPU's memory", [["P100 (16 GB)", 69, "var(--caution)"], ["V100 (16 GB)", 69, "var(--caution)"], ["H100 (80 GB)", 14, "var(--pass)"]], 100, (v) => Math.round(v) + "%");
+        return { up };
+      },
+      update(s, p) { s.up(seg(p, 0, 0.8), 0.18); },
+    },
+    {
+      label: "Result", title: "Newer GPUs: faster epochs, identical learning",
+      caption: "Loss curves matched on every GPU, which confirms a fair test. The next step is mixed precision and a faster input pipeline to cut the waiting time.",
+      duration: 4800,
+      setup(b) {
+        const up = bars(b, "Epoch time reduction vs P100", [["V100", 35, "var(--signal)", "30–40% lower"], ["H100", 70, "var(--pass)", "up to ~70% lower"]], 100, (v) => "−" + Math.round(v) + "%");
+        return { up };
+      },
+      update(s, p) { s.up(seg(p, 0, 0.8), 0.25); },
+    },
+  ];
+
+  /* ============================ Climate ============================ */
+  const r3 = rng(21);
+  const HOURS = Array.from({ length: 336 }, (_, i) => 4 + 5 * Math.sin((i / 24) * Math.PI * 2 - 1.6) + 3 * Math.sin(i / 60) + (r3() - 0.5) * 2);
+  const BAD = [70, 190, 260];
+  function hourPath(vals, skipBad) {
+    const W = 600, H = 200, mn = -10, mx = 22;
+    return vals.map((v, i) => { if (skipBad && BAD.includes(i)) v = (vals[i - 1] + vals[i + 1]) / 2; return `${i ? "L" : "M"}${(i / 335) * W},${H - ((v - mn) / (mx - mn)) * H}`; }).join(" ");
+  }
+  const SPIKED = HOURS.map((v, i) => (BAD.includes(i) ? (i === 190 ? 21 : -9) : v));
+  window.PROJECT_STAGES.climate = [
+    {
+      label: "Ingest", title: "Pull 14 days of hourly Boston weather",
+      caption: "336 hourly readings from the Open-Meteo forecast API, plus 10 years of daily climate normals for context.",
+      duration: 4200,
+      setup(b) {
+        title(b, "Hourly temperature, °C (336 readings)");
+        const s = svg(600, 210, `<path class="ln" d="${hourPath(SPIKED)}" fill="none" stroke="${C("--signal")}" stroke-width="1.6"/>`);
+        b.appendChild(s); const ln = s.querySelector(".ln"); const L = ln.getTotalLength(); ln.style.strokeDasharray = L; return { ln, L };
+      },
+      update(s, p) { s.ln.style.strokeDashoffset = s.L * (1 - seg(p, 0.05, 0.85)); },
+    },
+    {
+      label: "Clean", title: "Catch impossible values and gaps",
+      caption: "Timestamps become real dates, duplicates are dropped, and readings outside physical limits are removed and filled.",
+      duration: 4600,
+      setup(b) {
+        title(b, "Flagged readings in red, then repaired");
+        const W = 600, H = 200, mn = -10, mx = 22;
+        const dots = BAD.map((i) => `<circle class="bd" cx="${(i / 335) * W}" cy="${H - ((SPIKED[i] - mn) / (mx - mn)) * H}" r="7" fill="none" stroke="${C("--fail")}" stroke-width="2.5"/>`).join("");
+        const s = svg(600, 210, `<path class="a" d="${hourPath(SPIKED)}" fill="none" stroke="${C("--signal")}" stroke-width="1.6"/><path class="b" d="${hourPath(SPIKED, true)}" fill="none" stroke="${C("--signal")}" stroke-width="1.6" opacity="0"/>${dots}`);
+        b.appendChild(s); return { s };
+      },
+      update(st, p) {
+        st.s.querySelectorAll(".bd").forEach((d, i) => d.setAttribute("opacity", p > 0.15 + i * 0.12 && p < 0.75 ? 1 : 0));
+        st.s.querySelector(".a").setAttribute("opacity", p < 0.75 ? 1 : 0);
+        st.s.querySelector(".b").setAttribute("opacity", p >= 0.75 ? 1 : 0);
+      },
+    },
+    {
+      label: "Daily", title: "Summarize 336 hours into 14 days",
+      caption: "Average temperature, total rainfall and peak wind per day, saved as Parquet, a compact column-based file format.",
+      duration: 4600,
+      setup(b) {
+        title(b, "Daily average temperature, °C");
+        const days = Array.from({ length: 14 }, (_, d) => HOURS.slice(d * 24, d * 24 + 24).reduce((a, v) => a + v, 0) / 24);
+        const W = 600, H = 200, bw = W / 14;
+        let g = `<path d="${hourPath(HOURS)}" class="ln" fill="none" stroke="${C("--rule")}" stroke-width="1.2"/>`;
+        days.forEach((v, d) => { const h = ((v + 10) / 32) * H; g += `<rect class="dbar" data-h="${h}" x="${d * bw + 6}" y="${H}" width="${bw - 12}" height="0" fill="${C("--signal")}" rx="2"/><text class="dl" x="${d * bw + bw / 2}" y="${H - h - 6}" font-size="11" text-anchor="middle" opacity="0">${v.toFixed(1)}</text>`; });
+        const s = svg(600, 210, g); b.appendChild(s); return { s };
+      },
+      update(st, p) {
+        st.s.querySelectorAll(".dbar").forEach((r, d) => { const u = ease(seg(p, 0.1 + d * 0.035, 0.4 + d * 0.035)); const h = +r.dataset.h * u; r.setAttribute("y", 200 - h); r.setAttribute("height", h); });
+        st.s.querySelectorAll(".dl").forEach((t) => t.setAttribute("opacity", p > 0.85 ? 1 : 0));
+        st.s.querySelector(".ln").setAttribute("opacity", 1 - seg(p, 0.2, 0.6) * 0.7);
+      },
+    },
+    {
+      label: "Monitor", title: "Four checks run every hour",
+      caption: "Results go to a separate alert log, so a broken source or a unit change is caught before anyone uses the data.",
+      duration: 5200,
+      setup(b) {
+        const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+        box.appendChild(el("p", "panel-title", "Health report"));
+        const checks = [["Completeness", "record count within ±5% of expected"], ["Schema drift", "same columns as the saved baseline"], ["Statistical drift", "today's mean vs baseline, z = 0.7"], ["Thresholds", "all values within Boston's physical limits"]];
+        const rows = checks.map(([a, d]) => { const r = el("div", "row", `<span style="flex:1"><b>${a}</b><br><span class="muted">${d}</span></span><span class="tag pass fade">ok</span>`); box.appendChild(r); return r.querySelector(".tag"); });
+        b.appendChild(box); return { rows };
+      },
+      update(s, p) { s.rows.forEach((t, i) => show(t, p > 0.12 + i * 0.18)); },
+    },
+  ];
+
+  /* ============================ Real-time detection ============================ */
+  function streetScene(ctx, W, H, shift) {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "#dfe3e6"; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#c9ced2"; ctx.fillRect(0, H * 0.72, W, H * 0.28);
+    // person
+    const px = W * 0.3 + shift;
+    ctx.fillStyle = "#4a4f55"; ctx.beginPath(); ctx.arc(px, H * 0.28, 16, 0, Math.PI * 2); ctx.fill();
+    ctx.fillRect(px - 16, H * 0.33, 32, 70); ctx.fillRect(px - 14, H * 0.33 + 70, 11, 48); ctx.fillRect(px + 3, H * 0.33 + 70, 11, 48);
+    // chair
+    ctx.fillStyle = "#8a6a4a"; ctx.fillRect(W * 0.62, H * 0.5, 70, 10); ctx.fillRect(W * 0.62, H * 0.3, 10, 80); ctx.fillRect(W * 0.62, H * 0.5, 8, 50); ctx.fillRect(W * 0.62 + 62, H * 0.5, 8, 50);
+    // cup on a small table
+    ctx.fillStyle = "#a9adb1"; ctx.fillRect(W * 0.82, H * 0.55, 60, 8); ctx.fillRect(W * 0.82 + 26, H * 0.55, 8, 50);
+    ctx.fillStyle = "#f2f2f2"; ctx.fillRect(W * 0.82 + 20, H * 0.55 - 18, 16, 18);
+  }
+  function boxes(ctx, W, H, shift) {
+    return [
+      { n: "person", c: 0.91, x: W * 0.3 + shift - 26, y: H * 0.28 - 22, w: 52, h: 196 },
+      { n: "chair", c: 0.74, x: W * 0.62 - 6, y: H * 0.3 - 6, w: 84, h: 112 },
+      { n: "cup", c: 0.38, x: W * 0.82 + 16, y: H * 0.55 - 22, w: 24, h: 24 },
+      { n: "person", c: 0.52, x: W * 0.3 + shift - 20, y: H * 0.28 - 14, w: 48, h: 180, dup: true },
+    ];
+  }
+  function drawBox(ctx, o, color, alpha) {
+    ctx.globalAlpha = alpha; ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.strokeRect(o.x, o.y, o.w, o.h);
+    ctx.fillStyle = color; const label = `${o.n} ${o.c.toFixed(2)}`; ctx.font = "13px sans-serif"; const tw = ctx.measureText(label).width + 8;
+    ctx.fillRect(o.x, o.y - 18, tw, 18); ctx.fillStyle = "#fff"; ctx.fillText(label, o.x + 4, o.y - 5); ctx.globalAlpha = 1;
+  }
+  window.PROJECT_STAGES.realtime = [
+    {
+      label: "Stream", title: "Frames arrive 30 times a second",
+      caption: "A camera node publishes each frame on a ROS2 topic. The pipeline has about 33 ms per frame to keep up.",
+      duration: 3800,
+      setup(b) { const S = sceneCanvas(b, 280); const o = el("div", "mono muted"); o.style.marginTop = "8px"; b.appendChild(o); return { S, o }; },
+      update(s, p) { const sh = Math.sin(p * Math.PI * 2) * 12; streetScene(s.S.ctx, s.S.W, s.S.H, sh); s.o.textContent = `frame ${1040 + Math.floor(p * 30)}   1280 × 720   30 FPS`; },
+    },
+    {
+      label: "Detect", title: "YOLOv5 finds objects in one pass",
+      caption: "OpenCV resizes the frame to 640×640, and YOLOv5 predicts boxes and labels across the whole image at once, including weak and duplicate guesses.",
+      duration: 4400,
+      setup(b) { return { S: sceneCanvas(b, 280) }; },
+      update(s, p) { const { ctx, W, H } = s.S; streetScene(ctx, W, H, 0); boxes(ctx, W, H, 0).forEach((o, i) => { if (p > 0.15 + i * 0.15) drawBox(ctx, o, o.c > 0.5 ? (o.dup ? "#B57A06" : "#00B4A0") : "#C8372D", 1); }); },
+    },
+    {
+      label: "Filter", title: "Drop weak boxes and duplicates",
+      caption: "Boxes under the confidence threshold are removed, and overlapping boxes on the same object are merged (non-maximum suppression).",
+      duration: 4400,
+      setup(b) { const S = sceneCanvas(b, 280); const n = el("div", "", '<span class="tag fail fade">cup 0.38 below threshold</span> <span class="tag caution fade">duplicate person removed</span>'); n.style.marginTop = "8px"; b.appendChild(n); return { S, tags: n.querySelectorAll(".tag") }; },
+      update(s, p) {
+        const { ctx, W, H } = s.S; streetScene(ctx, W, H, 0);
+        boxes(ctx, W, H, 0).forEach((o) => { let a = 1; if (o.c < 0.5) a = 1 - seg(p, 0.15, 0.4); if (o.dup) a = 1 - seg(p, 0.5, 0.75); drawBox(ctx, o, o.c > 0.5 && !o.dup ? "#00B4A0" : o.dup ? "#B57A06" : "#C8372D", a); });
+        show(s.tags[0], p > 0.3); show(s.tags[1], p > 0.65);
+      },
+    },
+    {
+      label: "Latency", title: "Camera to detections in about 45 ms",
+      caption: "Stages overlap, so while one frame is being detected the next is already being prepared. That sustains about 30 FPS even though each frame takes ~45 ms end to end.",
+      duration: 5000,
+      setup(b) {
+        const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+        box.appendChild(el("p", "panel-title", "Where the ~45 ms goes (typical budget)"));
+        const parts = [["capture + transport", 7, "#5B6577"], ["resize + normalize", 7, "#B57A06"], ["YOLOv5 inference", 22, "#00B4A0"], ["filter", 4, "#C8372D"], ["publish + draw", 5, "#2E7D32"]];
+        const barEl = el("div"); barEl.style.cssText = "display:flex;height:34px;border-radius:3px;overflow:hidden;background:var(--paper)";
+        const segs = parts.map(([n, ms, c]) => { const i = el("i"); i.style.cssText = `width:0;background:${c}`; barEl.appendChild(i); return { i, ms }; });
+        box.appendChild(barEl);
+        const key = el("div"); key.style.cssText = "display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:14px";
+        key.innerHTML = parts.map(([n, ms, c]) => `<span><i style="display:inline-block;width:10px;height:10px;background:${c};margin-right:5px"></i>${n} ${ms} ms</span>`).join("");
+        box.appendChild(key);
+        const tot = el("div", "mono", ""); tot.style.marginTop = "10px"; box.appendChild(tot);
+        b.appendChild(box); return { segs, tot };
+      },
+      update(s, p) { let sum = 0; s.segs.forEach((o, k) => { const u = ease(seg(p, k * 0.13, k * 0.13 + 0.3)); o.i.style.width = (o.ms / 45) * 100 * u + "%"; sum += o.ms * u; }); s.tot.textContent = `total ≈ ${Math.round(sum)} ms`; },
+    },
+  ];
+
+  /* ============================ Multi-agent ============================ */
+  const AG = ["Planner", "Retriever", "Writer", "Verifier"];
+  function agentRow(b) {
+    const s = svg(640, 150, `
+      ${AG.map((n, i) => `<g class="ag" data-i="${i}"><rect x="${20 + i * 160}" y="40" width="120" height="56" rx="3" fill="#fff" stroke="${C("--rule")}" stroke-width="2"/><text x="${80 + i * 160}" y="74" text-anchor="middle" font-size="16" font-weight="600">${n}</text></g>`).join("")}
+      ${[0, 1, 2].map((i) => `<line x1="${140 + i * 160}" y1="68" x2="${180 + i * 160}" y2="68" stroke="${C("--rule")}" stroke-width="2"/>`).join("")}
+      <path class="back" d="M560 100 C 520 140, 280 140, 240 100" fill="none" stroke="${C("--fail")}" stroke-width="2" stroke-dasharray="6 5" opacity="0"/>
+      <text class="backt" x="400" y="146" text-anchor="middle" font-size="13" fill="${C("--fail")}" opacity="0">claim unsupported → find more evidence</text>
+      <circle class="tok" cx="80" cy="30" r="8" fill="${C("--signal")}"/>`);
+    b.appendChild(s);
+    return s;
+  }
+  function setActive(s, i) { s.querySelectorAll(".ag rect").forEach((r, k) => { r.setAttribute("stroke", k === i ? C("--signal") : C("--rule")); r.setAttribute("fill", k === i ? C("--signal-soft") : "#fff"); }); s.querySelector(".tok").setAttribute("cx", 80 + i * 160); }
+  window.PROJECT_STAGES.multiagent = [
+    {
+      label: "Plan", title: "A planner breaks the question into steps",
+      caption: "Specialized agents, each with a focused job, pass shared state along a LangGraph graph.",
+      duration: 4200,
+      setup(b) {
+        const s = agentRow(b); setActive(s, 0);
+        const d = el("div", "doc fade"); d.style.fontFamily = "var(--sans)"; d.innerHTML = '<b>Question:</b> What is our current remote-work policy for contractors?<br><span class="muted">Plan: 1. find the remote-work policy · 2. find the latest contractor update</span>';
+        b.appendChild(d); return { d };
+      },
+      update(s, p) { show(s.d, p > 0.25); },
+    },
+    {
+      label: "Retrieve", title: "A retriever gathers evidence in parallel",
+      caption: "Searches run at the same time over indexed company documents, which is one reason latency dropped 30%.",
+      duration: 4200,
+      setup(b) {
+        const s = agentRow(b); setActive(s, 1);
+        const cards = ["Remote Work Policy v3, §2", "Contractor Handbook, 2026 update", "HR FAQ"].map((t) => { const c = el("div", "tag signal fade", t); c.style.marginRight = "8px"; return c; });
+        const w = el("div"); cards.forEach((c) => w.appendChild(c)); b.appendChild(w); return { cards };
+      },
+      update(s, p) { s.cards.forEach((c, i) => show(c, p > 0.2 + i * 0.2)); },
+    },
+    {
+      label: "Write", title: "A writer drafts the answer from the evidence",
+      caption: "Every sentence is tied to a source passage.",
+      duration: 4200,
+      setup(b) { const s = agentRow(b); setActive(s, 2); const d = el("div", "doc"); d.style.fontFamily = "var(--sans)"; const sp = el("span"); d.appendChild(sp); b.appendChild(d); return { sp, text: "Contractors may work remotely up to 3 days a week [1]. As of 2026, they also need manager approval for travel [?]." }; },
+      update(s, p) { type(s.sp, s.text, seg(p, 0.05, 0.85)); },
+    },
+    {
+      label: "Verify", title: "A verifier checks every claim before it's sent",
+      caption: "The second claim had no supporting passage, so work goes back to the retriever. Retries are capped to control cost. This step cut unsupported answers by 25%.",
+      duration: 6000,
+      setup(b) {
+        const s = agentRow(b); setActive(s, 3);
+        const d = el("div", "doc"); d.style.fontFamily = "var(--sans)";
+        d.innerHTML = 'Contractors may work remotely up to 3 days a week [1]. <span class="c2">As of 2026, they also need manager approval for travel [?].</span>';
+        const ok = el("div", "fade", '<span class="tag pass">all claims supported, answer sent</span>'); ok.style.marginTop = "10px";
+        b.append(d, ok); return { s, c2: d.querySelector(".c2"), ok };
+      },
+      update(st, p) {
+        const back = p > 0.25 && p < 0.6;
+        st.s.querySelector(".back").setAttribute("opacity", back ? 1 : 0); st.s.querySelector(".backt").setAttribute("opacity", back ? 1 : 0);
+        st.c2.className = p > 0.15 && p < 0.65 ? "c2 hl-fail" : "c2";
+        if (p >= 0.65) { st.c2.innerHTML = "As of 2026, they also need manager approval for travel [2]."; }
+        setActive(st.s, back ? (p < 0.42 ? 3 : 1) : 3);
+        show(st.ok, p > 0.75);
+      },
+    },
+    {
+      label: "Results", title: "Measured with automated evals, not assumed",
+      caption: "Compared with the earlier version, the coordinated agents completed more tasks with fewer unsupported answers, and responded faster.",
+      duration: 4600,
+      setup(b) {
+        const up = bars(b, "Change vs earlier version", [["Tasks completed", 18, "var(--pass)", "+18%"], ["Unsupported answers", 25, "var(--pass)", "−25%"], ["Latency", 30, "var(--pass)", "−30%"]], 40, (v, full) => Math.round(v) + "%");
+        return { up };
+      },
+      update(s, p) { s.up(seg(p, 0, 0.8), 0.18); },
+    },
+  ];
+})();
+
+</script>
+<script>
+/* Content for the "Visualize my projects" page.
+   To edit a project, change its entry here. Projects with kind "flow" use the
+   generic before → after animation built from their `stages`. */
+(function () {
+  const { el, seg } = PipeHelpers;
+
+  // Generic stage: the whole pipeline as a chain of cards. Earlier steps are filled in,
+  // the current step types out its result, later steps wait as outlines.
+  function flowStages(p) {
+    const cards = [{ label: p.input.label, out: p.input.text, isInput: true }].concat(p.stages);
+    return p.stages.map((s, k) => ({
+      label: s.label, title: s.title, caption: s.caption, duration: s.duration || 4200,
+      setup(b) {
+        const chain = el("div", "chain");
+        const nodes = cards.map((c, j) => {
+          const state = j === 0 ? "input" : j <= k ? "done" : j === k + 1 ? "cur" : "todo";
+          const n = el("div", `link ${state}`, `<span class="link-label">${j === 0 ? c.label : j + ". " + c.label}</span><pre></pre>`);
+          const pre = n.querySelector("pre");
+          if (state === "input" || state === "done") pre.textContent = c.out;
+          chain.appendChild(n);
+          if (j < cards.length - 1) chain.appendChild(el("div", `joint${j <= k ? " lit" : ""}`, "<i></i>"));
+          return n;
+        });
+        b.appendChild(chain);
+        const joints = chain.querySelectorAll(".joint");
+        return { cur: nodes[k + 1], pre: nodes[k + 1].querySelector("pre"), joint: joints[k], text: s.out };
+      },
+      update(st, t) {
+        st.joint.classList.toggle("lit", t > 0.15);
+        st.pre.textContent = st.text.slice(0, Math.round(st.text.length * seg(t, 0.2, 0.85)));
+      },
+    }));
+  }
+
+  const P = [
+    {
+      id: "clinical", name: "Clinical Intake Agent", kind: "bespoke", page: "clinical.html",
+      tagline: "A patient form becomes checked fields, a clinician note and a health-record export, with uncertain fields sent to a person.",
+      stack: ["Python", "FastAPI", "Celery", "Redis", "PostgreSQL", "React", "Claude API", "Llama 3.1 8B (Ollama)", "Docker", "GitHub Actions"],
+      input: { label: "Input", text: "A patient intake form (PDF or text): name, date of birth, contact details, chief complaint, medications, allergies." },
+      output: { label: "Output", text: "Validated fields with confidence scores, a clinician note, a FHIR JSON bundle for the health record, and a review queue for low-confidence fields." },
+      numbers: [["90.6%", "extraction accuracy, Llama 3.1 8B"], ["0%", "hallucinated extracted fields"], ["80 / 10", "CI fails below 80% accuracy or above 10% hallucination"], ["6", "pipeline steps"]],
+      flow: ["Upload returns instantly; a background worker takes the job", "Read the form into text", "Remove phone numbers, addresses and record IDs before any model call", "Extract fields, each with a confidence score and the text it came from", "Check fields with plain rules; send low-confidence ones to review", "Write the clinician note from the extracted fields only", "Export a FHIR bundle; evaluation runs on every code push"],
+      future: ["Grade every sentence of the note against the extracted fields", "Use a validated de-identification model", "Add login and role-based access", "Grow the test set beyond four synthetic forms; add medical codes to the export"],
+      links: [["Code", "https://github.com/Uttaprexa/clinical-intake-agent"], ["Write-up", "https://medium.com/@uttapreksha24/i-built-a-clinical-intake-ai-pipeline-and-my-eval-harness-caught-a-hallucination-i-didnt-expect-b67ed732eb8b"]],
+    },
+    {
+      id: "grpo", name: "GRPO from Scratch", kind: "bespoke", page: "grpo.html",
+      tagline: "The reinforcement-learning method behind DeepSeek-R1, written without a training library and compared against PPO and DPO.",
+      stack: ["Python", "PyTorch", "Hugging Face Transformers", "Trio", "C++ / pybind11", "FSDP support", "Kubernetes manifests", "AWS EC2 (T4)"],
+      input: { label: "Input", text: "GSM8K math word problems with known numeric answers, and a small language model (Qwen2.5-0.5B-Instruct)." },
+      output: { label: "Output", text: "A fine-tuned model that solves more problems, plus a controlled comparison of GRPO, PPO and DPO on the same model, data and hardware." },
+      numbers: [["8.7 → 28.5%", "GSM8K accuracy after 300 GRPO steps"], ["8", "answers sampled per problem"], ["1.7×", "faster answer checking in C++"], ["25", "tests that run without a GPU"]],
+      flow: ["Sample 8 answers per problem with async workers", "Score each final answer: 1 if correct, 0 if not", "Compare each score with its group's average", "Update the model with a clipped step and a pull back toward the original", "Evaluate on 200 held-out problems"],
+      future: ["Repeat with several random seeds before ranking algorithms", "Denser, step-level rewards to fix all-wrong groups", "Faster generation for rollouts", "Scale beyond 0.5B parameters across multiple GPUs"],
+      links: [["Code", "https://github.com/Uttaprexa/grpo-llm"], ["Write-up", "https://medium.com/@uttapreksha24/grpo-vs-ppo-vs-dpo-on-gsm8k-what-i-learned-building-rl-training-from-scratch-f47701c637b9"]],
+    },
+    {
+      id: "memory", name: "Adaptive Agent Memory", kind: "bespoke", page: "memory.html",
+      tagline: "An agent decides on every turn what to remember, update or ignore, so it still knows your preferences 90 turns later.",
+      stack: ["Python", "Claude API", "sentence-transformers (all-MiniLM-L6-v2)", "NumPy", "Matplotlib", "Gradio"],
+      input: { label: "Input", text: "A long conversation (60–100 turns) with changing preferences, reworded statements and facts about other people." },
+      output: { label: "Output", text: "A small set of named memory slots with the latest value for each, and answers built from them." },
+      numbers: [["0.760", "answer accuracy, vs 0.613 for similarity search"], ["−64%", "missed facts vs keyword rules"], ["75", "test conversations across 15 topics"], ["0.86+", "accuracy at every distance between fact and question"]],
+      flow: ["Each user message goes to a selector", "Selector decides: store, keep briefly, or drop", "Stored facts become key-value slots; newer values replace older ones", "Answers are written from the slots plus recent turns", "Results compared with four other memory strategies"],
+      future: ["Run the cheap rule selector first; call the model only when unsure", "Keep slot history and ask the user about important conflicts", "Test on real multi-session conversations"],
+      links: [["Code", "https://github.com/Uttaprexa/adaptive-long-term-memory-llm-agents"]],
+    },
+    {
+      id: "kitti", name: "3D Detection on KITTI", kind: "bespoke", page: "kitti.html",
+      tagline: "A PointPillars-style detector that finds cars in LiDAR scans, built end to end and trained for about $10 of cloud GPU.",
+      stack: ["Python", "PyTorch", "NumPy", "SciPy", "AWS EC2 (T4)", "Google Colab"],
+      input: { label: "Input", text: "A LiDAR scan (100,000–120,000 points with x, y, z and reflectance) plus sensor calibration and labeled 3D boxes." },
+      output: { label: "Output", text: "3D boxes around cars (position, size, heading) with confidence scores, scored separately for near, mid-range and far objects." },
+      numbers: [["15.6×", "near-range detection score growth over training"], ["440K → 27.5K", "candidate boxes per scene after the head fix"], ["140", "epochs on 850 real scenes"], ["~$10", "total GPU cost"]],
+      flow: ["Convert labels between camera and LiDAR coordinates", "Group points into vertical pillars on a ground grid", "Summarize each pillar and lay them out as a 2D feature image", "A 2D network scores template boxes and predicts corrections", "Remove duplicate boxes and score by distance"],
+      future: ["Copy-paste object augmentation and full KITTI training split", "Move box matching to the GPU (current bottleneck)", "Evaluate with the official KITTI protocol"],
+      links: [["Code", "https://github.com/Uttaprexa/kitti-3d-detection"]],
+    },
+    {
+      id: "vlm", name: "VLM Anomaly Detection (arXiv)", kind: "bespoke",
+      tagline: "Co-authored paper comparing two CLIP-based methods that spot factory defects from text descriptions, with no defect examples needed.",
+      stack: ["PyTorch", "CLIP", "WinCLIP", "AnomalyCLIP", "MVTec AD"],
+      input: { label: "Input", text: "Product photo from MVTec AD\n(15 categories: bottles, cables,\nscrews, carpet, tile, …)" },
+      output: { label: "Output", text: "An anomaly score per image (is it defective?) and a heatmap per pixel (where is the defect?), analyzed by category, contrast and defect type." },
+      numbers: [["0.916", "image-level AUROC, AnomalyCLIP"], ["0.907", "pixel-level AUROC, AnomalyCLIP"], ["0.94 vs 0.77", "high- vs low-contrast defects"], ["15", "product categories"]],
+      stages: [
+        { label: "Describe", title: "Describe normal and damaged in words", caption: "Text prompts stand in for training examples. AnomalyCLIP learns one generic pair of prompts that works across products.", out: "normal:   \"a photo of a flawless bottle\"\ndamaged:  \"a photo of a damaged bottle\"" },
+        { label: "Encode", title: "Turn the image and the words into vectors", caption: "CLIP maps images and text into the same space, so they can be compared directly.", out: "image  → 1 global vector\npatches → grid of local vectors\nprompts → 2 text vectors" },
+        { label: "Compare", title: "Which description is the image closer to?", caption: "If the image sits closer to “damaged” than to “flawless”, its anomaly score is high.", out: "similarity to flawless: 0.21\nsimilarity to damaged:  0.27\nanomaly score:          0.81   (example)" },
+        { label: "Localize", title: "Do the same for every patch to find where", caption: "Scoring each local patch gives a heatmap of where the defect is.", out: "░░░░░░░░░░\n░░░░▒▓▓▒░░\n░░░▒▓██▓░░\n░░░░▒▓▒░░░\n░░░░░░░░░░" },
+        { label: "Analyze", title: "Break results down, not just average them", caption: "Textures were easiest. Missing components and logic errors were hardest, because nothing visibly wrong is present.", out: "AnomalyCLIP  image 0.916  pixel 0.907\nWinCLIP      image 0.612  pixel 0.726\nhardest: missing component 0.757" },
+      ],
+      flow: ["Write normal and damaged descriptions (WinCLIP) or use learned generic prompts (AnomalyCLIP)", "Encode the image, its patches and the prompts with CLIP", "Score the image against each description", "Score every patch to build a defect heatmap", "Analyze results by category, defect contrast and defect type"],
+      future: ["Combine learned prompts with sliding-window localization", "Learn from misclassified images (hard examples)", "Test under real factory lighting and camera angles"],
+      links: [["Paper (arXiv 2601.13440)", "https://arxiv.org/abs/2601.13440"], ["Code", "https://github.com/Uttaprexa/Analyzing-VLM-Based-Approaches-for-AC-AS"]],
+    },
+    {
+      id: "rag", name: "Healthcare Knowledge Retrieval", kind: "bespoke",
+      tagline: "Ask a health question, get an answer written only from retrieved documents, with every claim linked to its source.",
+      stack: ["Python", "FastAPI", "FAISS", "PostgreSQL", "Claude API", "OpenAI API", "Docker", "AWS EC2"],
+      input: { label: "Input", text: "Question:\n\"What are common side effects\n of metformin?\"" },
+      output: { label: "Output", text: "A short answer built only from retrieved passages, with numbered citations to the source documents, or “not found” when the sources don't cover it." },
+      numbers: [["50K+", "documents indexed"], ["+25%", "answer correctness vs first version"], ["−18%", "hallucinations"], ["−22%", "latency"]],
+      stages: [
+        { label: "Embed", title: "Turn the question into a vector", caption: "The same embedding model used for the documents encodes the question.", out: "query → [0.12, −0.08, 0.33, … ]  (384 numbers)" },
+        { label: "Retrieve", title: "Find the closest passages", caption: "FAISS searches the indexed chunks of 50,000+ documents for the nearest vectors.", out: "#1  drug_label_metformin §6   0.82\n#2  diabetes_guide §4.2       0.77\n#3  patient_faq_meds §2        0.71" },
+        { label: "Fetch", title: "Load text and source details", caption: "PostgreSQL holds each chunk's text, document, section and link.", out: "[1] \"…gastrointestinal effects such as\n     nausea and diarrhea…\"\n[2] \"…vitamin B12 levels may decrease…\"" },
+        { label: "Answer", title: "Write only from the sources, and cite them", caption: "The prompt requires a citation for every claim and allows “not found”. Citations are checked before returning.", out: "Common side effects include nausea and\ndiarrhea [1]; long-term use can lower\nvitamin B12 [2]." },
+      ],
+      flow: ["Split documents into overlapping chunks and embed them", "Store vectors in FAISS and text plus metadata in PostgreSQL", "Embed the question and retrieve the closest chunks", "Generate an answer only from those chunks, with citations", "Score every change on a fixed set of benchmark questions before shipping"],
+      future: ["Add a reranking model for retrieval precision", "Combine keyword and vector search", "Re-index automatically as documents change"],
+      links: [],
+    },
+    {
+      id: "pitchquest", name: "PitchQuest", kind: "bespoke",
+      tagline: "Team project: upload a pitch video and get feedback on content, delivery and slides from five AI models running in parallel.",
+      stack: ["PyTorch", "Whisper", "Wav2Vec2", "MediaPipe", "DeepFace", "SmolVLM-500M + LoRA", "FastAPI", "Next.js", "Supabase", "Weights & Biases", "Evidently AI"],
+      input: { label: "Input", text: "pitch_video.mp4   10 min\naudio + camera frames + slides" },
+      output: { label: "Output", text: "A feedback report: story clarity, speaking pace and filler words, vocal and facial confidence, posture, and slide-quality scores." },
+      numbers: [["5", "models in parallel"], ["<2 min", "to analyze a 10-minute video"], ["85%+", "agreement with human evaluators"], ["~1,000", "labeled slides for fine-tuning"]],
+      stages: [
+        { label: "Split", title: "Separate audio, video frames and slides", caption: "Each stream goes to the models that understand it.", out: "audio.wav\nframes: 1 every 2 s\nslides: 12 images" },
+        { label: "Analyze", title: "Five models run at the same time", caption: "Running them in parallel is what keeps a 10-minute video under 2 minutes.", out: "Whisper    → transcript + timing\nWav2Vec2   → vocal emotion\nMediaPipe  → posture, gestures\nDeepFace   → facial expression\nSmolVLM    → slide quality" },
+        { label: "Score", title: "Turn signals into scores", caption: "SmolVLM was fine-tuned with LoRA on labeled pitch-deck slides.", out: "pace: 168 words/min (fast)\nfiller words: 14\nslide clarity: 3.6 / 5" },
+        { label: "Feedback", title: "Write feedback a founder can act on", caption: "User corrections are saved; after 100 of them the slide model retrains automatically.", out: "Slow down in the first minute,\ncut \"um\", and simplify slide 4's chart." },
+      ],
+      flow: ["Upload a recorded pitch", "Split into audio, sampled frames and slide images", "Run five models in parallel", "Combine results into scores and written feedback", "Store user corrections; retrain the slide model after 100 corrections, tracked in Weights & Biases"],
+      future: ["Live coaching during practice", "Per-investor-style feedback", "Larger labeled slide set"],
+      links: [["Code", "https://github.com/harshitashitut/MLOps-Project"]],
+    },
+    {
+      id: "robotics", name: "Robot Pick-and-Place Policy", kind: "bespoke",
+      tagline: "A camera image goes in, one of six robot actions comes out, learned by copying an expert's demonstrations.",
+      stack: ["PyTorch", "CNN", "Behavior cloning", "Data augmentation", "Simulation"],
+      input: { label: "Input", text: "Camera image\n64 × 64 × 3 = 12,288 numbers" },
+      output: { label: "Output", text: "One of six actions: move left, right, forward or back; go down and grab; go up and release." },
+      numbers: [["58 → 80%", "action accuracy on unseen objects"], ["+22 pts", "from a CNN encoder plus augmentation"], ["349K", "parameters"], ["6", "discrete actions"]],
+      stages: [
+        { label: "See", title: "Detect edges and colors", caption: "32 small filters slide over the image; the same filter finds a pattern anywhere.", out: "32 feature maps, 64 × 64\n→ pooled to 32 × 32" },
+        { label: "Shapes", title: "Combine edges into shapes", caption: "64 filters on top of the first layer respond to corners and object outlines.", out: "64 feature maps → 4 × 4 summary grid\n= 1,024 numbers" },
+        { label: "State", title: "Compress to what matters", caption: "A linear layer squeezes the scene into 256 numbers describing where the object is and what it looks like.", out: "state vector: 256 numbers" },
+        { label: "Decide", title: "Score the six actions", caption: "A small network scores each action; the highest wins. Trained by copying a scripted expert.", out: "left 0.03   right 0.81\nforward 0.06   back 0.02\ngrab 0.05   release 0.03\n→ move right" },
+      ],
+      flow: ["Collect expert demonstrations in simulation: image and correct action", "Augment images with crops, color changes and flips", "CNN encoder compresses each image into a 256-number state", "Policy network picks one of six actions", "Train by matching the expert's action; test on objects never seen in training"],
+      future: ["Let the expert correct the policy's own mistakes (DAgger)", "Add memory of recent frames", "Randomize simulation visuals to transfer to a real robot", "Use a pretrained image encoder"],
+      links: [],
+    },
+    {
+      id: "pyspark", name: "Distributed Recommender (PySpark)", kind: "bespoke",
+      tagline: "Movie recommendations from 25 million ratings with Spark, plus a study of how training time scales with more CPU cores.",
+      stack: ["Python", "PySpark", "Spark MLlib (ALS)", "Slurm", "HPC cluster", "Matplotlib"],
+      input: { label: "Input", text: "MovieLens 25M ratings.csv\n25,000,095 rows\n162,541 users × 59,047 movies" },
+      output: { label: "Output", text: "Predicted ratings and top-10 recommendations per user, plus timing results for 1 to 8 cores." },
+      numbers: [["3.98×", "faster on 8 cores (129 s → 32 s)"], ["14.6%", "lower error than the best baseline"], ["0.663", "precision of top-10 recommendations"], ["25M", "ratings"]],
+      stages: [
+        { label: "Load", title: "Load ratings into a distributed table", caption: "Spark splits the table into partitions that cores process in parallel.", out: "userId  movieId  rating\n1       296      5.0\n1       306      3.5\n… split into partitions" },
+        { label: "Factorize", title: "Learn hidden taste factors", caption: "ALS gives every user and movie 10 numbers, alternating between solving for users and for movies.", out: "user 1   → [0.8, 0.1, 1.2, …]  (10)\nmovie 296 → [0.9, 0.0, 1.1, …] (10)" },
+        { label: "Predict", title: "Predict ratings and rank movies", caption: "A predicted rating is the match between a user's and a movie's factors.", out: "user 1 top picks:\n  movie 2571  4.7\n  movie 858   4.6\n  movie 50    4.6" },
+        { label: "Scale", title: "Measure what more cores buy", caption: "Speedup grows but efficiency falls, because each step shuffles data between workers.", out: "1 core  129.2 s\n2 cores  70.5 s\n4 cores  44.9 s\n8 cores  32.5 s   (3.98×)" },
+      ],
+      flow: ["Load and split ratings into training and test sets", "Compute simple average-rating baselines", "Train ALS (10 factors, regularization 0.1, 10 iterations)", "Evaluate prediction error and top-10 precision", "Repeat training on 1, 2, 4 and 8 cores with Slurm and compare"],
+      future: ["Run across multiple machines", "Use implicit signals such as views and clicks", "Compare with neural retrieval models"],
+      links: [["Code", "https://github.com/Uttaprexa/Scalable-Product-Recommendation-System-using-PySpark"]],
+    },
+    {
+      id: "gpu", name: "GPU Benchmarking: P100 vs V100 vs H100", kind: "bespoke",
+      tagline: "Team course project: the same ResNet-50 training on three GPU generations, profiled to see where the time actually goes.",
+      stack: ["Python", "PyTorch", "NVIDIA Nsight Systems", "CUDA", "Slurm", "Pandas", "Matplotlib"],
+      input: { label: "Input", text: "ResNet-50 training\nCIFAR-100, MS COCO, ImageNet subset\nbatch sizes 16, 32, 64, 128" },
+      output: { label: "Output", text: "Throughput, epoch time, memory use and loss per GPU, plus profiler timelines showing time spent computing, copying data and waiting." },
+      numbers: [["~70%", "lower epoch time, H100 vs P100"], ["30–40%", "lower epoch time, V100 vs P100"], ["3", "GPU generations"], ["3", "datasets"]],
+      stages: [
+        { label: "Train", title: "Same model and settings on each GPU", caption: "ResNet-50, SGD, 20 epochs, each GPU on its own node.", out: "P100 (2016)   V100 (2017)   H100 (2022)\nsame code, same data, same batch sizes" },
+        { label: "Profile", title: "Record where every millisecond goes", caption: "Nsight Systems captures kernel launches, memory copies and waiting time.", out: "trace: cudaLaunchKernel\n       cudaMemcpyAsync\n       cudaStreamSynchronize" },
+        { label: "Compare", title: "Older GPUs spent most of their time waiting", caption: "On ImageNet, P100 and V100 spent over 80% of API time blocked on sync; H100 overlapped copies and compute much better.", out: "time waiting on sync (ImageNet)\nP100  ~87%\nV100  ~81%\nH100  ~43%" },
+        { label: "Result", title: "Faster per epoch, same learning", caption: "Identical loss curves confirmed a fair comparison: each GPU learned the same way, just faster.", out: "epoch time vs P100\nV100  30–40% lower\nH100  up to ~70% lower" },
+      ],
+      flow: ["Set up identical environments on each GPU node", "Train ResNet-50 for 20 epochs at four batch sizes", "Profile every run with Nsight Systems", "Compare throughput, epoch time, memory and loss", "Explain differences from the profiler timelines"],
+      future: ["Mixed-precision training to measure tensor-core gains fully", "Repeated runs with error bars", "Multi-GPU scaling and A100 comparison", "Faster data loading to remove waiting time"],
+      links: [],
+    },
+    {
+      id: "climate", name: "Climate Data Pipeline", kind: "bespoke",
+      tagline: "Real Boston weather data pulled from two APIs, cleaned, stored and watched by an hourly monitor that flags anything unusual.",
+      stack: ["Python", "Pandas", "NumPy", "PyArrow / Parquet", "Open-Meteo API", "schedule"],
+      input: { label: "Input", text: "Open-Meteo forecast API (CSV)\nOpen-Meteo climate API (JSON)\nBoston, 14 days hourly" },
+      output: { label: "Output", text: "Clean daily weather summaries in Parquet, a health report, and alerts when the data changes shape or looks abnormal." },
+      numbers: [["336 → 14", "hourly rows to daily summaries"], ["4", "monitoring checks"], ["2", "data sources"], ["hourly", "schedule"]],
+      stages: [
+        { label: "Ingest", title: "Pull from two sources", caption: "Recent hourly forecasts plus 10 years of climate normals for context.", out: "336 hourly rows  (14 days × 24 h)\n+ 10-year daily normals" },
+        { label: "Clean", title: "Fix types, duplicates and impossible values", caption: "Timestamps become real dates, duplicates go, gaps are filled, impossible readings are removed.", out: "duplicates removed: 0\nmissing filled: 3\nout-of-range dropped: 1" },
+        { label: "Summarize", title: "Hourly to daily", caption: "Average temperature, total rain, peak wind.", out: "date        temp °C  rain mm  wind max\n2026-03-01   4.2      1.8      31\n…14 days" },
+        { label: "Monitor", title: "Four checks on every run", caption: "Results go to a separate alert log so problems aren't buried in routine logs.", out: "completeness   ok\nschema drift   ok\nvalue drift    ok (z = 0.7)\nthresholds     ok" },
+      ],
+      flow: ["Fetch hourly forecasts (CSV) and climate normals (JSON)", "Clean types, duplicates, gaps and impossible values", "Aggregate to daily summaries", "Validate and save as Parquet", "Compare against a saved baseline with four checks, every hour"],
+      future: ["Cloud storage partitioned by date", "Airflow scheduling with retries", "Seasonal baselines and alert notifications"],
+      links: [["Code", "https://github.com/Uttaprexa/climate-data-pipeline"]],
+    },
+    {
+      id: "realtime", name: "Real-Time Object Detection", kind: "bespoke",
+      tagline: "Live video in, labeled boxes out, at about 30 frames per second.",
+      stack: ["Python", "C++", "ROS2", "YOLOv5", "OpenCV", "PyTorch"],
+      input: { label: "Input", text: "Live camera stream\n30 frames per second" },
+      output: { label: "Output", text: "Labeled bounding boxes with confidence scores for each frame, published for other components and drawn on screen." },
+      numbers: [["~30", "frames per second"], ["~45 ms", "camera to detections"], ["YOLOv5", "detector"], ["ROS2", "robot middleware"]],
+      stages: [
+        { label: "Capture", title: "Grab the next frame", caption: "Frames arrive as messages on a ROS2 topic.", out: "frame 1042   1280 × 720" },
+        { label: "Prepare", title: "Resize and normalize", caption: "OpenCV resizes to the model's input size and converts colors.", out: "640 × 640, RGB, values 0–1" },
+        { label: "Detect", title: "Run YOLOv5", caption: "One pass predicts boxes and classes across the whole image.", out: "person  0.91\nchair   0.74\ncup     0.38" },
+        { label: "Filter", title: "Drop weak and duplicate boxes", caption: "Low-confidence boxes and overlaps are removed before publishing.", out: "person 0.91, chair 0.74\nlatency 45 ms" },
+      ],
+      flow: ["Receive frames over ROS2", "Preprocess with OpenCV", "Run YOLOv5 on the GPU", "Filter by confidence and remove overlapping boxes", "Publish detections and draw them on screen"],
+      future: ["TensorRT for lower latency", "Track objects across frames"],
+      links: [],
+    },
+    {
+      id: "multiagent", name: "Multi-Agent Knowledge Assistant", kind: "bespoke",
+      tagline: "Planning, retrieval and writing agents pass work between them to answer questions from company documents.",
+      stack: ["Python", "LangGraph", "LangChain", "FAISS", "PostgreSQL"],
+      input: { label: "Input", text: "Question about internal documents" },
+      output: { label: "Output", text: "An answer backed by retrieved evidence, or “not found”, within a set cost budget." },
+      numbers: [["+18%", "tasks completed"], ["−25%", "unsupported answers"], ["−30%", "latency"], ["3", "cooperating agents"]],
+      stages: [
+        { label: "Plan", title: "Break the question into steps", caption: "A planning agent decides what information is needed.", out: "1. find the policy document\n2. find the latest update" },
+        { label: "Retrieve", title: "Gather evidence", caption: "A retrieval agent searches documents in parallel.", out: "3 passages found" },
+        { label: "Write", title: "Answer from the evidence", caption: "A writing agent drafts the answer with sources.", out: "Draft answer with 2 sources" },
+        { label: "Check", title: "Verify before answering", caption: "Unsupported claims send work back to retrieval, with a limit on retries.", out: "all claims supported → send" },
+      ],
+      flow: ["Planner breaks the question into steps", "Retrieval agent gathers evidence", "Writer drafts an answer with sources", "Verifier checks claims; retries are capped to control cost"],
+      future: ["Smarter routing to skip planning for simple questions", "More automated evaluation"],
+      links: [],
+    },
+  ];
+
+  P.forEach((p) => { if (p.kind === "flow") p.makeStages = () => flowStages(p); else p.makeStages = () => window.PROJECT_STAGES[p.id]; });
+  window.PROJECTS = P;
+})();
+
+</script>
+<script>
+(function () {
+  const P = window.PROJECTS, $ = (id) => document.getElementById(id);
+  let current = null, ctrl = null;
+
+  const chips = P.map((p) => {
+    const a = document.createElement("a");
+    a.className = "chip"; a.href = "#" + p.id; a.textContent = p.name;
+    $("chips").appendChild(a);
+    return a;
+  });
+
+  function list(node, items, tag) {
+    node.innerHTML = "";
+    items.forEach((t) => { const li = document.createElement(tag || "li"); li.textContent = t; node.appendChild(li); });
+  }
+
+  function render(id, focus) {
+    const i = Math.max(0, P.findIndex((p) => p.id === id));
+    const p = P[i];
+    if (current === p.id) return;
+    current = p.id;
+
+    chips.forEach((c, j) => c.setAttribute("aria-current", j === i ? "true" : "false"));
+    const chip = chips[i];
+    chip.parentNode.scrollTo({ left: chip.offsetLeft - chip.parentNode.clientWidth / 2 + chip.clientWidth / 2, behavior: "smooth" });
+
+    $("p-count").textContent = `Project ${i + 1} of ${P.length}`;
+    $("p-name").textContent = p.name;
+    $("p-tagline").textContent = p.tagline;
+    document.title = `${p.name} · Visualize my projects · Uttapreksha Patel`;
+
+    if (ctrl) ctrl.stop();
+    ctrl = Pipeline("#pipeline", p.makeStages());
+    $("p-detail").innerHTML = p.page ? `Prefer one long page? <a href="${p.page}">Open the full walkthrough</a>.` : "";
+
+    $("p-stack").innerHTML = "";
+    p.stack.forEach((s) => { const e = document.createElement("span"); e.className = "pill"; e.textContent = s; $("p-stack").appendChild(e); });
+    $("p-in").textContent = p.input.text.replace(/\n/g, " ").replace(/\s+/g, " ");
+    $("p-out").textContent = p.output.text;
+    $("p-num").innerHTML = p.numbers.map(([v, l]) => `<div class="fact"><b>${v}</b><span>${l}</span></div>`).join("");
+    list($("p-flow"), p.flow);
+    list($("p-future"), p.future);
+    $("p-links").innerHTML = p.links.length
+      ? p.links.map(([l, u]) => `<a href="${u}" target="_blank" rel="noopener">${l}</a>`).join("")
+      : '<span class="none">No public repository for this one.</span>';
+
+    const prev = P[(i - 1 + P.length) % P.length], next = P[(i + 1) % P.length];
+    $("prev").innerHTML = `<small>Previous</small>${prev.name}`; $("prev").onclick = () => (location.hash = prev.id);
+    $("next").innerHTML = `<small>Next</small>${next.name}`; $("next").onclick = () => (location.hash = next.id);
+
+    if (focus) { $("project").focus({ preventScroll: true }); window.scrollTo({ top: document.querySelector(".switcher").offsetTop, behavior: "smooth" }); }
+  }
+
+  window.addEventListener("hashchange", () => render(location.hash.slice(1), true));
+  render(location.hash.slice(1) || P[0].id, false);
+})();
+</script>
+</body>
+</html>

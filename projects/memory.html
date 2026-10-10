@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adaptive memory for LLM agents — how it works · Uttapreksha Patel</title>
+<meta name="description" content="Watch an agent decide, turn by turn, what to remember, what to update and what to ignore, then answer correctly 90 turns later.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Shared styles for the project pipeline pages.
+   Colors are semantic: blue = data in motion, green = pass/correct,
+   red = fail/wrong, amber = uncertain. Change them here once. */
+:root {
+  --paper: #F8F8F6;
+  --bench: #FFFFFF;
+  --ink: #0E0E0E;
+  --graphite: #6A6A6A;
+  --rule: #E2E2DE;
+  --signal: #00B4A0;
+  --signal-soft: #E0F5F3;
+  --pass: #2E7D32;
+  --pass-soft: #E4F2E5;
+  --fail: #c8372d;
+  --fail-soft: #f8dfdc;
+  --caution: #b57a06;
+  --caution-soft: #f8ecd2;
+  --sans: "Inter", system-ui, sans-serif;
+  --display: "Syne", "Inter", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--sans); font-size: 17px; line-height: 1.55;
+}
+a { color: var(--signal); }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; border-radius: 4px; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; padding: 22px 0; gap: 16px; flex-wrap: wrap; }
+.topbar a { text-decoration: none; font-weight: 600; color: var(--ink); }
+.topbar a:hover { color: var(--signal); }
+.topbar nav { display: flex; gap: 20px; font-size: 15px; }
+
+.intro { padding: 28px 0 22px; max-width: 760px; }
+.intro h1 { font-size: clamp(34px, 6vw, 58px); line-height: 1.02; letter-spacing: -0.025em; margin: 0 0 14px; font-weight: 700; }
+.intro p { margin: 0; font-size: 19px; color: var(--graphite); max-width: 640px; }
+
+/* ---------- The pipeline ---------- */
+.pipeline { background: #fff; border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; }
+
+.rail { display: flex; align-items: center; padding: 18px 20px; gap: 0; overflow-x: auto; border-bottom: 1px solid var(--rule); scrollbar-width: thin; }
+.rail-step { display: flex; align-items: center; flex: 1 0 auto; min-width: 0; }
+.rail-step:last-child { flex: 0 0 auto; }
+.rail-btn {
+  display: flex; align-items: center; gap: 8px; background: none; border: 0; padding: 6px 4px;
+  font: 600 14px/1.2 var(--sans); color: var(--graphite); cursor: pointer; white-space: nowrap;
+}
+.rail-num {
+  width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--rule); display: grid; place-items: center;
+  font-size: 12px; background: #fff; transition: background .25s, border-color .25s, color .25s;
+}
+.rail-btn.done .rail-num { border-color: var(--signal); color: var(--signal); }
+.rail-btn.active { color: var(--ink); }
+.rail-btn.active .rail-num { background: var(--signal); border-color: var(--signal); color: #fff; }
+.rail-wire { flex: 1; height: 2px; background: var(--rule); margin: 0 8px; min-width: 18px; position: relative; overflow: hidden; }
+.rail-wire i { position: absolute; inset: 0; background: var(--signal); transform-origin: left; transform: scaleX(0); }
+
+.bench {
+  position: relative; min-height: 400px; padding: 26px;
+  display: flex; flex-direction: column; justify-content: center;
+  background-color: var(--bench);
+  background-image: radial-gradient(var(--rule) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+.caption-bar { display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; padding: 18px 22px; border-top: 1px solid var(--rule); }
+.caption h2 { font-size: 20px; margin: 0 0 4px; letter-spacing: -0.01em; }
+.caption p { margin: 0; color: var(--graphite); max-width: 680px; }
+.controls { display: flex; gap: 8px; flex-shrink: 0; }
+.ctrl {
+  border: 1px solid var(--rule); background: #fff; color: var(--ink); border-radius: 8px;
+  padding: 8px 12px; font: 600 14px var(--sans); cursor: pointer; min-width: 44px; min-height: 40px;
+}
+.ctrl:hover { border-color: var(--signal); color: var(--signal); }
+.progress { height: 3px; background: var(--paper); }
+.progress i { display: block; height: 100%; width: 0; background: var(--signal); }
+
+/* ---------- Building blocks used inside the bench ---------- */
+.doc {
+  background: #fff; border: 1px solid var(--rule); border-radius: 8px; padding: 18px 20px;
+  font: 14px/1.75 var(--mono); color: var(--ink); box-shadow: 0 1px 0 var(--rule);
+}
+.doc .k { color: var(--graphite); }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+.panel-title { font: 600 14px var(--sans); color: var(--graphite); margin: 0 0 8px; }
+.redact { background: var(--ink); color: transparent; border-radius: 2px; transition: background .2s; }
+.tag { display: inline-block; font: 600 12px var(--sans); padding: 2px 8px; border-radius: 999px; }
+.tag.pass { background: var(--pass-soft); color: var(--pass); }
+.tag.fail { background: var(--fail-soft); color: var(--fail); }
+.tag.caution { background: var(--caution-soft); color: var(--caution); }
+.tag.signal { background: var(--signal-soft); color: var(--signal); }
+.row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--paper); }
+.row:last-child { border-bottom: 0; }
+.bar { flex: 1; height: 8px; background: var(--paper); border-radius: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; border-radius: 4px; background: var(--signal); }
+.mono { font-family: var(--mono); font-size: 14px; }
+.muted { color: var(--graphite); }
+.fade { opacity: 0; transition: opacity .35s; }
+.fade.on { opacity: 1; }
+.hl-fail { background: var(--fail-soft); color: var(--fail); border-bottom: 2px solid var(--fail); }
+.note {
+  border-left: 3px solid var(--fail); background: #fff; padding: 10px 14px; border-radius: 0 8px 8px 0;
+  font-size: 15px; box-shadow: 0 1px 0 var(--rule);
+}
+.note.signal { border-color: var(--signal); }
+.chart-row { display: grid; grid-template-columns: 130px 1fr 60px; gap: 12px; align-items: center; margin: 10px 0; font-size: 15px; }
+.chart-row .bar { height: 16px; border-radius: 3px; }
+.chart-row .bar i { border-radius: 3px; }
+canvas { display: block; max-width: 100%; }
+
+/* ---------- Below the pipeline ---------- */
+.facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin: 34px 0 10px; border-top: 2px solid var(--ink); }
+.fact { padding: 16px 18px 6px 0; }
+.fact b { display: block; font-size: 30px; letter-spacing: -0.02em; line-height: 1.1; }
+.fact span { color: var(--graphite); font-size: 15px; }
+.built { padding: 18px 0 70px; max-width: 760px; }
+.built h2 { font-size: 22px; margin: 26px 0 8px; }
+.built p { margin: 0 0 10px; }
+.stack { color: var(--graphite); }
+footer { border-top: 1px solid var(--rule); padding: 24px 0 40px; color: var(--graphite); font-size: 15px; }
+
+@media (max-width: 760px) {
+  body { font-size: 16px; }
+  .bench { padding: 16px; min-height: 380px; }
+  .cols { grid-template-columns: 1fr; }
+  .facts { grid-template-columns: repeat(2, 1fr); }
+  .caption-bar { flex-direction: column; }
+  .rail-btn .rail-label { display: none; }
+  .rail-btn.active .rail-label { display: inline; }
+  .chart-row { grid-template-columns: 96px 1fr 52px; font-size: 14px; }
+  .row { flex-wrap: wrap; gap: 4px 12px; }
+  .row .bar { flex: 1 1 100%; order: 5; }
+  .row > span[style*="width"] { width: auto !important; }
+  .doc { padding: 14px; font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+/* ---------- Project-specific pieces (moved from individual pages) ---------- */
+/* grpo */
+.answers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .ans { background: #fff; border: 1px solid var(--rule); border-radius: 8px; padding: 12px; font-size: 14px; min-height: 92px; transition: border-color .25s, background .25s; }
+  .ans .final { font: 500 20px var(--mono); margin-top: 6px; }
+  .ans.right { border-color: var(--pass); background: var(--pass-soft); }
+  .ans.wrong { border-color: var(--fail); background: var(--fail-soft); }
+  .ans .rw { float: right; font: 600 13px var(--mono); }
+  .adv { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; height: 220px; align-items: center; position: relative; }
+  .adv::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px dashed var(--graphite); }
+  .adv .col { position: relative; height: 100%; }
+  .adv .col i { position: absolute; left: 15%; right: 15%; border-radius: 3px; }
+  .adv .col span { position: absolute; left: 0; right: 0; text-align: center; font: 500 13px var(--mono); }
+  @media (max-width: 760px) { .answers { grid-template-columns: repeat(2, 1fr); } .adv { gap: 4px; } .adv .col span { font-size: 11px; } }
+/* memory */
+.chat { display: flex; flex-direction: column; gap: 10px; }
+  .turn { background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 10px 14px; max-width: 100%; }
+  .turn .who { font-size: 13px; color: var(--graphite); }
+  .turn .tag { margin-left: 8px; }
+  .slot { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--paper); font-family: var(--mono); font-size: 14px; }
+  .slot:last-child { border-bottom: 0; }
+  .old { text-decoration: line-through; color: var(--graphite); }
+  .flash { background: var(--signal-soft); border-radius: 4px; }
+/* kitti */
+.scene { position: relative; }
+  .scene canvas { width: 100%; background: #fff; border: 1px solid var(--rule); border-radius: 8px; }
+  .overlay { position: absolute; right: 14px; top: 14px; background: rgba(255,255,255,.94); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 14px; font-size: 14px; min-width: 210px; }
+  .overlay b { font-size: 22px; display: block; font-family: var(--mono); font-weight: 500; }
+  .bugs .row { align-items: flex-start; }
+  .bugs .row b { display: block; }
+  @media (max-width: 760px) { .overlay { position: static; margin-top: 10px; } }
+.rail { position: relative; }
+
+/* generic before → after visual */
+.io { display: grid; grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1.25fr); align-items: center; gap: 10px; }
+.io .card { background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; }
+.io .card.prev { opacity: .55; }
+.io .card.cur { border-color: var(--signal); box-shadow: 0 0 0 3px var(--signal-soft); }
+.io .card pre { margin: 6px 0 0; font: 14px/1.6 var(--mono); white-space: pre-wrap; word-break: break-word; min-height: 3.2em; }
+.io .arrow { height: 2px; background: var(--rule); position: relative; overflow: visible; }
+.io .arrow i { position: absolute; left: 0; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--signal); }
+@media (max-width: 760px) {
+  .io { grid-template-columns: 1fr; }
+  .io .arrow { width: 2px; height: 34px; margin: 0 auto; }
+  .io .arrow i { left: -4px; top: 0; }
+}
+
+/* generic pipeline chain */
+.chain { display: flex; align-items: stretch; gap: 0; width: 100%; }
+.link { flex: 1 1 0; min-width: 0; background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 12px; transition: border-color .3s, box-shadow .3s, opacity .3s; }
+.link pre { margin: 6px 0 0; font: 12.5px/1.55 var(--mono); white-space: pre-wrap; word-break: break-word; }
+.link-label { font: 600 13px var(--sans); color: var(--graphite); }
+.link.input { background: var(--paper); }
+.link.cur { border-color: var(--signal); box-shadow: 0 0 0 3px var(--signal-soft); }
+.link.cur .link-label { color: var(--signal); }
+.link.todo { background: transparent; border-style: dashed; opacity: .6; }
+.joint { flex: 0 0 22px; align-self: center; height: 2px; background: var(--rule); position: relative; }
+.joint i { position: absolute; right: -1px; top: -4px; border: 5px solid transparent; border-left: 6px solid var(--rule); }
+.joint.lit { background: var(--signal); }
+.joint.lit i { border-left-color: var(--signal); }
+@media (max-width: 900px) {
+  .chain { flex-direction: column; }
+  .joint { flex: 0 0 18px; width: 2px; height: auto; align-self: center; }
+  .joint i { right: auto; top: auto; bottom: -6px; left: -4px; border: 5px solid transparent; border-top: 6px solid var(--rule); }
+  .joint.lit i { border-top-color: var(--signal); border-left-color: transparent; }
+  .link.todo pre { display: none; }
+}
+
+
+/* match portfolio: Syne headings, square-ish corners */
+.intro h1, .head h2, .caption h2, .item h2 { font-family: var(--display); letter-spacing: -0.03em; }
+.pipeline, .doc, .link, .card, .ans, .turn, .ctrl, .chip, .pill, .note, .scene canvas, .overlay { border-radius: 3px !important; }
+.chip[aria-current="true"] { background: var(--teal, #00B4A0); border-color: #00B4A0; }
+.topbar a:first-child::before { content: ""; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <a href="../">← Back to portfolio</a>
+    <nav><a href="./#memory">All projects</a><a href="https://github.com/Uttaprexa/adaptive-long-term-memory-llm-agents">Code</a></nav>
+  </header>
+
+  <section class="intro">
+    <h1>Memory that keeps up with you</h1>
+    <p>Long conversations push early facts out of a chatbot's view. This agent decides on every turn whether to remember, update or ignore what you said, so it still knows you're vegan 90 turns later.</p>
+  </section>
+
+  <div id="pipeline"></div>
+
+  <section class="facts" aria-label="Results">
+    <div class="fact"><b>0.760</b><span>answer accuracy, vs 0.613 for a retrieval baseline</span></div>
+    <div class="fact"><b>−64%</b><span>missed facts compared with keyword rules</span></div>
+    <div class="fact"><b>75</b><span>test conversations, 60–100 turns each</span></div>
+    <div class="fact"><b>0.86+</b><span>accuracy at every distance between fact and question</span></div>
+  </section>
+
+  <section class="built">
+    <h2>How it's built</h2>
+    <p>For each user message, a Claude call returns one of three decisions and, when storing, a key and value. Memory is a small set of named slots; a newer value for the same key replaces the old one. Answers are written from the slots plus the last few turns. I compared it with four alternatives: keeping only recent turns, a short rolling summary, similarity search over past turns, and keyword rules.</p>
+    <p class="stack">Python · Claude API · sentence-transformers (all-MiniLM-L6-v2) · Gradio demo</p>
+    <h2>Test set</h2>
+    <p>75 generated conversations across 15 topics, with preferences that change more than once, reworded statements, and facts about other people that must not be stored as yours. Every conversation has known correct answers.</p>
+  </section>
+</div>
+<footer><div class="wrap">Conversation shown is an example in the style of the test set.</div></footer>
+
+<script>
+/* Tiny auto-playing pipeline engine.
+   Each stage = { label, title, caption, duration(ms), setup(bench) -> state, update(state, p) }
+   update() is called every frame with p from 0 to 1, so pause/replay are exact. */
+(function () {
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const H = {
+    el(tag, cls, html) {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (html != null) e.innerHTML = html;
+      return e;
+    },
+    // map p into a sub-window [a, b] of the stage, clamped to 0..1
+    seg(p, a, b) { return Math.max(0, Math.min(1, (p - a) / (b - a))); },
+    ease(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; },
+    show(node, on) { node.classList.toggle("on", !!on); },
+    type(node, text, t) { node.textContent = text.slice(0, Math.round(text.length * t)); },
+    // simple seeded random, so canvases look the same every loop
+    rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); },
+    reduce,
+  };
+  window.PipeHelpers = H;
+
+  window.Pipeline = function (root, stages) {
+    root = typeof root === "string" ? document.querySelector(root) : root;
+    root.classList.add("pipeline");
+    root.innerHTML = "";
+
+    const rail = H.el("div", "rail");
+    rail.setAttribute("role", "tablist");
+    rail.setAttribute("aria-label", "Pipeline steps");
+    const btns = [], wires = [];
+    stages.forEach((s, i) => {
+      const step = H.el("div", "rail-step");
+      const b = H.el("button", "rail-btn", `<span class="rail-num">${i + 1}</span><span class="rail-label">${s.label}</span>`);
+      b.type = "button";
+      b.setAttribute("aria-label", `Step ${i + 1}: ${s.label}`);
+      b.addEventListener("click", () => go(i, true));
+      step.appendChild(b); btns.push(b);
+      if (i < stages.length - 1) { const w = H.el("div", "rail-wire", "<i></i>"); step.appendChild(w); wires.push(w.firstChild); }
+      rail.appendChild(step);
+    });
+
+    const bench = H.el("div", "bench");
+    bench.setAttribute("aria-live", "off");
+    const bar = H.el("div", "caption-bar");
+    const cap = H.el("div", "caption", "<h2></h2><p></p>");
+    cap.setAttribute("aria-live", "polite");
+    const ctr = H.el("div", "controls");
+    const playBtn = H.el("button", "ctrl", "Pause");
+    const againBtn = H.el("button", "ctrl", "Replay");
+    playBtn.type = againBtn.type = "button";
+    ctr.append(playBtn, againBtn);
+    bar.append(cap, ctr);
+    const prog = H.el("div", "progress", "<i></i>");
+    root.append(rail, bench, bar, prog);
+
+    let idx = 0, t = 0, state = null, playing = true, last = null, alive = true;
+    const HOLD = reduce ? 2600 : 1100;
+
+    function go(i, user) {
+      idx = (i + stages.length) % stages.length; t = 0;
+      const s = stages[idx];
+      bench.innerHTML = "";
+      state = s.setup(bench) || {};
+      cap.querySelector("h2").textContent = `${idx + 1}. ${s.title}`;
+      cap.querySelector("p").textContent = s.caption;
+      btns.forEach((b, j) => {
+        b.classList.toggle("active", j === idx);
+        b.classList.toggle("done", j < idx);
+        b.setAttribute("aria-selected", j === idx ? "true" : "false");
+      });
+      wires.forEach((w, j) => { w.style.transform = `scaleX(${j < idx ? 1 : 0})`; });
+      const bl = btns[idx].parentNode.offsetLeft - rail.clientWidth / 2 + 60; rail.scrollTo({ left: Math.max(0, bl), behavior: reduce ? "auto" : "smooth" });
+      s.update(state, reduce ? 1 : 0);
+      if (user && !playing) render();
+    }
+
+    function render() {
+      const s = stages[idx];
+      const p = reduce ? 1 : Math.min(1, t / s.duration);
+      s.update(state, p);
+      prog.firstChild.style.width = `${Math.min(1, t / (s.duration + HOLD)) * 100}%`;
+      if (idx < wires.length) wires[idx].style.transform = `scaleX(${H.seg(t, s.duration, s.duration + HOLD)})`;
+    }
+
+    function frame(now) {
+      if (!alive) return;
+      if (last == null) last = now;
+      const dt = Math.min(64, now - last); last = now;
+      if (playing && !document.hidden) {
+        t += dt;
+        const s = stages[idx];
+        const end = s.duration + HOLD + (idx === stages.length - 1 ? 2200 : 0);
+        render();
+        if (t >= end) go(idx + 1);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    playBtn.addEventListener("click", () => { playing = !playing; playBtn.textContent = playing ? "Pause" : "Play"; });
+    againBtn.addEventListener("click", () => { playing = true; playBtn.textContent = "Pause"; go(0); });
+
+    go(0);
+    requestAnimationFrame(frame);
+    return { stop() { alive = false; root.innerHTML = ""; } };
+  };
+})();
+
+</script>
+<script>
+window.PROJECT_STAGES = window.PROJECT_STAGES || {};
+(function () {
+
+const { el, seg, ease, show } = PipeHelpers;
+
+const TURNS = [
+  { n: 3,  text: "I'm vegetarian, by the way.", act: "Store", cls: "signal", slot: ["diet", "vegetarian"] },
+  { n: 8,  text: "Haha, that's hilarious.", act: "Drop", cls: "fail" },
+  { n: 15, text: "My friend Maya is vegan.", act: "Drop: about someone else", cls: "fail" },
+  { n: 22, text: "Let's plan the trip later.", act: "Keep for now", cls: "caution" },
+  { n: 40, text: "I've gone fully vegan now.", act: "Store: update", cls: "signal", slot: ["diet", "vegan"] },
+  { n: 57, text: "I only drink caffeine-free stuff these days.", act: "Store: reworded", cls: "signal", slot: ["drink", "decaf"] },
+];
+
+function layout(b) {
+  const cols = el("div", "cols");
+  const left = el("div", "", '<p class="panel-title">Conversation</p>');
+  const chat = el("div", "chat"); left.appendChild(chat);
+  const right = el("div", "", '<p class="panel-title">Memory slots</p>');
+  const mem = el("div", "doc"); mem.style.minHeight = "120px"; right.appendChild(mem);
+  cols.append(left, right); b.appendChild(cols);
+  return { chat, mem };
+}
+function turnNode(t) {
+  return el("div", "turn fade", `<div class="who">User, turn ${t.n}<span class="tag ${t.cls} fade">${t.act}</span></div>${t.text}`);
+}
+function slotNode(k, v) { return el("div", "slot fade", `<span>${k}</span><span class="val">${v}</span>`); }
+
+// each stage shows a window of turns; memory state is rebuilt from what came before
+function stage(range, opts) {
+  return {
+    setup(b) {
+      const L = layout(b);
+      const mem = {};
+      TURNS.slice(0, range[0]).forEach(t => { if (t.slot) mem[t.slot[0]] = t.slot[1]; });
+      const slots = {};
+      Object.entries(mem).forEach(([k, v]) => { const s = slotNode(k, v); s.classList.add("on"); L.mem.appendChild(s); slots[k] = s; });
+      const items = TURNS.slice(range[0], range[1]).map(t => {
+        const node = turnNode(t); L.chat.appendChild(node);
+        let s = null, oldVal = null;
+        if (t.slot) {
+          if (slots[t.slot[0]]) { s = slots[t.slot[0]]; oldVal = s.querySelector(".val").textContent; }
+          else { s = slotNode(t.slot[0], t.slot[1]); L.mem.appendChild(s); slots[t.slot[0]] = s; }
+        }
+        return { t, node, tag: node.querySelector(".tag"), s, oldVal };
+      });
+      if (!Object.keys(slots).length) L.mem.appendChild(el("p", "muted", "Empty"));
+      return { items, L };
+    },
+    update(st, p) {
+      const n = st.items.length;
+      st.items.forEach((o, i) => {
+        const a = 0.05 + (i / n) * 0.8, w = 0.8 / n;
+        show(o.node, p > a);
+        show(o.tag, p > a + w * 0.4);
+        if (o.s) {
+          const done = p > a + w * 0.7;
+          if (o.oldVal) {
+            o.s.querySelector(".val").innerHTML = done ? `<span class="old">${o.oldVal}</span> ${o.t.slot[1]}` : o.oldVal;
+          } else show(o.s, done);
+          o.s.classList.toggle("flash", done && p < a + w * 1.2);
+        }
+        const empty = st.L.mem.querySelector("p.muted");
+        if (empty && o.s && p > a + w * 0.7) empty.remove();
+      });
+    },
+    ...opts,
+  };
+}
+
+window.PROJECT_STAGES.memory = [
+  stage([0, 2], {
+    label: "Decide", title: "Every message gets one of three decisions",
+    caption: "Store it as a fact, keep it briefly in recent context, or drop it. A durable preference is stored; small talk is dropped.",
+    duration: 4200,
+  }),
+  stage([2, 4], {
+    label: "Filter", title: "Facts about other people aren't yours",
+    caption: "“My friend Maya is vegan” mentions a diet but isn't about you, so it's not stored. Plans in progress stay in short-term context only.",
+    duration: 4200,
+  }),
+  stage([4, 5], {
+    label: "Update", title: "A newer statement replaces the old one",
+    caption: "Diet changes from vegetarian to vegan. The slot is overwritten, so the agent never mixes old and new.",
+    duration: 3800,
+  }),
+  stage([5, 6], {
+    label: "Reword", title: "Reworded facts still land in the right slot",
+    caption: "No keyword like “I prefer” here. Keyword rules miss this; the model-based selector understands it means decaf.",
+    duration: 3800,
+  }),
+  {
+    label: "Recall", title: "Ninety turns later, the answer uses what was kept",
+    caption: "The prompt is built from the memory slots, not the whole conversation, so old facts never fall out of view.",
+    duration: 5200,
+    setup(b) {
+      const L = layout(b);
+      [["diet", "vegan"], ["drink", "decaf"]].forEach(([k, v]) => { const s = slotNode(k, v); s.classList.add("on"); L.mem.appendChild(s); });
+      const q = el("div", "turn fade", '<div class="who">User, turn 93</div>Can you suggest dinner and a drink for tonight?');
+      const a = el("div", "turn fade", '<div class="who">Agent</div><span class="ans"></span>');
+      a.style.borderColor = "var(--pass)";
+      L.chat.append(q, a);
+      return { q, a, span: a.querySelector(".ans"), slots: [...L.mem.children], text: "How about a chickpea and spinach curry with coconut rice — fully vegan — and a decaf chai to go with it?" };
+    },
+    update(st, p) {
+      show(st.q, p > 0.05);
+      st.slots.forEach(s => s.classList.toggle("flash", p > 0.25 && p < 0.55));
+      show(st.a, p > 0.4);
+      st.span.textContent = st.text.slice(0, Math.round(st.text.length * seg(p, 0.45, 0.9)));
+    }
+  },
+  {
+    label: "Results", title: "Compared with four other ways to remember",
+    caption: "Similarity search finds turns that look like the question, including stale or someone else's facts. Structured slots always hold the latest value.",
+    duration: 5600,
+    setup(b) {
+      const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+      box.appendChild(el("p", "panel-title", "Answer accuracy across 75 conversations"));
+      const data = [["This agent", 0.76, "var(--pass)"], ["Similarity search", 0.613, "var(--signal)"], ["Rolling summary", 0.493, "var(--signal)"], ["Keyword rules", 0.453, "var(--signal)"], ["Recent turns only", 0.0, "var(--graphite)"]];
+      const rows = data.map(([n, v, c]) => {
+        const r = el("div", "chart-row", `<span>${n}</span><span class="bar"><i></i></span><span class="mono v"></span>`);
+        box.appendChild(r); const i = r.querySelector("i"); i.style.background = c;
+        return { i, v: r.querySelector(".v"), val: v };
+      });
+      b.appendChild(box);
+      return { rows };
+    },
+    update(st, p) {
+      st.rows.forEach((o, k) => {
+        const t = ease(seg(p, k * 0.1, k * 0.1 + 0.45));
+        o.i.style.width = o.val * 100 * t + "%";
+        o.v.textContent = (o.val * t).toFixed(3);
+      });
+    }
+  },
+];
+
+})();
+
+</script>
+<script>Pipeline("#pipeline", PROJECT_STAGES.memory);</script>
+</body>
+</html>

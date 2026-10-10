@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clinical Intake Agent — how it works · Uttapreksha Patel</title>
+<meta name="description" content="Watch a patient intake form move through a 6-step LLM pipeline: redaction, extraction, validation, summary, FHIR export and evaluation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Shared styles for the project pipeline pages.
+   Colors are semantic: blue = data in motion, green = pass/correct,
+   red = fail/wrong, amber = uncertain. Change them here once. */
+:root {
+  --paper: #F8F8F6;
+  --bench: #FFFFFF;
+  --ink: #0E0E0E;
+  --graphite: #6A6A6A;
+  --rule: #E2E2DE;
+  --signal: #00B4A0;
+  --signal-soft: #E0F5F3;
+  --pass: #2E7D32;
+  --pass-soft: #E4F2E5;
+  --fail: #c8372d;
+  --fail-soft: #f8dfdc;
+  --caution: #b57a06;
+  --caution-soft: #f8ecd2;
+  --sans: "Inter", system-ui, sans-serif;
+  --display: "Syne", "Inter", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--sans); font-size: 17px; line-height: 1.55;
+}
+a { color: var(--signal); }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; border-radius: 4px; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; padding: 22px 0; gap: 16px; flex-wrap: wrap; }
+.topbar a { text-decoration: none; font-weight: 600; color: var(--ink); }
+.topbar a:hover { color: var(--signal); }
+.topbar nav { display: flex; gap: 20px; font-size: 15px; }
+
+.intro { padding: 28px 0 22px; max-width: 760px; }
+.intro h1 { font-size: clamp(34px, 6vw, 58px); line-height: 1.02; letter-spacing: -0.025em; margin: 0 0 14px; font-weight: 700; }
+.intro p { margin: 0; font-size: 19px; color: var(--graphite); max-width: 640px; }
+
+/* ---------- The pipeline ---------- */
+.pipeline { background: #fff; border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; }
+
+.rail { display: flex; align-items: center; padding: 18px 20px; gap: 0; overflow-x: auto; border-bottom: 1px solid var(--rule); scrollbar-width: thin; }
+.rail-step { display: flex; align-items: center; flex: 1 0 auto; min-width: 0; }
+.rail-step:last-child { flex: 0 0 auto; }
+.rail-btn {
+  display: flex; align-items: center; gap: 8px; background: none; border: 0; padding: 6px 4px;
+  font: 600 14px/1.2 var(--sans); color: var(--graphite); cursor: pointer; white-space: nowrap;
+}
+.rail-num {
+  width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--rule); display: grid; place-items: center;
+  font-size: 12px; background: #fff; transition: background .25s, border-color .25s, color .25s;
+}
+.rail-btn.done .rail-num { border-color: var(--signal); color: var(--signal); }
+.rail-btn.active { color: var(--ink); }
+.rail-btn.active .rail-num { background: var(--signal); border-color: var(--signal); color: #fff; }
+.rail-wire { flex: 1; height: 2px; background: var(--rule); margin: 0 8px; min-width: 18px; position: relative; overflow: hidden; }
+.rail-wire i { position: absolute; inset: 0; background: var(--signal); transform-origin: left; transform: scaleX(0); }
+
+.bench {
+  position: relative; min-height: 400px; padding: 26px;
+  display: flex; flex-direction: column; justify-content: center;
+  background-color: var(--bench);
+  background-image: radial-gradient(var(--rule) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+.caption-bar { display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; padding: 18px 22px; border-top: 1px solid var(--rule); }
+.caption h2 { font-size: 20px; margin: 0 0 4px; letter-spacing: -0.01em; }
+.caption p { margin: 0; color: var(--graphite); max-width: 680px; }
+.controls { display: flex; gap: 8px; flex-shrink: 0; }
+.ctrl {
+  border: 1px solid var(--rule); background: #fff; color: var(--ink); border-radius: 8px;
+  padding: 8px 12px; font: 600 14px var(--sans); cursor: pointer; min-width: 44px; min-height: 40px;
+}
+.ctrl:hover { border-color: var(--signal); color: var(--signal); }
+.progress { height: 3px; background: var(--paper); }
+.progress i { display: block; height: 100%; width: 0; background: var(--signal); }
+
+/* ---------- Building blocks used inside the bench ---------- */
+.doc {
+  background: #fff; border: 1px solid var(--rule); border-radius: 8px; padding: 18px 20px;
+  font: 14px/1.75 var(--mono); color: var(--ink); box-shadow: 0 1px 0 var(--rule);
+}
+.doc .k { color: var(--graphite); }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+.panel-title { font: 600 14px var(--sans); color: var(--graphite); margin: 0 0 8px; }
+.redact { background: var(--ink); color: transparent; border-radius: 2px; transition: background .2s; }
+.tag { display: inline-block; font: 600 12px var(--sans); padding: 2px 8px; border-radius: 999px; }
+.tag.pass { background: var(--pass-soft); color: var(--pass); }
+.tag.fail { background: var(--fail-soft); color: var(--fail); }
+.tag.caution { background: var(--caution-soft); color: var(--caution); }
+.tag.signal { background: var(--signal-soft); color: var(--signal); }
+.row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--paper); }
+.row:last-child { border-bottom: 0; }
+.bar { flex: 1; height: 8px; background: var(--paper); border-radius: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; border-radius: 4px; background: var(--signal); }
+.mono { font-family: var(--mono); font-size: 14px; }
+.muted { color: var(--graphite); }
+.fade { opacity: 0; transition: opacity .35s; }
+.fade.on { opacity: 1; }
+.hl-fail { background: var(--fail-soft); color: var(--fail); border-bottom: 2px solid var(--fail); }
+.note {
+  border-left: 3px solid var(--fail); background: #fff; padding: 10px 14px; border-radius: 0 8px 8px 0;
+  font-size: 15px; box-shadow: 0 1px 0 var(--rule);
+}
+.note.signal { border-color: var(--signal); }
+.chart-row { display: grid; grid-template-columns: 130px 1fr 60px; gap: 12px; align-items: center; margin: 10px 0; font-size: 15px; }
+.chart-row .bar { height: 16px; border-radius: 3px; }
+.chart-row .bar i { border-radius: 3px; }
+canvas { display: block; max-width: 100%; }
+
+/* ---------- Below the pipeline ---------- */
+.facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin: 34px 0 10px; border-top: 2px solid var(--ink); }
+.fact { padding: 16px 18px 6px 0; }
+.fact b { display: block; font-size: 30px; letter-spacing: -0.02em; line-height: 1.1; }
+.fact span { color: var(--graphite); font-size: 15px; }
+.built { padding: 18px 0 70px; max-width: 760px; }
+.built h2 { font-size: 22px; margin: 26px 0 8px; }
+.built p { margin: 0 0 10px; }
+.stack { color: var(--graphite); }
+footer { border-top: 1px solid var(--rule); padding: 24px 0 40px; color: var(--graphite); font-size: 15px; }
+
+@media (max-width: 760px) {
+  body { font-size: 16px; }
+  .bench { padding: 16px; min-height: 380px; }
+  .cols { grid-template-columns: 1fr; }
+  .facts { grid-template-columns: repeat(2, 1fr); }
+  .caption-bar { flex-direction: column; }
+  .rail-btn .rail-label { display: none; }
+  .rail-btn.active .rail-label { display: inline; }
+  .chart-row { grid-template-columns: 96px 1fr 52px; font-size: 14px; }
+  .row { flex-wrap: wrap; gap: 4px 12px; }
+  .row .bar { flex: 1 1 100%; order: 5; }
+  .row > span[style*="width"] { width: auto !important; }
+  .doc { padding: 14px; font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+/* ---------- Project-specific pieces (moved from individual pages) ---------- */
+/* grpo */
+.answers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .ans { background: #fff; border: 1px solid var(--rule); border-radius: 8px; padding: 12px; font-size: 14px; min-height: 92px; transition: border-color .25s, background .25s; }
+  .ans .final { font: 500 20px var(--mono); margin-top: 6px; }
+  .ans.right { border-color: var(--pass); background: var(--pass-soft); }
+  .ans.wrong { border-color: var(--fail); background: var(--fail-soft); }
+  .ans .rw { float: right; font: 600 13px var(--mono); }
+  .adv { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; height: 220px; align-items: center; position: relative; }
+  .adv::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px dashed var(--graphite); }
+  .adv .col { position: relative; height: 100%; }
+  .adv .col i { position: absolute; left: 15%; right: 15%; border-radius: 3px; }
+  .adv .col span { position: absolute; left: 0; right: 0; text-align: center; font: 500 13px var(--mono); }
+  @media (max-width: 760px) { .answers { grid-template-columns: repeat(2, 1fr); } .adv { gap: 4px; } .adv .col span { font-size: 11px; } }
+/* memory */
+.chat { display: flex; flex-direction: column; gap: 10px; }
+  .turn { background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 10px 14px; max-width: 100%; }
+  .turn .who { font-size: 13px; color: var(--graphite); }
+  .turn .tag { margin-left: 8px; }
+  .slot { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--paper); font-family: var(--mono); font-size: 14px; }
+  .slot:last-child { border-bottom: 0; }
+  .old { text-decoration: line-through; color: var(--graphite); }
+  .flash { background: var(--signal-soft); border-radius: 4px; }
+/* kitti */
+.scene { position: relative; }
+  .scene canvas { width: 100%; background: #fff; border: 1px solid var(--rule); border-radius: 8px; }
+  .overlay { position: absolute; right: 14px; top: 14px; background: rgba(255,255,255,.94); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 14px; font-size: 14px; min-width: 210px; }
+  .overlay b { font-size: 22px; display: block; font-family: var(--mono); font-weight: 500; }
+  .bugs .row { align-items: flex-start; }
+  .bugs .row b { display: block; }
+  @media (max-width: 760px) { .overlay { position: static; margin-top: 10px; } }
+.rail { position: relative; }
+
+/* generic before → after visual */
+.io { display: grid; grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1.25fr); align-items: center; gap: 10px; }
+.io .card { background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; }
+.io .card.prev { opacity: .55; }
+.io .card.cur { border-color: var(--signal); box-shadow: 0 0 0 3px var(--signal-soft); }
+.io .card pre { margin: 6px 0 0; font: 14px/1.6 var(--mono); white-space: pre-wrap; word-break: break-word; min-height: 3.2em; }
+.io .arrow { height: 2px; background: var(--rule); position: relative; overflow: visible; }
+.io .arrow i { position: absolute; left: 0; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--signal); }
+@media (max-width: 760px) {
+  .io { grid-template-columns: 1fr; }
+  .io .arrow { width: 2px; height: 34px; margin: 0 auto; }
+  .io .arrow i { left: -4px; top: 0; }
+}
+
+/* generic pipeline chain */
+.chain { display: flex; align-items: stretch; gap: 0; width: 100%; }
+.link { flex: 1 1 0; min-width: 0; background: #fff; border: 1px solid var(--rule); border-radius: 10px; padding: 12px; transition: border-color .3s, box-shadow .3s, opacity .3s; }
+.link pre { margin: 6px 0 0; font: 12.5px/1.55 var(--mono); white-space: pre-wrap; word-break: break-word; }
+.link-label { font: 600 13px var(--sans); color: var(--graphite); }
+.link.input { background: var(--paper); }
+.link.cur { border-color: var(--signal); box-shadow: 0 0 0 3px var(--signal-soft); }
+.link.cur .link-label { color: var(--signal); }
+.link.todo { background: transparent; border-style: dashed; opacity: .6; }
+.joint { flex: 0 0 22px; align-self: center; height: 2px; background: var(--rule); position: relative; }
+.joint i { position: absolute; right: -1px; top: -4px; border: 5px solid transparent; border-left: 6px solid var(--rule); }
+.joint.lit { background: var(--signal); }
+.joint.lit i { border-left-color: var(--signal); }
+@media (max-width: 900px) {
+  .chain { flex-direction: column; }
+  .joint { flex: 0 0 18px; width: 2px; height: auto; align-self: center; }
+  .joint i { right: auto; top: auto; bottom: -6px; left: -4px; border: 5px solid transparent; border-top: 6px solid var(--rule); }
+  .joint.lit i { border-top-color: var(--signal); border-left-color: transparent; }
+  .link.todo pre { display: none; }
+}
+
+
+/* match portfolio: Syne headings, square-ish corners */
+.intro h1, .head h2, .caption h2, .item h2 { font-family: var(--display); letter-spacing: -0.03em; }
+.pipeline, .doc, .link, .card, .ans, .turn, .ctrl, .chip, .pill, .note, .scene canvas, .overlay { border-radius: 3px !important; }
+.chip[aria-current="true"] { background: var(--teal, #00B4A0); border-color: #00B4A0; }
+.topbar a:first-child::before { content: ""; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <a href="../">← Back to portfolio</a>
+    <nav><a href="./#clinical">All projects</a><a href="https://github.com/Uttaprexa/clinical-intake-agent">Code</a><a href="https://medium.com/@uttapreksha24/i-built-a-clinical-intake-ai-pipeline-and-my-eval-harness-caught-a-hallucination-i-didnt-expect-b67ed732eb8b">Write-up</a></nav>
+  </header>
+
+  <section class="intro">
+    <h1>Clinical Intake Agent</h1>
+    <p>A patient form goes in. Validated fields, a clinician note and a health-record export come out, and anything uncertain goes to a person. Here's one synthetic form going through it.</p>
+  </section>
+
+  <div id="pipeline"></div>
+
+  <section class="facts" aria-label="Results">
+    <div class="fact"><b>90.6%</b><span>extraction accuracy, Llama 3.1 8B</span></div>
+    <div class="fact"><b>0%</b><span>hallucinated extracted fields</span></div>
+    <div class="fact"><b>80 / 10</b><span>CI fails below 80% accuracy or above 10% hallucination</span></div>
+    <div class="fact"><b>6</b><span>pipeline steps, each checkable on its own</span></div>
+  </section>
+
+  <section class="built">
+    <h2>How it's built</h2>
+    <p>A FastAPI endpoint stores the upload and hands the job to a Celery worker through Redis, so the request returns instantly. The worker runs the six steps and saves results to PostgreSQL. A React review screen checks back every few seconds and shows flagged fields for editing. One setting switches the model between Claude, a local Llama 3.1 8B and a free mock for testing.</p>
+    <p class="stack">Python · FastAPI · Celery · Redis · PostgreSQL · React · Claude API · Llama 3.1 8B (Ollama) · Docker · GitHub Actions</p>
+    <h2>What it doesn't do yet</h2>
+    <p>Redaction is pattern-based plus one model pass, not a certified de-identification tool. The export is a subset of FHIR without medical codes. There's no login yet, and the test set is four typed, synthetic forms. The next step is grading summaries claim by claim against the extracted fields.</p>
+  </section>
+</div>
+<footer><div class="wrap">Synthetic data only. No real patient information is shown or used.</div></footer>
+
+<script>
+/* Tiny auto-playing pipeline engine.
+   Each stage = { label, title, caption, duration(ms), setup(bench) -> state, update(state, p) }
+   update() is called every frame with p from 0 to 1, so pause/replay are exact. */
+(function () {
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const H = {
+    el(tag, cls, html) {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (html != null) e.innerHTML = html;
+      return e;
+    },
+    // map p into a sub-window [a, b] of the stage, clamped to 0..1
+    seg(p, a, b) { return Math.max(0, Math.min(1, (p - a) / (b - a))); },
+    ease(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; },
+    show(node, on) { node.classList.toggle("on", !!on); },
+    type(node, text, t) { node.textContent = text.slice(0, Math.round(text.length * t)); },
+    // simple seeded random, so canvases look the same every loop
+    rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); },
+    reduce,
+  };
+  window.PipeHelpers = H;
+
+  window.Pipeline = function (root, stages) {
+    root = typeof root === "string" ? document.querySelector(root) : root;
+    root.classList.add("pipeline");
+    root.innerHTML = "";
+
+    const rail = H.el("div", "rail");
+    rail.setAttribute("role", "tablist");
+    rail.setAttribute("aria-label", "Pipeline steps");
+    const btns = [], wires = [];
+    stages.forEach((s, i) => {
+      const step = H.el("div", "rail-step");
+      const b = H.el("button", "rail-btn", `<span class="rail-num">${i + 1}</span><span class="rail-label">${s.label}</span>`);
+      b.type = "button";
+      b.setAttribute("aria-label", `Step ${i + 1}: ${s.label}`);
+      b.addEventListener("click", () => go(i, true));
+      step.appendChild(b); btns.push(b);
+      if (i < stages.length - 1) { const w = H.el("div", "rail-wire", "<i></i>"); step.appendChild(w); wires.push(w.firstChild); }
+      rail.appendChild(step);
+    });
+
+    const bench = H.el("div", "bench");
+    bench.setAttribute("aria-live", "off");
+    const bar = H.el("div", "caption-bar");
+    const cap = H.el("div", "caption", "<h2></h2><p></p>");
+    cap.setAttribute("aria-live", "polite");
+    const ctr = H.el("div", "controls");
+    const playBtn = H.el("button", "ctrl", "Pause");
+    const againBtn = H.el("button", "ctrl", "Replay");
+    playBtn.type = againBtn.type = "button";
+    ctr.append(playBtn, againBtn);
+    bar.append(cap, ctr);
+    const prog = H.el("div", "progress", "<i></i>");
+    root.append(rail, bench, bar, prog);
+
+    let idx = 0, t = 0, state = null, playing = true, last = null, alive = true;
+    const HOLD = reduce ? 2600 : 1100;
+
+    function go(i, user) {
+      idx = (i + stages.length) % stages.length; t = 0;
+      const s = stages[idx];
+      bench.innerHTML = "";
+      state = s.setup(bench) || {};
+      cap.querySelector("h2").textContent = `${idx + 1}. ${s.title}`;
+      cap.querySelector("p").textContent = s.caption;
+      btns.forEach((b, j) => {
+        b.classList.toggle("active", j === idx);
+        b.classList.toggle("done", j < idx);
+        b.setAttribute("aria-selected", j === idx ? "true" : "false");
+      });
+      wires.forEach((w, j) => { w.style.transform = `scaleX(${j < idx ? 1 : 0})`; });
+      const bl = btns[idx].parentNode.offsetLeft - rail.clientWidth / 2 + 60; rail.scrollTo({ left: Math.max(0, bl), behavior: reduce ? "auto" : "smooth" });
+      s.update(state, reduce ? 1 : 0);
+      if (user && !playing) render();
+    }
+
+    function render() {
+      const s = stages[idx];
+      const p = reduce ? 1 : Math.min(1, t / s.duration);
+      s.update(state, p);
+      prog.firstChild.style.width = `${Math.min(1, t / (s.duration + HOLD)) * 100}%`;
+      if (idx < wires.length) wires[idx].style.transform = `scaleX(${H.seg(t, s.duration, s.duration + HOLD)})`;
+    }
+
+    function frame(now) {
+      if (!alive) return;
+      if (last == null) last = now;
+      const dt = Math.min(64, now - last); last = now;
+      if (playing && !document.hidden) {
+        t += dt;
+        const s = stages[idx];
+        const end = s.duration + HOLD + (idx === stages.length - 1 ? 2200 : 0);
+        render();
+        if (t >= end) go(idx + 1);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    playBtn.addEventListener("click", () => { playing = !playing; playBtn.textContent = playing ? "Pause" : "Play"; });
+    againBtn.addEventListener("click", () => { playing = true; playBtn.textContent = "Pause"; go(0); });
+
+    go(0);
+    requestAnimationFrame(frame);
+    return { stop() { alive = false; root.innerHTML = ""; } };
+  };
+})();
+
+</script>
+<script>
+window.PROJECT_STAGES = window.PROJECT_STAGES || {};
+(function () {
+
+const { el, seg, ease, show, type } = PipeHelpers;
+
+const FORM = [
+  ["Patient name", "Aisha Patel", false],
+  ["Date of birth", "03/14/1977", false],
+  ["Phone", "(617) 555-0142", true],
+  ["Address", "41 Elm St, Boston MA", true],
+  ["Record ID", "MRN-0048213", true],
+  ["Chief complaint", "Recurrent migraines, about 3 per week", false],
+  ["Medications", "Sumatriptan 50 mg, as needed", false],
+  ["Allergies", "Penicillin (rash)", false],
+];
+
+function formDoc(bench, redactOn) {
+  const d = el("div", "doc");
+  const lines = FORM.map(([k, v, phi]) => {
+    const line = el("div", "", `<span class="k">${k}:</span> <span class="v">${v}</span>`);
+    if (phi && redactOn) line.querySelector(".v").classList.add("phi");
+    d.appendChild(line);
+    return line;
+  });
+  bench.appendChild(d);
+  return { d, lines };
+}
+
+const FIELDS = [
+  ["date_of_birth", "1977-03-14", 0.99],
+  ["chief_complaint", "recurrent migraines", 0.97],
+  ["frequency", "~3 per week", 0.62],
+  ["medication", "sumatriptan 50 mg PRN", 0.93],
+  ["allergy", "penicillin (rash)", 0.95],
+];
+
+window.PROJECT_STAGES.clinical = [
+  {
+    label: "Ingest", title: "Read the form",
+    caption: "The upload becomes plain text. Image-only PDFs are rejected with a clear error instead of guessed at.",
+    duration: 4200,
+    setup(b) {
+      const wrap = el("div", "", '<p class="panel-title">intake_form.pdf → text</p>');
+      b.appendChild(wrap);
+      const f = formDoc(wrap, false);
+      f.lines.forEach(l => { l.dataset.full = l.textContent; l.style.minHeight = "1.75em"; });
+      return f;
+    },
+    update(s, p) {
+      s.lines.forEach((l, i) => {
+        const t = seg(p, i * 0.1, i * 0.1 + 0.2);
+        l.style.opacity = t > 0 ? 1 : 0.15;
+        if (t < 1) l.textContent = l.dataset.full.slice(0, Math.round(l.dataset.full.length * t));
+        else if (!l.querySelector(".k")) { const [k, v] = FORM[i]; l.innerHTML = `<span class="k">${k}:</span> <span class="v">${v}</span>`; }
+      });
+    }
+  },
+  {
+    label: "Redact", title: "Strip identifiers before any model sees them",
+    caption: "Phone numbers, addresses and record IDs are removed first, so the least possible personal data ever reaches a model.",
+    duration: 3800,
+    setup(b) {
+      const wrap = el("div", "", '<p class="panel-title">Pattern matching, then one model pass</p>');
+      b.appendChild(wrap);
+      const f = formDoc(wrap, true);
+      const tags = [...f.d.querySelectorAll(".phi")].map(v => { const t = el("span", "tag fail fade", "removed"); t.style.marginLeft = "10px"; v.after(t); return t; });
+      return { phis: [...f.d.querySelectorAll(".phi")], tags };
+    },
+    update(s, p) {
+      s.phis.forEach((v, i) => {
+        const t = seg(p, 0.15 + i * 0.22, 0.3 + i * 0.22);
+        v.classList.toggle("redact", t >= 1);
+        show(s.tags[i], t >= 1);
+      });
+    }
+  },
+  {
+    label: "Extract", title: "Pull out structured fields, each with a confidence score",
+    caption: "The model returns every field with how sure it is and the exact text it came from, so any value can be checked in one click.",
+    duration: 4600,
+    setup(b) {
+      const wrap = el("div", "", '<p class="panel-title">Extracted fields</p>');
+      const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+      const rows = FIELDS.map(([k, v, c]) => {
+        const r = el("div", "row fade", `<span class="mono" style="width:150px">${k}</span><span style="width:190px">${v}</span><span class="bar"><i></i></span><span class="mono" style="width:40px;text-align:right">${c.toFixed(2)}</span>`);
+        box.appendChild(r);
+        return { r, i: r.querySelector(".bar i"), c };
+      });
+      wrap.appendChild(box); b.appendChild(wrap);
+      return { rows };
+    },
+    update(s, p) {
+      s.rows.forEach((o, i) => {
+        const t = seg(p, i * 0.14, i * 0.14 + 0.3);
+        show(o.r, t > 0);
+        o.i.style.width = `${ease(t) * o.c * 100}%`;
+        o.i.style.background = o.c < 0.8 ? "var(--caution)" : "var(--signal)";
+      });
+    }
+  },
+  {
+    label: "Validate", title: "Check with plain rules, not another model",
+    caption: "Rules are repeatable and easy to audit. A model here would add a second chance to make things up. Uncertain fields go to a person.",
+    duration: 4400,
+    setup(b) {
+      const cols = el("div", "cols");
+      const left = el("div", "", '<p class="panel-title">Rule checks</p>');
+      const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+      const checks = [
+        ["Date of birth is a real date", true], ["Required fields present", true],
+        ["Dosage has a unit", true], ["Every field ≥ 0.80 confidence", false],
+      ].map(([t, ok]) => {
+        const r = el("div", "row", `<span style="flex:1">${t}</span><span class="tag ${ok ? "pass" : "caution"} fade">${ok ? "passed" : "1 field below"}</span>`);
+        box.appendChild(r); return r.querySelector(".tag");
+      });
+      left.appendChild(box);
+      const right = el("div", "fade", '<p class="panel-title">Sent to the review screen</p>');
+      right.appendChild(el("div", "note signal", '<b>frequency: “~3 per week”</b><br><span class="muted">Confidence 0.62. A clinician confirms or edits it before export.</span>'));
+      cols.append(left, right); b.appendChild(cols);
+      return { checks, right };
+    },
+    update(s, p) {
+      s.checks.forEach((c, i) => show(c, p > 0.15 + i * 0.17));
+      show(s.right, p > 0.85);
+    }
+  },
+  {
+    label: "Summarize", title: "Write the note from the fields, not the raw form",
+    caption: "The note-writer only sees what extraction captured, which leaves far less room to invent details.",
+    duration: 4600,
+    setup(b) {
+      const wrap = el("div", "", '<p class="panel-title">Clinician note (generated)</p>');
+      const d = el("div", "doc"); d.style.fontFamily = "var(--sans)"; d.style.fontSize = "17px"; d.style.lineHeight = "1.7";
+      const span = el("span"); d.appendChild(span); wrap.appendChild(d); b.appendChild(wrap);
+      return { span, text: "Aisha Patel is a 44-year-old female presenting with recurrent migraines, about three per week. She takes sumatriptan 50 mg as needed. Allergy: penicillin (rash)." };
+    },
+    update(s, p) { type(s.span, s.text, seg(p, 0.05, 0.9)); }
+  },
+  {
+    label: "Export", title: "Package it for the health record",
+    caption: "Fields are mapped to FHIR, the standard format for exchanging health data, as a bundle of resources.",
+    duration: 4000,
+    setup(b) {
+      const wrap = el("div", "", '<p class="panel-title">fhir_bundle.json</p>');
+      const d = el("pre", "doc"); d.style.margin = "0"; d.style.whiteSpace = "pre-wrap";
+      wrap.appendChild(d); b.appendChild(wrap);
+      return { d, text:
+`{ "resourceType": "Bundle",
+  "entry": [
+    { "resourceType": "Patient", "birthDate": "1977-03-14" },
+    { "resourceType": "Condition", "code": { "text": "recurrent migraines" } },
+    { "resourceType": "MedicationStatement", "medication": "sumatriptan 50 mg PRN" },
+    { "resourceType": "AllergyIntolerance", "code": { "text": "penicillin" } }
+  ] }` };
+    },
+    update(s, p) { type(s.d, s.text, seg(p, 0.05, 0.85)); }
+  },
+  {
+    label: "Evaluate", title: "The checks passed. Reading the output found what they missed",
+    caption: "The harness graded extraction only. The form never stated age or gender. The model guessed both from the name and birth year, and got the age wrong. Next: grade every claim in the note against the fields.",
+    duration: 6200,
+    setup(b) {
+      const cols = el("div", "cols");
+      const left = el("div", "", '<p class="panel-title">Automated eval, 4 synthetic forms</p>');
+      const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+      const r1 = el("div", "row", '<span style="flex:1">Extraction accuracy</span><b class="mono n1">0.0%</b><span class="tag pass fade">pass</span>');
+      const r2 = el("div", "row", '<span style="flex:1">Extraction hallucination</span><b class="mono">0%</b><span class="tag pass fade">pass</span>');
+      const r3 = el("div", "row", '<span style="flex:1">CI regression suite</span><span class="tag pass fade">passed</span>');
+      box.append(r1, r2, r3); left.appendChild(box);
+      const right = el("div", "fade", '<p class="panel-title">Manual review of the note</p>');
+      const d = el("div", "doc"); d.style.fontFamily = "var(--sans)"; d.style.fontSize = "17px";
+      d.innerHTML = 'Aisha Patel is a <span class="hl">44-year-old female</span> presenting with recurrent migraines…';
+      const note = el("div", "note fade", "Not in the form. The harness never looked at summaries.");
+      note.style.marginTop = "12px";
+      right.append(d, note);
+      cols.append(left, right); b.appendChild(cols);
+      return { n1: r1.querySelector(".n1"), tags: [...box.querySelectorAll(".tag")], right, hl: d.querySelector(".hl"), note };
+    },
+    update(s, p) {
+      s.n1.textContent = (90.6 * ease(seg(p, 0, 0.3))).toFixed(1) + "%";
+      s.tags.forEach((t, i) => show(t, p > 0.3 + i * 0.07));
+      show(s.right, p > 0.55);
+      s.hl.classList.toggle("hl-fail", p > 0.72);
+      show(s.note, p > 0.8);
+    }
+  },
+];
+
+})();
+
+</script>
+<script>Pipeline("#pipeline", PROJECT_STAGES.clinical);</script>
+</body>
+</html>
