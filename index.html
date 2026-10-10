@@ -155,7 +155,6 @@ h1 {
   margin-bottom: 20px;
 }
 h1 em { font-style: normal; color: var(--teal); }
-h1 em { font-style: normal; color: var(--teal); }
 .hero-desc {
   font-size: 15px; color: var(--gray);
   line-height: 1.7; max-width: 480px;
@@ -179,6 +178,19 @@ h1 em { font-style: normal; color: var(--teal); }
   font-family: var(--body);
 }
 .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+
+/* NEW: Visualize my projects button */
+.btn-visualize {
+  background: var(--teal); color: white;
+  padding: 12px 24px; border-radius: 3px;
+  font-size: 14px; font-weight: 500;
+  text-decoration: none; transition: opacity .15s;
+  font-family: var(--body);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-visualize:hover { opacity: .88; }
+.btn-visualize .dot { width: 8px; height: 8px; border-radius: 50%; background: white; animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .35; } }
 
 /* hero right (legacy) */
 .hero-right { display: flex; flex-direction: column; gap: 12px; }
@@ -315,6 +327,10 @@ h2 {
   font-family: var(--mono);
 }
 .proj-link:hover { gap: 8px; }
+/* NEW: link row so "See it work" sits next to GitHub */
+.proj-links { display: flex; gap: 18px; flex-wrap: wrap; }
+.proj-link.visual { color: var(--ink); }
+.proj-link.visual:hover { color: var(--teal); }
 
 /* ── FEATURED ────────────────────────────────── */
 .featured-card {
@@ -469,6 +485,7 @@ footer a { color: var(--teal); text-decoration: none; }
 @media(prefers-reduced-motion: reduce) {
   .ticker-track { animation: none; }
   .reveal { opacity: 1; transform: none; transition: none; }
+  .btn-visualize .dot { animation: none; }
   * { transition: none !important; }
 }
 </style>
@@ -486,6 +503,7 @@ footer a { color: var(--teal); text-decoration: none; }
   <ul class="nav-links">
     <li><a href="#work">Work</a></li>
     <li><a href="#projects">Projects</a></li>
+    <li><a href="projects/">Visualize</a></li><!-- NEW -->
     <li><a href="#experience">Experience</a></li>
     <li><a href="#writing">Writing</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -509,6 +527,7 @@ footer a { color: var(--teal); text-decoration: none; }
       </p>
       <div class="hero-actions">
         <a href="mailto:patel.utt@northeastern.edu" class="btn-primary">Get in touch</a>
+        <a href="projects/" class="btn-visualize"><span class="dot"></span>Visualize my projects</a><!-- NEW -->
         <a href="https://github.com/Uttaprexa" target="_blank" class="btn-ghost">GitHub ↗</a>
         <a href="https://linkedin.com/in/uttapreksha-patel" target="_blank" class="btn-ghost">LinkedIn ↗</a>
         <a href="https://medium.com/@uttapreksha24" target="_blank" class="btn-ghost">Writing ↗</a>
@@ -586,6 +605,7 @@ footer a { color: var(--teal); text-decoration: none; }
         <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Docker</span>
         <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">CI/CD</span>
       </div>
+      <a href="projects/#clinical" class="proj-link" style="margin-top:20px">See it work →</a><!-- NEW -->
     </div>
     <div class="featured-metrics">
       <div class="fm-row"><span class="fm-key">extraction_acc</span><span class="fm-val">90.6%</span></div>
@@ -607,6 +627,7 @@ footer a { color: var(--teal); text-decoration: none; }
       <h2>What I've built</h2>
     </div>
     <div class="section-meta">
+      <a href="projects/" style="color:var(--teal);text-decoration:none;font-family:var(--mono);font-size:12px;margin-right:18px">Visualize all →</a><!-- NEW -->
       <a href="https://github.com/Uttaprexa" target="_blank" style="color:var(--teal);text-decoration:none;font-family:var(--mono);font-size:12px">All repos ↗</a>
     </div>
   </div>
@@ -625,7 +646,7 @@ footer a { color: var(--teal); text-decoration: none; }
         <span class="proj-metric">tests <span class="mv">25</span></span>
       </div>
       <div class="proj-stack">PyTorch · GRPO · PPO · DPO · FSDP · Trio · Kubernetes · C++/pybind11 · AWS · GSM8K</div>
-      <a href="https://github.com/Uttaprexa/grpo-llm" target="_blank" class="proj-link">GitHub ↗</a>
+      <div class="proj-links"><a href="https://github.com/Uttaprexa/grpo-llm" target="_blank" class="proj-link">GitHub ↗</a><a href="projects/#grpo" class="proj-link visual">See it work →</a></div>
     </div>
 
     <div class="project-card">
@@ -639,7 +660,7 @@ footer a { color: var(--teal); text-decoration: none; }
         <span class="proj-metric">dialogues <span class="mv">75</span></span>
       </div>
       <div class="proj-stack">Python · Claude API · OpenAI API · LangGraph · LangChain · RAG · FAISS · FastAPI · Docker</div>
-      <a href="https://github.com/Uttaprexa/adaptive-long-term-memory-llm-agents" target="_blank" class="proj-link">GitHub ↗</a>
+      <div class="proj-links"><a href="https://github.com/Uttaprexa/adaptive-long-term-memory-llm-agents" target="_blank" class="proj-link">GitHub ↗</a><a href="projects/#memory" class="proj-link visual">See it work →</a></div>
     </div>
 
     <div class="project-card">
@@ -653,6 +674,7 @@ footer a { color: var(--teal); text-decoration: none; }
         <span class="proj-metric">latency <span class="mv">−22%</span></span>
       </div>
       <div class="proj-stack">Python · FastAPI · RAG · FAISS · PostgreSQL · Docker · AWS EC2</div>
+      <div class="proj-links"><a href="projects/#rag" class="proj-link visual">See it work →</a></div>
     </div>
 
     <div class="project-card">
@@ -665,7 +687,7 @@ footer a { color: var(--teal); text-decoration: none; }
         <span class="proj-metric">categories <span class="mv">15</span></span>
       </div>
       <div class="proj-stack">PyTorch · WinCLIP · AnomalyCLIP · MVTec AD · VisA · Benchmarking</div>
-      <a href="https://arxiv.org" target="_blank" class="proj-link">arXiv ↗</a>
+      <div class="proj-links"><a href="https://arxiv.org/abs/2601.13440" target="_blank" class="proj-link">arXiv ↗</a><a href="projects/#vlm" class="proj-link visual">See it work →</a></div>
     </div>
 
     <div class="project-card">
@@ -679,7 +701,7 @@ footer a { color: var(--teal); text-decoration: none; }
         <span class="proj-metric">sources <span class="mv">2 APIs</span></span>
       </div>
       <div class="proj-stack">Python · Pandas · NumPy · PyArrow · Parquet · Open-Meteo API · Z-score drift · Airflow (prod)</div>
-      <a href="https://github.com/Uttaprexa/climate-data-pipeline" target="_blank" class="proj-link">GitHub ↗</a>
+      <div class="proj-links"><a href="https://github.com/Uttaprexa/climate-data-pipeline" target="_blank" class="proj-link">GitHub ↗</a><a href="projects/#climate" class="proj-link visual">See it work →</a></div>
     </div>
 
     <div class="project-card">
@@ -692,6 +714,7 @@ footer a { color: var(--teal); text-decoration: none; }
         <span class="proj-metric">training <span class="mv">behaviour cloning</span></span>
       </div>
       <div class="proj-stack">PyTorch · CNN · Reinforcement Learning · Simulation · Data Augmentation · Policy Gradient</div>
+      <div class="proj-links"><a href="projects/#robotics" class="proj-link visual">See it work →</a></div>
     </div>
 
     <div class="project-card">
@@ -705,7 +728,7 @@ footer a { color: var(--teal); text-decoration: none; }
         <span class="proj-metric">presented <span class="mv">Google, Cambridge</span></span>
       </div>
       <div class="proj-stack">PyTorch · Whisper · Wav2Vec2 · MediaPipe · DeepFace · SmolVLM · LoRA · FastAPI · Next.js · W&B</div>
-      <a href="https://github.com/harshitashitut/MLOps-Project" target="_blank" class="proj-link">GitHub ↗</a>
+      <div class="proj-links"><a href="https://github.com/harshitashitut/MLOps-Project" target="_blank" class="proj-link">GitHub ↗</a><a href="projects/#pitchquest" class="proj-link visual">See it work →</a></div>
     </div>
 
     <div class="project-card">
@@ -719,7 +742,7 @@ footer a { color: var(--teal); text-decoration: none; }
         <span class="proj-metric">P@10 <span class="mv">0.663</span></span>
       </div>
       <div class="proj-stack">PySpark · Spark MLlib · ALS · Slurm · SQL · HPC · Airflow</div>
-      <a href="https://github.com/Uttaprexa/Scalable-Product-Recommendation-System-using-PySpark" target="_blank" class="proj-link">GitHub ↗</a>
+      <div class="proj-links"><a href="https://github.com/Uttaprexa/Scalable-Product-Recommendation-System-using-PySpark" target="_blank" class="proj-link">GitHub ↗</a><a href="projects/#pyspark" class="proj-link visual">See it work →</a></div>
     </div>
 
   </div>
