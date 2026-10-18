@@ -582,39 +582,39 @@ footer a { color: var(--teal); text-decoration: none; }
 
 <!-- FEATURED PROJECT -->
 <div id="work" style="max-width:1160px;margin:0 auto;padding:0 48px;border-bottom:1px solid var(--rule)">
-  <div style="padding:40px 0 16px;font-family:var(--mono);font-size:11px;color:var(--teal);letter-spacing:.12em;text-transform:uppercase">Featured · Most Recent</div>
+  <div style="padding:40px 0 16px;font-family:var(--mono);font-size:11px;color:var(--teal);letter-spacing:.12em;text-transform:uppercase">Featured</div>
   <div class="featured-card reveal">
     <div>
-      <div class="featured-eyebrow">Clinical AI · Eval Harness · Production</div>
-      <div class="featured-name">Clinical Intake & Documentation Agent</div>
+      <div class="featured-eyebrow">CUDA · Inference Kernels · Performance Engineering</div>
+      <div class="featured-name">nanoserve: an LLM inference engine, every kernel hand-written in CUDA C++</div>
       <p class="featured-desc" style="margin-bottom:16px">
-        Built a 6-step clinical intake pipeline: ingest → PHI redaction → LLM extraction → validation → summarization → FHIR export. Orchestrated via async Celery workers with provider-agnostic LLM layer (Claude + Llama interchangeable behind one interface). Requirements gathered from a regulatory affairs professional. React review UI with per-field confidence scoring routes low-confidence extractions to human review.
+        GEMM, FlashAttention-2, fused RMSNorm/RoPE/SwiGLU, 4-bit quantized GEMM and Mixture-of-Experts, written from scratch in CUDA C++ with PyTorch used only as a correctness reference. Every kernel is benchmarked against NVIDIA's own library and explained with Nsight Compute. The tensor-core GEMM climbed to 90% of cuBLAS through hand-written PTX (cp.async, ldmatrix, mma.sync), and the fused memory-bound kernels run at 98.5–99.7% of the GPU's bandwidth.
       </p>
       <p class="featured-desc">
-        Built eval harness with labeled synthetic test set and LLM-as-judge graders. Llama 3.1 8B scored 90.6% extraction / 0% hallucination on extraction — but the harness surfaced a hallucination in the summarization stage (model inferred patient demographics not in source text), a gap the extraction-only suite didn't cover. Enforced via pytest regression suite running on every CI commit.
+        Plugged into a real model, the kernels run Qwen2.5-7B on a single NVIDIA L4 at 2.61× Hugging Face's generation speed with 4-bit weights, and with perplexity within 0.02% in bf16. The README records the wrong hypotheses too, and where it still loses: 4-bit quality and large-expert MoE are the next things to fix.
       </p>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:16px">
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Python</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">FastAPI</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Celery</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Redis</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Claude API</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Llama</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">React</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">FHIR</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Docker</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">CI/CD</span>
+        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">CUDA C++</span>
+        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">PTX</span>
+        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Tensor Cores</span>
+        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">FlashAttention-2</span>
+        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">W4A16</span>
+        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">MoE</span>
+        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Nsight Compute</span>
+        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">PyTorch</span>
+        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Qwen2.5</span>
+        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">NVIDIA L4</span>
       </div>
-      <a href="projects/#clinical" class="proj-link" style="margin-top:20px">See it work →</a>
+      <div class="proj-links" style="margin-top:8px"><a href="https://github.com/Uttaprexa/nanoserve" target="_blank" class="proj-link" style="margin-top:12px">GitHub ↗</a><a href="projects/#nanoserve" class="proj-link" style="margin-top:12px">See it work →</a></div>
     </div>
     <div class="featured-metrics">
-      <div class="fm-row"><span class="fm-key">extraction_acc</span><span class="fm-val">90.6%</span></div>
-      <div class="fm-row"><span class="fm-key">hallucinations</span><span class="fm-val">0%</span></div>
-      <div class="fm-row"><span class="fm-key">pipeline_steps</span><span class="fm-val">6</span></div>
-      <div class="fm-row"><span class="fm-key">eval_method</span><span class="fm-val">LLM-as-judge</span></div>
-      <div class="fm-row"><span class="fm-key">ci_threshold</span><span class="fm-val">80% / 10%</span></div>
-      <div class="fm-row"><span class="fm-key">export_format</span><span class="fm-val">FHIR JSON</span></div>
-      <div class="fm-row"><span class="fm-key">llm_layer</span><span class="fm-val">provider-agnostic</span></div>
+      <div class="fm-row"><span class="fm-key">qwen2.5_7b_decode</span><span class="fm-val">2.61× vs HF</span></div>
+      <div class="fm-row"><span class="fm-key">bf16_gemm</span><span class="fm-val">90% of cuBLAS</span></div>
+      <div class="fm-row"><span class="fm-key">flashattention2</span><span class="fm-val">67 TFLOP/s</span></div>
+      <div class="fm-row"><span class="fm-key">vs_standard_attn</span><span class="fm-val">up to 17.9×</span></div>
+      <div class="fm-row"><span class="fm-key">fused_rmsnorm_bw</span><span class="fm-val">99.7% of peak</span></div>
+      <div class="fm-row"><span class="fm-key">w4_decode_gemv</span><span class="fm-val">3.4–3.7×</span></div>
+      <div class="fm-row"><span class="fm-key">perplexity_bf16</span><span class="fm-val">+0.02%</span></div>
     </div>
   </div>
 </div>
@@ -635,6 +635,20 @@ footer a { color: var(--teal); text-decoration: none; }
   <div class="projects-grid reveal">
 
     <div class="project-card">
+      <div class="proj-tag"><span class="proj-tag-pill">Clinical AI · Eval Harness</span></div>
+      <div class="proj-name">Clinical Intake & Documentation Agent</div>
+      <p class="proj-desc">6-step async pipeline: ingest → PHI redaction → LLM extraction → validation → summarization → FHIR export, orchestrated by Celery workers behind a provider-agnostic LLM layer (Claude, Llama or a mock, one setting). A React review UI routes low-confidence fields to a human. The eval harness passed with 90.6% extraction accuracy and 0% extraction hallucination — then manual review found a summarization hallucination it missed: the model inferred patient demographics that weren't in the form. Next: grade every claim in the note against the extracted fields.</p>
+      <div class="proj-metrics">
+        <span class="proj-metric">extraction <span class="mv">90.6%</span></span>
+        <span class="proj-metric">hallucination <span class="mv">0%</span></span>
+        <span class="proj-metric">CI thresholds <span class="mv">80% / 10%</span></span>
+        <span class="proj-metric">steps <span class="mv">6</span></span>
+      </div>
+      <div class="proj-stack">Python · FastAPI · Celery · Redis · PostgreSQL · React · Claude API · Llama 3.1 8B · FHIR · Docker · GitHub Actions</div>
+      <div class="proj-links"><a href="https://github.com/Uttaprexa/clinical-intake-agent" target="_blank" class="proj-link">GitHub ↗</a><a href="https://medium.com/@uttapreksha24/i-built-a-clinical-intake-ai-pipeline-and-my-eval-harness-caught-a-hallucination-i-didnt-expect-b67ed732eb8b" target="_blank" class="proj-link">Write-up ↗</a><a href="projects/#clinical" class="proj-link visual">See it work →</a></div>
+    </div>
+
+    <div class="project-card">
       <div class="proj-tag"><span class="proj-tag-pill">RL · From Scratch · Open Source</span></div>
       <div class="proj-name">GRPO-LLM: RL Post-Training Framework</div>
       <p class="proj-desc">Implemented GRPO from scratch without wrapping TRL — group-relative advantage estimation, KL-divergence penalty, clipped surrogate objective. Built sandboxed RL execution environment with subprocess isolation, memory limits, and timeouts to prevent environment failures from corrupting training. Identified reward sparsity as the core online RL bottleneck at small model scale through controlled 300-iteration ablation. Open-sourced with full AWS logs and blog documenting every engineering decision.</p>
@@ -647,20 +661,6 @@ footer a { color: var(--teal); text-decoration: none; }
       </div>
       <div class="proj-stack">PyTorch · GRPO · PPO · DPO · FSDP · Trio · Kubernetes · C++/pybind11 · AWS · GSM8K</div>
       <div class="proj-links"><a href="https://github.com/Uttaprexa/grpo-llm" target="_blank" class="proj-link">GitHub ↗</a><a href="projects/#grpo" class="proj-link visual">See it work →</a></div>
-    </div>
-
-    <div class="project-card">
-      <div class="proj-tag"><span class="proj-tag-pill">CUDA · Kernels · Inference</span></div>
-      <div class="proj-name">nanoserve: LLM Inference Kernels in CUDA C++</div>
-      <p class="proj-desc">Built an LLM inference stack from scratch in CUDA C++ — GEMM, FlashAttention-2, fused RMSNorm/RoPE/SwiGLU, 4-bit quantized GEMM, Mixture-of-Experts — integrated into PyTorch to run Qwen2.5-1.5B and 7B on an NVIDIA L4 GPU. Optimized a BF16 tensor-core GEMM from 1.7% to 91% of cuBLAS across 14 kernel iterations, diagnosing each bottleneck with Nsight Compute and SASS inspection — replacing WMMA's generic shared-memory loads with ldmatrix alone gained +19 percentage points.</p>
-      <div class="proj-metrics">
-        <span class="proj-metric">vs HF Transformers <span class="mv">2.61×</span></span>
-        <span class="proj-metric">FlashAttention-2 <span class="mv">67 TFLOP/s</span></span>
-        <span class="proj-metric">cuBLAS GEMM <span class="mv">90%</span></span>
-        <span class="proj-metric">DRAM bandwidth <span class="mv">98.5–99.7%</span></span>
-      </div>
-      <div class="proj-stack">CUDA C++ · PyTorch · FlashAttention-2 · ldmatrix/mma.sync/cp.async · Nsight Compute · SASS · W4A16 Quantization · MoE</div>
-      <div class="proj-links"><a href="https://github.com/Uttaprexa/nanoserve" target="_blank" class="proj-link">GitHub ↗</a><a href="projects/#nanoserve" class="proj-link visual">See it work →</a></div>
     </div>
 
     <div class="project-card">
