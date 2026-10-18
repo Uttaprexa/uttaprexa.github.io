@@ -1,989 +1,333 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Uttapreksha Patel — AI Engineer</title>
-<meta name="description" content="AI Engineer. Clinical AI, GRPO from scratch, eval harnesses, production systems. M.S. ECE Northeastern. May 2026.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
+[UP.](#)
 
-/* ── TOKENS ─────────────────────────────────── */
-:root {
-  --paper:   #F8F8F6;
-  --ink:     #0E0E0E;
-  --teal:    #00B4A0;
-  --teal-dim:#E0F5F3;
-  --gray:    #6A6A6A;
-  --rule:    #E2E2DE;
-  --mono:    'JetBrains Mono', monospace;
-  --display: 'Syne', sans-serif;
-  --body:    'Inter', system-ui, sans-serif;
-}
+- [Work](#work)
+- [Projects](#projects)
+- [Visualize](projects/)
+- [Experience](#experience)
+- [Writing](#writing)
+- [Contact](#contact)
 
-/* ── RESET ───────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; scroll-behavior: smooth; }
-body { background: var(--paper); color: var(--ink); font-family: var(--body); line-height: 1.6; overflow-x: hidden; }
-::selection { background: var(--teal); color: white; }
+[Hire me →](mailto:patel.utt@northeastern.edu)
 
-/* ── TICKER STRIP ────────────────────────────── */
-.ticker-wrap {
-  background: var(--ink);
-  overflow: hidden;
-  white-space: nowrap;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  position: relative;
-}
-.ticker-track {
-  display: inline-flex;
-  animation: ticker 40s linear infinite;
-  gap: 0;
-}
-.ticker-track:hover { animation-play-state: paused; }
-@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-.tick {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 32px;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: rgba(255,255,255,.5);
-  border-right: 1px solid rgba(255,255,255,.08);
-}
-.tick .tv { color: var(--teal); font-weight: 500; font-size: 12px; }
-.tick .sep { color: rgba(255,255,255,.15); }
+AI Engineer · May 2026 · Open to Relocate
 
-/* ── NAV ─────────────────────────────────────── */
-nav {
-  position: sticky; top: 0; z-index: 99;
-  background: rgba(248,248,246,.92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--rule);
-  padding: 0 48px;
-  height: 56px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.nav-logo {
-  font-family: var(--body);
-  font-size: 20px; font-weight: 800;
-  color: var(--ink); text-decoration: none;
-  letter-spacing: -.03em;
-}
-.nav-links { display: flex; gap: 32px; list-style: none; }
-.nav-links a {
-  font-size: 13px; color: var(--gray);
-  text-decoration: none; transition: color .15s;
-  letter-spacing: .01em;
-}
-.nav-links a:hover { color: var(--teal); }
-.nav-cta {
-  background: var(--teal); color: white;
-  padding: 8px 20px; border-radius: 3px;
-  font-size: 13px; font-weight: 500;
-  text-decoration: none; transition: opacity .15s;
-  font-family: var(--body);
-}
-.nav-cta:hover { opacity: .85; }
+Uttapreksha\
+Patel
 
-/* ── HERO ────────────────────────────────────── */
-.hero {
-  max-width: 1160px;
-  margin: 0 auto;
-  padding: 0 48px;
-  border-bottom: 1px solid var(--rule);
-}
-.hero-top {
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 40px;
-  align-items: start;
-  padding: 40px 0 28px;
-  border-bottom: 1px solid var(--rule);
-}
-.hero-bottom {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  align-items: center;
-  padding: 28px 0 48px;
-}
-.hero-name {
-  font-family: var(--body);
-  font-size: clamp(1.8rem, 3vw, 2.6rem);
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -.03em;
-  color: var(--ink);
-  margin-bottom: 16px;
-  white-space: nowrap;
-}
-.hero-headline-col h1 {
-  font-family: var(--body);
-  font-size: clamp(3rem, 5.5vw, 5.4rem);
-  font-weight: 800;
-  line-height: 0.95;
-  letter-spacing: -.04em;
-  color: var(--ink);
-  margin: 0;
-}
-.hero-headline-col h1 em {
-  font-style: normal;
-  color: var(--teal);
-}
-.hero-photo-col { }
-.hero-metrics-col { }
-.hero-eyebrow {
-  font-family: var(--mono);
-  font-size: 11px; color: var(--teal);
-  letter-spacing: .12em; text-transform: uppercase;
-  margin-bottom: 12px;
-  display: flex; align-items: center; gap: 8px;
-}
-.hero-eyebrow::before { content: ''; display: block; width: 24px; height: 1px; background: var(--teal); }
-h1 {
-  font-family: var(--body);
-  font-size: clamp(2rem, 3.8vw, 3.6rem);
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -.03em;
-  color: var(--ink);
-  margin-bottom: 20px;
-}
-h1 em { font-style: normal; color: var(--teal); }
-.hero-desc {
-  font-size: 15px; color: var(--gray);
-  line-height: 1.7; max-width: 480px;
-  margin-bottom: 28px;
-}
-.hero-desc strong { color: var(--ink); font-weight: 500; }
-.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-.btn-primary {
-  background: var(--ink); color: white;
-  padding: 12px 28px; border-radius: 3px;
-  font-size: 14px; font-weight: 500;
-  text-decoration: none; transition: background .15s;
-  font-family: var(--body);
-}
-.btn-primary:hover { background: #222; }
-.btn-ghost {
-  border: 1.5px solid var(--rule); color: var(--gray);
-  padding: 12px 24px; border-radius: 3px;
-  font-size: 14px; text-decoration: none;
-  transition: border-color .15s, color .15s;
-  font-family: var(--body);
-}
-.btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+I build production AI systems end-to-end and evaluate them rigorously, **clinical pipelines, LLM agents, RL post-training, CUDA inference kernels, RAG systems, HPC infrastructure.** Published on arXiv. Collaborated with Sandia National Labs. Presented at Google. M.S. ECE Northeastern, GPA 3.9. Open to relocate anywhere.
 
-/* NEW: Visualize my projects button */
-.btn-visualize {
-  background: var(--teal); color: white;
-  padding: 12px 24px; border-radius: 3px;
-  font-size: 14px; font-weight: 500;
-  text-decoration: none; transition: opacity .15s;
-  font-family: var(--body);
-  display: inline-flex; align-items: center; gap: 8px;
-}
-.btn-visualize:hover { opacity: .88; }
-.btn-visualize .dot { width: 8px; height: 8px; border-radius: 50%; background: white; animation: pulse 1.6s ease-in-out infinite; }
-@keyframes pulse { 50% { opacity: .35; } }
+[Get in touch](mailto:patel.utt@northeastern.edu) [Visualize my projects](projects/) [GitHub ↗](https://github.com/Uttaprexa) [LinkedIn ↗](https://linkedin.com/in/uttapreksha-patel) [Writing ↗](https://medium.com/@uttapreksha24)
 
-/* hero right (legacy) */
-.hero-right { display: flex; flex-direction: column; gap: 12px; }
-.hero-photo-wrap { }
-.hero-photo {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 3px;
-  filter: grayscale(10%);
-}
-.hero-photo-caption {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--teal);
-  letter-spacing: .06em;
-}
-.hero-photo-caption::before {
-  content: '';
-  display: block;
-  width: 16px;
-  height: 1px;
-  background: var(--teal);
-  flex-shrink: 0;
-}
-.hero-stat-block {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: var(--rule);
-  border: 1px solid var(--rule);
-  border-radius: 3px;
-  overflow: hidden;
-}
-.hstat {
-  background: #111;
-  padding: 12px 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 76px;
-}
+![Uttapreksha at NEU × Google Innovation Day, Cambridge](https://uttaprexa.github.io/google.png)
 
-.hstat-val {
-  font-family: var(--mono);
-  font-size: 1.1rem; font-weight: 700;
-  color: var(--teal); line-height: 1;
-  margin-bottom: 5px;
-  letter-spacing: 0;
-  white-space: nowrap;
-}
+NEU × Google · Cambridge · 2025
 
-.hstat-label { font-size: 9px; color: rgba(255,255,255,.4); letter-spacing: .05em; text-transform: uppercase; font-family: var(--mono); line-height: 1.3; margin-bottom: 4px; }
+# Ships. *Evaluates.* Repeats.
 
-/* ── SECTION SHARED ──────────────────────────── */
-.section { max-width: 1160px; margin: 0 auto; padding: 80px 48px; border-bottom: 1px solid var(--rule); }
-.section:last-of-type { border-bottom: none; }
-.section-top {
-  display: flex; align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 48px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--rule);
-}
-.section-label {
-  font-family: var(--mono); font-size: 11px;
-  color: var(--teal); letter-spacing: .12em;
-  text-transform: uppercase;
-}
-h2 {
-  font-family: var(--display);
-  font-size: clamp(1.8rem, 3vw, 2.6rem);
-  font-weight: 700; letter-spacing: -.03em;
-  color: var(--ink); line-height: 1.1;
-}
-.section-meta { font-size: 13px; color: var(--gray); }
+Clinical AI extraction
 
-/* ── PROJECTS ────────────────────────────────── */
-.projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
-.project-card {
-  background: var(--paper);
-  padding: 32px;
-  transition: background .2s;
-  position: relative;
-  overflow: hidden;
-}
-.project-card:hover { background: white; }
-.project-card::after {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0;
-  height: 2px; background: var(--teal);
-  transform: scaleX(0); transform-origin: left;
-  transition: transform .3s ease;
-}
-.project-card:hover::after { transform: scaleX(1); }
-.proj-tag {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--teal); letter-spacing: .1em;
-  text-transform: uppercase; margin-bottom: 12px;
-  display: flex; gap: 8px; align-items: center;
-}
-.proj-tag-pill {
-  background: var(--teal-dim); color: var(--teal);
-  padding: 2px 8px; border-radius: 2px;
-  font-size: 9px; font-weight: 500;
-}
-.proj-name {
-  font-family: var(--display);
-  font-size: 1.15rem; font-weight: 700;
-  letter-spacing: -.02em; color: var(--ink);
-  margin-bottom: 10px; line-height: 1.25;
-}
-.proj-desc {
-  font-size: 13px; color: var(--gray);
-  line-height: 1.7; margin-bottom: 16px;
-}
-.proj-metrics { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-.proj-metric {
-  background: var(--teal-dim);
-  padding: 4px 10px; border-radius: 2px;
-  font-family: var(--mono); font-size: 11px;
-  color: var(--ink); font-weight: 500;
-}
-.proj-metric .mv { color: var(--teal); }
-.proj-stack { font-size: 11px; color: var(--gray); line-height: 1.6; }
-.proj-link {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 12px; color: var(--teal); text-decoration: none;
-  margin-top: 12px; font-weight: 500; transition: gap .2s;
-  font-family: var(--mono);
-}
-.proj-link:hover { gap: 8px; }
-/* NEW: link row so "See it work" sits next to GitHub */
-.proj-links { display: flex; gap: 18px; flex-wrap: wrap; }
-.proj-link.visual { color: var(--ink); }
-.proj-link.visual:hover { color: var(--teal); }
+90.6%
 
-/* ── FEATURED ────────────────────────────────── */
-.featured-card {
-  background: var(--ink);
-  padding: 40px 48px;
-  display: grid; grid-template-columns: 1fr 280px;
-  gap: 48px; align-items: center;
-  margin-bottom: 1px;
-}
-.featured-eyebrow {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--teal); letter-spacing: .12em;
-  text-transform: uppercase; margin-bottom: 12px;
-}
-.featured-name {
-  font-family: var(--display);
-  font-size: 1.4rem; font-weight: 700;
-  color: white; letter-spacing: -.02em;
-  margin-bottom: 10px; line-height: 1.2;
-}
-.featured-desc { font-size: 13px; color: rgba(255,255,255,.55); line-height: 1.75; }
-.featured-metrics { display: flex; flex-direction: column; gap: 12px; }
-.fm-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.06); font-size: 12px; }
-.fm-row:last-child { border-bottom: none; }
-.fm-key { color: rgba(255,255,255,.35); font-family: var(--mono); font-size: 10px; letter-spacing: .05em; }
-.fm-val { color: var(--teal); font-family: var(--mono); font-weight: 500; font-size: 12px; }
+CUDA inference speedup
 
-/* ── EXPERIENCE ──────────────────────────────── */
-.exp-list { display: flex; flex-direction: column; gap: 0; }
-.exp-item {
-  display: grid; grid-template-columns: 200px 1fr;
-  gap: 40px; padding: 32px 0;
-  border-bottom: 1px solid var(--rule);
-}
-.exp-item:last-child { border-bottom: none; }
-.exp-date { font-family: var(--mono); font-size: 11px; color: var(--gray); line-height: 1.6; padding-top: 2px; }
-.exp-date strong { color: var(--teal); font-size: 12px; display: block; margin-bottom: 2px; }
-.exp-role { font-family: var(--display); font-size: 1.05rem; font-weight: 700; letter-spacing: -.01em; color: var(--ink); margin-bottom: 2px; }
-.exp-org { font-size: 13px; color: var(--teal); font-weight: 500; margin-bottom: 12px; }
-.exp-bullets { list-style: none; }
-.exp-bullets li {
-  font-size: 13px; color: var(--gray);
-  padding-left: 16px; position: relative;
-  margin-bottom: 6px; line-height: 1.65;
-}
-.exp-bullets li::before { content: '—'; position: absolute; left: 0; color: var(--teal); font-size: 11px; top: 2px; }
-.exp-bullets li strong { color: var(--ink); font-weight: 500; }
+2.61×
 
-/* ── SKILLS ──────────────────────────────────── */
-.skills-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 32px; }
-.skill-group { }
-.skill-group-label {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--teal); letter-spacing: .1em;
-  text-transform: uppercase; margin-bottom: 12px;
-  padding-bottom: 8px; border-bottom: 1px solid var(--rule);
-}
-.skill-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.skill-tag {
-  font-size: 12px; padding: 4px 10px;
-  background: white; border: 1px solid var(--rule);
-  border-radius: 2px; color: var(--ink);
-  transition: border-color .15s, color .15s;
-}
-.skill-tag:hover { border-color: var(--teal); color: var(--teal); }
+GPA · Northeastern
 
-/* ── WRITING ─────────────────────────────────── */
-.writing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.article-card {
-  padding: 24px; border: 1px solid var(--rule);
-  border-radius: 3px; text-decoration: none;
-  transition: border-color .15s, box-shadow .15s;
-  display: block;
-}
-.article-card:hover { border-color: var(--teal); box-shadow: 0 4px 24px rgba(0,180,160,.06); }
-.article-tag {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--teal); text-transform: uppercase;
-  letter-spacing: .1em; margin-bottom: 8px;
-}
-.article-title {
-  font-family: var(--display); font-size: 1rem;
-  font-weight: 700; color: var(--ink);
-  letter-spacing: -.01em; line-height: 1.35;
-  margin-bottom: 8px;
-}
-.article-desc { font-size: 12px; color: var(--gray); line-height: 1.6; }
+3.9 / 4.0
 
-/* ── CONTACT ─────────────────────────────────── */
-.contact-wrap {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 64px; align-items: center;
-}
-.contact-statement {
-  font-family: var(--display);
-  font-size: clamp(1.6rem, 3vw, 2.4rem);
-  font-weight: 700; letter-spacing: -.03em;
-  color: var(--ink); line-height: 1.15;
-  margin-bottom: 16px;
-}
-.contact-sub { font-size: 15px; color: var(--gray); line-height: 1.7; }
-.contact-links { display: flex; flex-direction: column; gap: 0; }
-.contact-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 0; border-bottom: 1px solid var(--rule);
-  text-decoration: none; transition: all .15s;
-  color: inherit;
-}
-.contact-row:hover .contact-arrow { transform: translateX(4px); color: var(--teal); }
-.contact-row:hover .contact-val { color: var(--teal); }
-.contact-key { font-family: var(--mono); font-size: 11px; color: var(--gray); text-transform: uppercase; letter-spacing: .08em; }
-.contact-val { font-size: 14px; color: var(--ink); font-weight: 500; }
-.contact-arrow { color: var(--gray); transition: all .15s; font-size: 18px; }
+HPC records / run
 
-/* ── FOOTER ──────────────────────────────────── */
-footer {
-  max-width: 1160px; margin: 0 auto;
-  padding: 32px 48px;
-  display: flex; justify-content: space-between; align-items: center;
-  border-top: 1px solid var(--rule);
-}
-footer p { font-size: 12px; color: var(--gray); font-family: var(--mono); }
-footer a { color: var(--teal); text-decoration: none; }
+1M+
 
-/* ── REVEAL ANIMATIONS ───────────────────────── */
-.reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
-.reveal.in { opacity: 1; transform: translateY(0); }
+Distributed speedup
 
-/* ── RESPONSIVE ──────────────────────────────── */
-@media(max-width:1024px) {
-  .hero-top { grid-template-columns: 1fr; }
-  .hero-bottom { grid-template-columns: 1fr; }
-  .hero-photo-col { display: none; }
-  .featured-card { grid-template-columns: 1fr; }
-  .skills-grid { grid-template-columns: repeat(2,1fr); }
-}
-@media(max-width:768px) {
-  nav { padding: 0 20px; }
-  .nav-links { display: none; }
-  .hero { padding-left: 20px; padding-right: 20px; }
-  .section { padding-left: 20px; padding-right: 20px; }
-  .hero-top { grid-template-columns: 1fr; }
-  .hero-bottom { grid-template-columns: 1fr; }
-  .hero-photo-col { display: none; }
-  .projects-grid { grid-template-columns: 1fr; }
-  .exp-item { grid-template-columns: 1fr; gap: 8px; }
-  .skills-grid { grid-template-columns: 1fr; }
-  .writing-grid { grid-template-columns: 1fr; }
-  .contact-wrap { grid-template-columns: 1fr; gap: 32px; }
-  footer { flex-direction: column; gap: 8px; text-align: center; }
-}
-@media(prefers-reduced-motion: reduce) {
-  .ticker-track { animation: none; }
-  .reveal { opacity: 1; transform: none; transition: none; }
-  .btn-visualize .dot { animation: none; }
-  * { transition: none !important; }
-}
-</style>
-</head>
-<body>
+3.98×
 
-<!-- TICKER -->
-<div class="ticker-wrap" aria-label="Key engineering outcomes">
-  <div class="ticker-track" id="ticker"></div>
-</div>
+LLM agent failures
 
-<!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo">UP<span style="color:var(--teal)">.</span></a>
-  <ul class="nav-links">
-    <li><a href="#work">Work</a></li>
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="projects/">Visualize</a></li><!-- NEW -->
-    <li><a href="#experience">Experience</a></li>
-    <li><a href="#writing">Writing</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-  <a href="mailto:patel.utt@northeastern.edu" class="nav-cta">Hire me →</a>
-</nav>
+−64%
 
-<!-- HERO -->
-<div class="hero">
+Featured · Most Recent
 
-  <!-- TOP ROW: name/bio left | photo right -->
-  <div class="hero-top">
-    <div class="hero-bio-col">
-      <div class="hero-eyebrow">AI Engineer · May 2026 · Open to Relocate</div>
-      <div class="hero-name">Uttapreksha<br>Patel</div>
-      <p class="hero-desc">
-        I build production AI systems end-to-end and evaluate them rigorously,
-        <strong>clinical pipelines, LLM agents, RL post-training, RAG systems, HPC infrastructure.</strong>
-        Published on arXiv. Collaborated with Sandia National Labs. Presented at Google.
-        M.S. ECE Northeastern, GPA 3.9. Open to relocate anywhere.
-      </p>
-      <div class="hero-actions">
-        <a href="mailto:patel.utt@northeastern.edu" class="btn-primary">Get in touch</a>
-        <a href="projects/" class="btn-visualize"><span class="dot"></span>Visualize my projects</a><!-- NEW -->
-        <a href="https://github.com/Uttaprexa" target="_blank" class="btn-ghost">GitHub ↗</a>
-        <a href="https://linkedin.com/in/uttapreksha-patel" target="_blank" class="btn-ghost">LinkedIn ↗</a>
-        <a href="https://medium.com/@uttapreksha24" target="_blank" class="btn-ghost">Writing ↗</a>
-      </div>
-    </div>
-    <div class="hero-photo-col">
-      <img
-        src="https://uttaprexa.github.io/google.png"
-        alt="Uttapreksha at NEU × Google Innovation Day, Cambridge"
-        class="hero-photo"
-      >
-      <div class="hero-photo-caption">NEU × Google · Cambridge · 2025</div>
-    </div>
-  </div>
+Clinical AI · Eval Harness · Production
 
-  <!-- BOTTOM ROW: headline left | metrics right -->
-  <div class="hero-bottom">
-    <div class="hero-headline-col">
-      <h1>Ships.<br><em>Evaluates.</em><br>Repeats.</h1>
-    </div>
-    <div class="hero-metrics-col">
-      <div class="hero-stat-block">
-        <div class="hstat">
-          <div class="hstat-label">Clinical AI extraction</div>
-          <div class="hstat-val">90.6%</div>
-        </div>
-        <div class="hstat">
-          <div class="hstat-label">VLM AUROC · arXiv</div>
-          <div class="hstat-val">0.916</div>
-        </div>
-        <div class="hstat">
-          <div class="hstat-label">GPA · Northeastern</div>
-          <div class="hstat-val">3.9 / 4.0</div>
-        </div>
-        <div class="hstat">
-          <div class="hstat-label">HPC records / run</div>
-          <div class="hstat-val">1M+</div>
-        </div>
-        <div class="hstat">
-          <div class="hstat-label">Distributed speedup</div>
-          <div class="hstat-val">3.98×</div>
-        </div>
-        <div class="hstat">
-          <div class="hstat-label">LLM agent failures</div>
-          <div class="hstat-val">−64%</div>
-        </div>
-      </div>
-    </div>
-  </div>
+Clinical Intake & Documentation Agent
 
-</div>
+Built a 6-step clinical intake pipeline: ingest → PHI redaction → LLM extraction → validation → summarization → FHIR export. Orchestrated via async Celery workers with provider-agnostic LLM layer (Claude + Llama interchangeable behind one interface). Requirements gathered from a regulatory affairs professional. React review UI with per-field confidence scoring routes low-confidence extractions to human review.
 
-<!-- FEATURED PROJECT -->
-<div id="work" style="max-width:1160px;margin:0 auto;padding:0 48px;border-bottom:1px solid var(--rule)">
-  <div style="padding:40px 0 16px;font-family:var(--mono);font-size:11px;color:var(--teal);letter-spacing:.12em;text-transform:uppercase">Featured · Most Recent</div>
-  <div class="featured-card reveal">
-    <div>
-      <div class="featured-eyebrow">Clinical AI · Eval Harness · Production</div>
-      <div class="featured-name">Clinical Intake & Documentation Agent</div>
-      <p class="featured-desc" style="margin-bottom:16px">
-        Built a 6-step clinical intake pipeline: ingest → PHI redaction → LLM extraction → validation → summarization → FHIR export. Orchestrated via async Celery workers with provider-agnostic LLM layer (Claude + Llama interchangeable behind one interface). Requirements gathered from a regulatory affairs professional. React review UI with per-field confidence scoring routes low-confidence extractions to human review.
-      </p>
-      <p class="featured-desc">
-        Built eval harness with labeled synthetic test set and LLM-as-judge graders. Llama 3.1 8B scored 90.6% extraction / 0% hallucination on extraction — but the harness surfaced a hallucination in the summarization stage (model inferred patient demographics not in source text), a gap the extraction-only suite didn't cover. Enforced via pytest regression suite running on every CI commit.
-      </p>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:16px">
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Python</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">FastAPI</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Celery</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Redis</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Claude API</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Llama</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">React</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">FHIR</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">Docker</span>
-        <span style="font-size:11px;padding:3px 8px;border:1px solid rgba(255,255,255,.1);border-radius:2px;color:rgba(255,255,255,.4);font-family:var(--mono)">CI/CD</span>
-      </div>
-      <a href="projects/#clinical" class="proj-link" style="margin-top:20px">See it work →</a><!-- NEW -->
-    </div>
-    <div class="featured-metrics">
-      <div class="fm-row"><span class="fm-key">extraction_acc</span><span class="fm-val">90.6%</span></div>
-      <div class="fm-row"><span class="fm-key">hallucinations</span><span class="fm-val">0%</span></div>
-      <div class="fm-row"><span class="fm-key">pipeline_steps</span><span class="fm-val">6</span></div>
-      <div class="fm-row"><span class="fm-key">eval_method</span><span class="fm-val">LLM-as-judge</span></div>
-      <div class="fm-row"><span class="fm-key">ci_threshold</span><span class="fm-val">80% / 10%</span></div>
-      <div class="fm-row"><span class="fm-key">export_format</span><span class="fm-val">FHIR JSON</span></div>
-      <div class="fm-row"><span class="fm-key">llm_layer</span><span class="fm-val">provider-agnostic</span></div>
-    </div>
-  </div>
-</div>
+Built eval harness with labeled synthetic test set and LLM-as-judge graders. Llama 3.1 8B scored 90.6% extraction / 0% hallucination on extraction — but the harness surfaced a hallucination in the summarization stage (model inferred patient demographics not in source text), a gap the extraction-only suite didn't cover. Enforced via pytest regression suite running on every CI commit.
 
-<!-- PROJECTS -->
-<section id="projects" class="section">
-  <div class="section-top">
-    <div>
-      <div class="section-label">Selected projects</div>
-      <h2>What I've built</h2>
-    </div>
-    <div class="section-meta">
-      <a href="projects/" style="color:var(--teal);text-decoration:none;font-family:var(--mono);font-size:12px;margin-right:18px">Visualize all →</a><!-- NEW -->
-      <a href="https://github.com/Uttaprexa" target="_blank" style="color:var(--teal);text-decoration:none;font-family:var(--mono);font-size:12px">All repos ↗</a>
-    </div>
-  </div>
+Python FastAPI Celery Redis Claude API Llama React FHIR Docker CI/CD
 
-  <div class="projects-grid reveal">
+[See it work →](projects/#clinical)
 
-    <div class="project-card">
-      <div class="proj-tag"><span class="proj-tag-pill">RL · From Scratch · Open Source</span></div>
-      <div class="proj-name">GRPO-LLM: RL Post-Training Framework</div>
-      <p class="proj-desc">Implemented GRPO from scratch without wrapping TRL — group-relative advantage estimation, KL-divergence penalty, clipped surrogate objective. Built sandboxed RL execution environment with subprocess isolation, memory limits, and timeouts to prevent environment failures from corrupting training. Identified reward sparsity as the core online RL bottleneck at small model scale through controlled 300-iteration ablation. Open-sourced with full AWS logs and blog documenting every engineering decision.</p>
-      <div class="proj-metrics">
-        <span class="proj-metric">DPO <span class="mv">29.5%</span></span>
-        <span class="proj-metric">GRPO <span class="mv">28.5%</span></span>
-        <span class="proj-metric">PPO <span class="mv">25.0%</span></span>
-        <span class="proj-metric">C++ speedup <span class="mv">1.7×</span></span>
-        <span class="proj-metric">tests <span class="mv">25</span></span>
-      </div>
-      <div class="proj-stack">PyTorch · GRPO · PPO · DPO · FSDP · Trio · Kubernetes · C++/pybind11 · AWS · GSM8K</div>
-      <div class="proj-links"><a href="https://github.com/Uttaprexa/grpo-llm" target="_blank" class="proj-link">GitHub ↗</a><a href="projects/#grpo" class="proj-link visual">See it work →</a></div>
-    </div>
+extraction_acc90.6%
 
-    <div class="project-card">
-      <div class="proj-tag"><span class="proj-tag-pill">LLM Agent · Evals</span></div>
-      <div class="proj-name">Adaptive Long-Term Memory for LLM Agents</div>
-      <p class="proj-desc">Adaptive long-term memory for LLM dialogue agents using structured key-value slots with both rule-based and LLM-based selectors. LangGraph-orchestrated agent with tool use, adaptive memory classification (STORE/KEEP/DROP), multi-step state management, guardrails, and fallback logic. Evaluation framework built from scratch: LLM-as-judge graders, regression tests catching regressions before deployment, failure mode taxonomy distinguishing policy violations from capability gaps.</p>
-      <div class="proj-metrics">
-        <span class="proj-metric">accuracy <span class="mv">0.613→0.760</span></span>
-        <span class="proj-metric">failures <span class="mv">−64%</span></span>
-        <span class="proj-metric">domains <span class="mv">15</span></span>
-        <span class="proj-metric">dialogues <span class="mv">75</span></span>
-      </div>
-      <div class="proj-stack">Python · Claude API · OpenAI API · LangGraph · LangChain · RAG · FAISS · FastAPI · Docker</div>
-      <div class="proj-links"><a href="https://github.com/Uttaprexa/adaptive-long-term-memory-llm-agents" target="_blank" class="proj-link">GitHub ↗</a><a href="projects/#memory" class="proj-link visual">See it work →</a></div>
-    </div>
+hallucinations0%
 
-    <div class="project-card">
-      <div class="proj-tag"><span class="proj-tag-pill">RAG · Production</span></div>
-      <div class="proj-name">Healthcare Knowledge Retrieval API</div>
-      <p class="proj-desc">End-to-end RAG pipeline on unstructured healthcare documents: ingestion, chunking, embedding generation, FAISS vector search, PostgreSQL storage, FastAPI REST endpoints. Eval-driven iteration — no improvement shipped without passing eval thresholds. Monitoring layer tracking pipeline health and data quality in production.</p>
-      <div class="proj-metrics">
-        <span class="proj-metric">correctness <span class="mv">+25%</span></span>
-        <span class="proj-metric">hallucinations <span class="mv">−18%</span></span>
-        <span class="proj-metric">precision <span class="mv">+21%</span></span>
-        <span class="proj-metric">latency <span class="mv">−22%</span></span>
-      </div>
-      <div class="proj-stack">Python · FastAPI · RAG · FAISS · PostgreSQL · Docker · AWS EC2</div>
-      <div class="proj-links"><a href="projects/#rag" class="proj-link visual">See it work →</a></div>
-    </div>
+pipeline_steps6
 
-    <div class="project-card">
-      <div class="proj-tag"><span class="proj-tag-pill">Research · Published</span></div>
-      <div class="proj-name">VLM Anomaly Detection — arXiv 2026</div>
-      <p class="proj-desc">Co-authored paper evaluating WinCLIP and AnomalyCLIP on MVTec AD and VisA benchmarks across 15 object categories. Designed reproducible evaluation pipelines with systematic failure mode analysis, chased down dataset-level failure patterns rather than reporting aggregate metrics.</p>
-      <div class="proj-metrics">
-        <span class="proj-metric">cls AUROC <span class="mv">0.916</span></span>
-        <span class="proj-metric">seg AUROC <span class="mv">0.907</span></span>
-        <span class="proj-metric">categories <span class="mv">15</span></span>
-      </div>
-      <div class="proj-stack">PyTorch · WinCLIP · AnomalyCLIP · MVTec AD · VisA · Benchmarking</div>
-      <div class="proj-links"><a href="https://arxiv.org/abs/2601.13440" target="_blank" class="proj-link">arXiv ↗</a><a href="projects/#vlm" class="proj-link visual">See it work →</a></div>
-    </div>
+eval_methodLLM-as-judge
 
-    <div class="project-card">
-      <div class="proj-tag"><span class="proj-tag-pill">Data Engineering · MLOps</span></div>
-      <div class="proj-name">Climate & Time-Series Data Pipeline</div>
-      <p class="proj-desc">Production-style Python data pipeline ingesting real Boston weather data from two REST APIs (CSV + JSON formats). Cleans, validates, and aggregates 336 hourly records into 14 daily summaries, saves as Apache Parquet. Automated drift monitoring watchdog with 4 checks: completeness (±5% record count), schema drift detection via set operations, Z-score statistical drift vs saved JSON baseline, and domain-specific threshold alerts. Separate pipeline.log and monitor.log. Scheduled hourly via scheduler.py.</p>
-      <div class="proj-metrics">
-        <span class="proj-metric">monitoring checks <span class="mv">4</span></span>
-        <span class="proj-metric">schedule <span class="mv">hourly</span></span>
-        <span class="proj-metric">format <span class="mv">Parquet</span></span>
-        <span class="proj-metric">sources <span class="mv">2 APIs</span></span>
-      </div>
-      <div class="proj-stack">Python · Pandas · NumPy · PyArrow · Parquet · Open-Meteo API · Z-score drift · Airflow (prod)</div>
-      <div class="proj-links"><a href="https://github.com/Uttaprexa/climate-data-pipeline" target="_blank" class="proj-link">GitHub ↗</a><a href="projects/#climate" class="proj-link visual">See it work →</a></div>
-    </div>
+ci_threshold80% / 10%
 
-    <div class="project-card">
-      <div class="proj-tag"><span class="proj-tag-pill">Robotics · CV · RL</span></div>
-      <div class="proj-name">Robotic Manipulation Policy Learning</div>
-      <p class="proj-desc">Developed PyTorch-based deep learning policies for object interaction and pick-and-place manipulation tasks using visual state representations and simulated environments. Trained CNN-based perception models that compress camera images into state vectors feeding a policy network predicting robot actions. Trained with behaviour cloning on augmented multi-object datasets with reproducible training, inference, temporal state evaluation, batch training, and policy validation workflows.</p>
-      <div class="proj-metrics">
-        <span class="proj-metric">action consistency <span class="mv">+22%</span></span>
-        <span class="proj-metric">unseen scenarios <span class="mv">generalizes</span></span>
-        <span class="proj-metric">training <span class="mv">behaviour cloning</span></span>
-      </div>
-      <div class="proj-stack">PyTorch · CNN · Reinforcement Learning · Simulation · Data Augmentation · Policy Gradient</div>
-      <div class="proj-links"><a href="projects/#robotics" class="proj-link visual">See it work →</a></div>
-    </div>
+export_formatFHIR JSON
 
-    <div class="project-card">
-      <div class="proj-tag"><span class="proj-tag-pill">Multimodal AI · MLOps · Team Project</span></div>
-      <div class="proj-name">PitchQuest: Multimodal Pitch Analysis</div>
-      <p class="proj-desc">End-to-end multimodal AI platform analyzing pitch presentations across content, delivery, and visual performance. Integrates 5 foundation models in parallel: Whisper (transcription), Wav2Vec2 (speech emotion), MediaPipe (pose), DeepFace (facial emotion), SmolVLM-500M fine-tuned on 500-1,000 labeled pitch deck slides via LoRA. FastAPI backend with Next.js frontend. Automated MLOps pipeline with Weights & Biases tracking, Evidently AI drift detection, and retraining triggered at 100 feedback corrections.</p>
-      <div class="proj-metrics">
-        <span class="proj-metric">latency <span class="mv">&lt;2 min</span></span>
-        <span class="proj-metric">agreement <span class="mv">85%+</span></span>
-        <span class="proj-metric">models <span class="mv">5</span></span>
-        <span class="proj-metric">presented <span class="mv">Google, Cambridge</span></span>
-      </div>
-      <div class="proj-stack">PyTorch · Whisper · Wav2Vec2 · MediaPipe · DeepFace · SmolVLM · LoRA · FastAPI · Next.js · W&B</div>
-      <div class="proj-links"><a href="https://github.com/harshitashitut/MLOps-Project" target="_blank" class="proj-link">GitHub ↗</a><a href="projects/#pitchquest" class="proj-link visual">See it work →</a></div>
-    </div>
+llm_layerprovider-agnostic
 
-    <div class="project-card">
-      <div class="proj-tag"><span class="proj-tag-pill">Distributed ML</span></div>
-      <div class="proj-name">Scalable Product Recommendation — PySpark</div>
-      <p class="proj-desc">ALS collaborative filtering on MovieLens 25M — 25M ratings, 162K users, 59K movies. Tuned parallelism, partition strategy, and executor memory across 1-8 cores on HPC cluster. Analyzed scaling behavior to identify shuffle overhead bottlenecks. Designed SQL-style transformations, schema validation, and feature engineering workflows with automated scaling tests confirming reproducibility.</p>
-      <div class="proj-metrics">
-        <span class="proj-metric">speedup <span class="mv">3.98×</span></span>
-        <span class="proj-metric">time <span class="mv">129s→32s</span></span>
-        <span class="proj-metric">RMSE <span class="mv">0.8131</span></span>
-        <span class="proj-metric">P@10 <span class="mv">0.663</span></span>
-      </div>
-      <div class="proj-stack">PySpark · Spark MLlib · ALS · Slurm · SQL · HPC · Airflow</div>
-      <div class="proj-links"><a href="https://github.com/Uttaprexa/Scalable-Product-Recommendation-System-using-PySpark" target="_blank" class="proj-link">GitHub ↗</a><a href="projects/#pyspark" class="proj-link visual">See it work →</a></div>
-    </div>
+Selected projects
 
-  </div>
-</section>
+## What I've built
 
-<!-- EXPERIENCE -->
-<section id="experience" class="section">
-  <div class="section-top">
-    <div>
-      <div class="section-label">Work</div>
-      <h2>Experience</h2>
-    </div>
-  </div>
+[Visualize all →](projects/) [All repos ↗](https://github.com/Uttaprexa)
 
-  <div class="exp-list">
-    <div class="exp-item reveal">
-      <div class="exp-date">
-        <strong>2025 — now</strong>
-        Feb 2025 – Present<br>
-        <span style="color:var(--teal);font-size:10px;margin-top:6px;display:block">In collaboration with<br>Sandia National Laboratories</span>
-      </div>
-      <div>
-        <div class="exp-role">Research Assistant — HPC Systems & ML Workload Analysis</div>
-        <div class="exp-org">Northeastern University · Boston, MA</div>
-        <ul class="exp-bullets">
-          <li>Deployed and configured <strong>LDMS (Lightweight Distributed Metric Service)</strong> telemetry infrastructure using aggregator-sampler daemon architecture across AWS EC2 and Northeastern's Explorer HPC cluster — collecting system-level metrics (memory bandwidth, CPU utilization, I/O throughput) at <strong>1-second intervals</strong> across distributed compute nodes, in collaboration with Sandia National Laboratories</li>
-          <li>Instrumented HPC workloads (<strong>IOR, VPIC, Darshan</strong>) to capture per-operation I/O traces, bandwidth utilization, and compute-to-memory ratios, built Python analysis pipelines processing <strong>1M+ telemetry records</strong> to identify I/O bottlenecks, temporal anomalies, and performance regressions; identified <strong>8 resource contention events with sub-second precision</strong></li>
-          <li>Quantified I/O interference through controlled experiments: CPU interference reduced write bandwidth <strong>95%</strong> (477→20 MB/s); memory interference reduced bandwidth <strong>98.9%</strong> (4266→46 MB/s); diagnosed and resolved critical LDMS <strong>buffer overflow failures</strong> through memory allocation tuning, restoring stable metric collection across multi-node environments</li>
-          <li>Deployed containerized ML workloads (miniGAN) via <strong>Docker on AWS EC2</strong>, building monitoring scripts to track performance metrics; improved pipeline reliability by <strong>30%</strong> through automated validation and structured logging</li>
-          <li>Produced workload characterization reports, performance scorecards, and technical documentation communicating bottleneck analysis and infrastructure findings to collaborators at Northeastern and <strong>Sandia National Laboratories</strong>; findings directly informed strategic operational decisions</li>
-        </ul>
-      </div>
-    </div>
+RL · From Scratch · Open Source
 
-    <div class="exp-item reveal">
-      <div class="exp-date">
-        <strong>2023 — 2024</strong>
-        Dec 2023 – Apr 2024
-      </div>
-      <div>
-        <div class="exp-role">Python Development Intern</div>
-        <div class="exp-org">TecUnique Pvt. Ltd. · Vadodara, India</div>
-        <ul class="exp-bullets">
-          <li>Built a complete <strong>Python REST API test automation framework</strong> from scratch using Pytest for the Spectra product, automated end-to-end validation across GET, POST, PUT, PATCH, and DELETE endpoints with <strong>93% pass rate across 30 test cases</strong>; implemented bearer token authentication and structured HTML/XML test reports</li>
-          <li>Built <strong>data-driven test suites</strong> reading inputs from Excel and JSON files, enabling parameterized testing across multiple modules including ingest, discovery, and schema validation; implemented regression tracking to catch regressions before each release</li>
-          <li>Reduced manual testing from days to hours; managed source code with Git in an Agile/Scrum environment with JIRA, first production-quality Python codebase built entirely from scratch and relied on by the engineering team</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
+GRPO-LLM: RL Post-Training Framework
 
-<!-- SKILLS -->
-<section class="section">
-  <div class="section-top">
-    <div>
-      <div class="section-label">Capabilities</div>
-      <h2>Technical Stack</h2>
-    </div>
-  </div>
+Implemented GRPO from scratch without wrapping TRL — group-relative advantage estimation, KL-divergence penalty, clipped surrogate objective. Built sandboxed RL execution environment with subprocess isolation, memory limits, and timeouts to prevent environment failures from corrupting training. Identified reward sparsity as the core online RL bottleneck at small model scale through controlled 300-iteration ablation. Open-sourced with full AWS logs and blog documenting every engineering decision.
 
-  <div class="skills-grid reveal" style="grid-template-columns:repeat(2,1fr)">
-    <div class="skill-group">
-      <div class="skill-group-label">Languages</div>
-      <div class="skill-tags">
-        <span class="skill-tag">Python (OOP, PEP8)</span><span class="skill-tag">TypeScript</span><span class="skill-tag">JavaScript</span><span class="skill-tag">C++ (pybind11)</span><span class="skill-tag">SQL</span><span class="skill-tag">Bash</span><span class="skill-tag">CUDA</span>
-      </div>
-    </div>
-    <div class="skill-group">
-      <div class="skill-group-label">AI / LLMs / Agents</div>
-      <div class="skill-tags">
-        <span class="skill-tag">LangChain</span><span class="skill-tag">LangGraph</span><span class="skill-tag">Claude API</span><span class="skill-tag">OpenAI API</span><span class="skill-tag">Llama</span><span class="skill-tag">RAG</span><span class="skill-tag">FAISS</span><span class="skill-tag">Embeddings</span><span class="skill-tag">Vector Search</span><span class="skill-tag">Agentic Pipelines</span><span class="skill-tag">Tool Use</span><span class="skill-tag">Adaptive Memory</span><span class="skill-tag">Guardrails</span><span class="skill-tag">Fallback Logic</span><span class="skill-tag">Prompt Engineering</span><span class="skill-tag">Few-Shot</span><span class="skill-tag">Chain-of-Thought</span>
-      </div>
-    </div>
-    <div class="skill-group">
-      <div class="skill-group-label">ML / Deep Learning / CV</div>
-      <div class="skill-tags">
-        <span class="skill-tag">PyTorch</span><span class="skill-tag">TensorFlow / Keras</span><span class="skill-tag">scikit-learn</span><span class="skill-tag">Transformers</span><span class="skill-tag">FSDP</span><span class="skill-tag">CNNs</span><span class="skill-tag">RNNs</span><span class="skill-tag">Computer Vision</span><span class="skill-tag">NLP</span><span class="skill-tag">Fine-Tuning</span><span class="skill-tag">LoRA</span><span class="skill-tag">Model Evaluation</span><span class="skill-tag">Experiment Tracking</span><span class="skill-tag">MLflow</span>
-      </div>
-    </div>
-    <div class="skill-group">
-      <div class="skill-group-label">Evals / RL / Safety</div>
-      <div class="skill-tags">
-        <span class="skill-tag">GRPO</span><span class="skill-tag">PPO</span><span class="skill-tag">DPO</span><span class="skill-tag">RLHF</span><span class="skill-tag">Policy Gradient</span><span class="skill-tag">KL Penalty</span><span class="skill-tag">Verifiable Rewards</span><span class="skill-tag">Sandboxed RL Envs</span><span class="skill-tag">LLM-as-Judge</span><span class="skill-tag">Eval Harness Design</span><span class="skill-tag">Regression Testing</span><span class="skill-tag">Failure Mode Taxonomy</span><span class="skill-tag">Ablations</span><span class="skill-tag">Controlled Experiments</span>
-      </div>
-    </div>
-    <div class="skill-group">
-      <div class="skill-group-label">Multimodal</div>
-      <div class="skill-tags">
-        <span class="skill-tag">VLMs</span><span class="skill-tag">CLIP</span><span class="skill-tag">WinCLIP</span><span class="skill-tag">AnomalyCLIP</span><span class="skill-tag">SmolVLM</span><span class="skill-tag">Whisper</span><span class="skill-tag">Wav2Vec2</span><span class="skill-tag">MediaPipe</span><span class="skill-tag">DeepFace</span><span class="skill-tag">Multimodal Inference</span>
-      </div>
-    </div>
-    <div class="skill-group">
-      <div class="skill-group-label">Backend / APIs / Data</div>
-      <div class="skill-tags">
-        <span class="skill-tag">FastAPI</span><span class="skill-tag">Flask</span><span class="skill-tag">React</span><span class="skill-tag">Next.js</span><span class="skill-tag">Celery</span><span class="skill-tag">Redis</span><span class="skill-tag">REST APIs</span><span class="skill-tag">Microservices</span><span class="skill-tag">PostgreSQL</span><span class="skill-tag">MySQL</span><span class="skill-tag">Schema Validation</span><span class="skill-tag">ETL Pipelines</span><span class="skill-tag">Apache Parquet</span><span class="skill-tag">Pandas</span><span class="skill-tag">NumPy</span><span class="skill-tag">SciPy</span><span class="skill-tag">Airflow</span><span class="skill-tag">PySpark</span><span class="skill-tag">Spark MLlib</span>
-      </div>
-    </div>
-    <div class="skill-group">
-      <div class="skill-group-label">MLOps / Cloud / Infra</div>
-      <div class="skill-tags">
-        <span class="skill-tag">Docker</span><span class="skill-tag">Docker Compose</span><span class="skill-tag">Kubernetes</span><span class="skill-tag">AWS EC2</span><span class="skill-tag">AWS S3</span><span class="skill-tag">GitHub Actions</span><span class="skill-tag">CI/CD</span><span class="skill-tag">Monitoring</span><span class="skill-tag">Structured Logging</span><span class="skill-tag">Drift Detection</span><span class="skill-tag">Weights & Biases</span><span class="skill-tag">Evidently AI</span><span class="skill-tag">Git</span><span class="skill-tag">Linux</span><span class="skill-tag">Pytest</span><span class="skill-tag">Reproducible Workflows</span>
-      </div>
-    </div>
-    <div class="skill-group">
-      <div class="skill-group-label">HPC / Systems</div>
-      <div class="skill-tags">
-        <span class="skill-tag">Slurm</span><span class="skill-tag">LDMS</span><span class="skill-tag">Darshan</span><span class="skill-tag">IOR</span><span class="skill-tag">VPIC</span><span class="skill-tag">NVIDIA Nsight</span><span class="skill-tag">CUDA Profiling</span><span class="skill-tag">GPU Benchmarking</span><span class="skill-tag">Trio (async)</span><span class="skill-tag">OpenMPI</span><span class="skill-tag">Distributed Training</span><span class="skill-tag">Subprocess Isolation</span><span class="skill-tag">Memory Profiling</span>
-      </div>
-    </div>
-  </div>
-</section>
+DPO 29.5% GRPO 28.5% PPO 25.0% C++ speedup 1.7× tests 25
 
-<!-- WRITING -->
-<section id="writing" class="section">
-  <div class="section-top">
-    <div>
-      <div class="section-label">Writing</div>
-      <h2>On Medium</h2>
-    </div>
-    <div class="section-meta">
-      <a href="https://medium.com/@uttapreksha24" target="_blank" style="color:var(--teal);text-decoration:none;font-family:var(--mono);font-size:12px">All articles ↗</a>
-    </div>
-  </div>
+PyTorch · GRPO · PPO · DPO · FSDP · Trio · Kubernetes · C++/pybind11 · AWS · GSM8K
 
-  <div class="writing-grid reveal">
-    <a href="https://medium.com/@uttapreksha24/i-built-a-clinical-intake-ai-pipeline-and-my-eval-harness-caught-a-hallucination-i-didnt-expect-b67ed732eb8b" target="_blank" class="article-card">
-      <div class="article-tag">Clinical AI · Evals · Latest</div>
-      <div class="article-title">I Built a Clinical Intake AI Pipeline; Then Found the Blind Spot in My Own Eval Harness</div>
-      <p class="article-desc">Built a 6-step clinical pipeline with an eval harness designed to catch hallucinations. Llama 3.1 8B scored 90.6% extraction accuracy — but inferred a patient's age and gender from their name. The harness missed it. Finding that blind spot was more useful than a clean 100% would have been.</p>
-    </a>
-    <a href="https://medium.com/@uttapreksha24/grpo-vs-ppo-vs-dpo-on-gsm8k-what-i-learned-building-rl-training-from-scratch-f47701c637b9" target="_blank" class="article-card">
-      <div class="article-tag">RL · Open Source</div>
-      <div class="article-title">GRPO from Scratch: Engineering Decisions, Reward Sparsity, and What the Ablation Revealed</div>
-      <p class="article-desc">Every engineering decision in the GRPO implementation documented. Why reward sparsity is a failure mode models cannot self-correct. Full AWS logs, reproducible configs.</p>
-    </a>
-  </div>
-</section>
+[GitHub ↗](https://github.com/Uttaprexa/grpo-llm)[See it work →](projects/#grpo)
 
-<!-- EDUCATION -->
-<section class="section" style="padding-top:48px;padding-bottom:48px">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
-    <div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--teal);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Education</div>
-      <div style="font-family:var(--display);font-size:1.1rem;font-weight:700;letter-spacing:-.02em;margin-bottom:4px">M.S. Electrical & Computer Engineering</div>
-      <div style="font-size:13px;color:var(--teal);font-weight:500;margin-bottom:6px">Northeastern University · Boston, MA · May 2026</div>
-      <div style="font-size:12px;color:var(--gray);line-height:1.7">GPA 3.9/4.0 · Concentration: ML, CV, Algorithms<br>Coursework: LLM Dialogue Agents · Advanced ML · MLOps · HPC<br>Presented at Google Office, Cambridge (MLOps)</div>
-    </div>
-    <div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--teal);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">&nbsp;</div>
-      <div style="font-family:var(--display);font-size:1.1rem;font-weight:700;letter-spacing:-.02em;margin-bottom:4px">B.E. Electronics & Communication Engineering</div>
-      <div style="font-size:13px;color:var(--teal);font-weight:500;margin-bottom:6px">G H Patel College of Engineering · India · May 2024</div>
-      <div style="font-size:12px;color:var(--gray);line-height:1.7">GPA 3.7/4.0<br>ISTE Documentation Head · IDEA Lab Co-Ambassador<br>TEDx Volunteer</div>
-    </div>
-  </div>
-</section>
+CUDA · Kernels · Inference
 
-<!-- CONTACT -->
-<section id="contact" class="section">
-  <div class="contact-wrap">
-    <div>
-      <div class="section-label" style="margin-bottom:16px">Contact</div>
-      <div class="contact-statement">Let's build something that matters.</div>
-      <p class="contact-sub">Looking for AI engineering · ML engineering · Forward Deployed Engineering · SWE infra roles. Available May 2026. Will relocate anywhere, immediately.</p>
-    </div>
-    <div class="contact-links">
-      <a href="mailto:patel.utt@northeastern.edu" class="contact-row">
-        <span class="contact-key">email</span>
-        <span class="contact-val">patel.utt@northeastern.edu</span>
-        <span class="contact-arrow">→</span>
-      </a>
-      <a href="tel:+16179619251" class="contact-row">
-        <span class="contact-key">phone</span>
-        <span class="contact-val">(617) 961-9251</span>
-        <span class="contact-arrow">→</span>
-      </a>
-      <a href="https://linkedin.com/in/uttapreksha-patel" target="_blank" class="contact-row">
-        <span class="contact-key">linkedin</span>
-        <span class="contact-val">uttapreksha-patel</span>
-        <span class="contact-arrow">→</span>
-      </a>
-      <a href="https://github.com/Uttaprexa" target="_blank" class="contact-row">
-        <span class="contact-key">github</span>
-        <span class="contact-val">Uttaprexa</span>
-        <span class="contact-arrow">→</span>
-      </a>
-      <a href="https://medium.com/@uttapreksha24" target="_blank" class="contact-row">
-        <span class="contact-key">writing</span>
-        <span class="contact-val">@uttapreksha24</span>
-        <span class="contact-arrow">→</span>
-      </a>
-    </div>
-  </div>
-</section>
+nanoserve: LLM Inference Kernels in CUDA C++
 
-<footer>
-  <p>Uttapreksha Patel · Boston MA → anywhere · May 2026</p>
-  <p><a href="mailto:patel.utt@northeastern.edu">patel.utt@northeastern.edu</a></p>
-</footer>
+Built an LLM inference stack from scratch in CUDA C++ — GEMM, FlashAttention-2, fused RMSNorm/RoPE/SwiGLU, 4-bit quantized GEMM, Mixture-of-Experts — integrated into PyTorch to run Qwen2.5-1.5B and 7B on an NVIDIA L4 GPU. Optimized a BF16 tensor-core GEMM from 1.7% to 91% of cuBLAS across 14 kernel iterations, diagnosing each bottleneck with Nsight Compute and SASS inspection — replacing WMMA's generic shared-memory loads with ldmatrix alone gained +19 percentage points.
 
-<script>
-// TICKER
-const ticks = [
-  ['extraction_acc', '90.6%'],
-  ['hallucination_stage_found', 'summarization · unexpected'],
-  ['query_accuracy', '0.613 → 0.760'],
-  ['agent_failures', '−64%'],
-  ['AUROC_published', '0.916'],
-  ['seg_AUROC', '0.907'],
-  ['distributed_speedup', '3.98×'],
-  ['training_time', '129s → 32s'],
-  ['records_pipeline', '1M+'],
-  ['reliability', '+30%'],
-  ['BW_loss_detected', '95% (477→20 MB/s)'],
-  ['GRPO_GSM8K', '28.5%'],
-  ['C++_speedup', '1.7×'],
-  ['rag_correctness', '+25%'],
-  ['rag_hallucinations', '−18%'],
-  ['rag_latency', '−22%'],
-  ['drift_checks', '4 · hourly'],
-  ['pitch_latency', '<2 min · 10-min video'],
-  ['pitch_human_agreement', '85%+'],
-  ['models_integrated', '5 foundation models'],
-  ['GPA', '3.9/4.0'],
-  ['presented_at', 'Google Office · Cambridge'],
-];
+vs HF Transformers 2.61× FlashAttention-2 67 TFLOP/s cuBLAS GEMM 90% DRAM bandwidth 98.5–99.7%
 
-const track = document.getElementById('ticker');
-const doubled = [...ticks, ...ticks];
-doubled.forEach(([k,v]) => {
-  const el = document.createElement('div');
-  el.className = 'tick';
-  el.innerHTML = `<span class="sep">◈</span> <span>${k}</span> <span class="sep">=</span> <span class="tv">${v}</span>`;
-  track.appendChild(el);
-});
+CUDA C++ · PyTorch · FlashAttention-2 · ldmatrix/mma.sync/cp.async · Nsight Compute · SASS · W4A16 Quantization · MoE
 
-// REVEAL
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('in'); observer.unobserve(e.target); } });
-}, { threshold: 0.08 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-</script>
-</body>
-</html>
+[GitHub ↗](https://github.com/Uttaprexa/nanoserve)[See it work →](projects/#nanoserve)
+
+LLM Agent · Evals
+
+Adaptive Long-Term Memory for LLM Agents
+
+Adaptive long-term memory for LLM dialogue agents using structured key-value slots with both rule-based and LLM-based selectors. LangGraph-orchestrated agent with tool use, adaptive memory classification (STORE/KEEP/DROP), multi-step state management, guardrails, and fallback logic. Evaluation framework built from scratch: LLM-as-judge graders, regression tests catching regressions before deployment, failure mode taxonomy distinguishing policy violations from capability gaps.
+
+accuracy 0.613→0.760 failures −64% domains 15 dialogues 75
+
+Python · Claude API · OpenAI API · LangGraph · LangChain · RAG · FAISS · FastAPI · Docker
+
+[GitHub ↗](https://github.com/Uttaprexa/adaptive-long-term-memory-llm-agents)[See it work →](projects/#memory)
+
+Evals · Benchmark Infra
+
+Secure Code Execution Sandbox for Coding Evals
+
+Built a Docker sandbox for untrusted model-generated code with an out-of-process test oracle, closing exploits like early exit(0) and always-true \_\_eq\_\_ that fool exit-code harnesses. Found and fixed three bugs in my own harness through the study — each mislabeling failures, like CPU timeouts reported as crashes — then confirmed via same-seed regeneration that the fix actually mattered.
+
+pass@1 32.7% pass@10 71.5% confirmed genuine 87% red-team cases 24
+
+Python · Docker · Linux Process Isolation · pass@k Evaluation · HumanEval
+
+[GitHub ↗](https://github.com/Uttaprexa/evalsandbox)[See it work →](projects/#sandbox)
+
+Data Quality · Statistical QA
+
+RLHF Preference Data QA Pipeline
+
+Built an automated QA pipeline for HH-RLHF preference data combining embedding-based heuristics with a local LLM judge. Injected known-bad examples to adversarially test detection, then measured the judge's own bias across 300 pairs and routed low-trust verdicts to human review — simulating 12 weeks of annotation campaigns with statistical process control to catch quality drops before they compound.
+
+label-flip recall 10%→57% judge position bias 32.7% precision 0.44→0.60
+
+Python · LLM-as-Judge · Statistical QA · HH-RLHF · p-charts/PSI/KS tests
+
+[GitHub ↗](https://github.com/Uttaprexa/RLHF-Preference-Data-QA-Pipeline)[See it work →](projects/#rlhf)
+
+RAG · Production
+
+Healthcare Knowledge Retrieval API
+
+End-to-end RAG pipeline on unstructured healthcare documents: ingestion, chunking, embedding generation, FAISS vector search, PostgreSQL storage, FastAPI REST endpoints. Eval-driven iteration — no improvement shipped without passing eval thresholds. Monitoring layer tracking pipeline health and data quality in production.
+
+correctness +25% hallucinations −18% precision +21% latency −22%
+
+Python · FastAPI · RAG · FAISS · PostgreSQL · Docker · AWS EC2
+
+[See it work →](projects/#rag)
+
+Research · Published
+
+VLM Anomaly Detection — arXiv 2026
+
+Co-authored paper evaluating WinCLIP and AnomalyCLIP on MVTec AD and VisA benchmarks across 15 object categories. Designed reproducible evaluation pipelines with systematic failure mode analysis, chased down dataset-level failure patterns rather than reporting aggregate metrics.
+
+cls AUROC 0.916 seg AUROC 0.907 categories 15
+
+PyTorch · WinCLIP · AnomalyCLIP · MVTec AD · VisA · Benchmarking
+
+[arXiv ↗](https://arxiv.org/abs/2601.13440)[See it work →](projects/#vlm)
+
+Computer Vision · Perception
+
+3D Point Cloud Object Detection — KITTI
+
+Built a PointPillars-based 3D detection pipeline (LiDAR ingestion, camera calibration transforms, anchor-based detection head) trained on real KITTI sensor data. Found and fixed a GPU-CPU sync bottleneck caused by \~240,000 wasted per-scene calls, rewriting the hot path fully vectorized — plus a separate anchor-count explosion that had made training impractically slow.
+
+near-field AP 15.6× wasted calls fixed \~240K/scene anchors 440K→27.5K
+
+Python · PyTorch · NumPy · AWS EC2 · CUDA · LiDAR
+
+[GitHub ↗](https://github.com/Uttaprexa/kitti-3d-detection)[See it work →](projects/#kitti)
+
+Data Engineering · MLOps
+
+Climate & Time-Series Data Pipeline
+
+Production-style Python data pipeline ingesting real Boston weather data from two REST APIs (CSV + JSON formats). Cleans, validates, and aggregates 336 hourly records into 14 daily summaries, saves as Apache Parquet. Automated drift monitoring watchdog with 4 checks: completeness (±5% record count), schema drift detection via set operations, Z-score statistical drift vs saved JSON baseline, and domain-specific threshold alerts. Separate pipeline.log and monitor.log. Scheduled hourly via scheduler.py.
+
+monitoring checks 4 schedule hourly format Parquet sources 2 APIs
+
+Python · Pandas · NumPy · PyArrow · Parquet · Open-Meteo API · Z-score drift · Airflow (prod)
+
+[GitHub ↗](https://github.com/Uttaprexa/climate-data-pipeline)[See it work →](projects/#climate)
+
+Robotics · CV · RL
+
+Robotic Manipulation Policy Learning
+
+Developed PyTorch-based deep learning policies for object interaction and pick-and-place manipulation tasks using visual state representations and simulated environments. Trained CNN-based perception models that compress camera images into state vectors feeding a policy network predicting robot actions. Trained with behaviour cloning on augmented multi-object datasets with reproducible training, inference, temporal state evaluation, batch training, and policy validation workflows.
+
+action consistency +22% unseen scenarios generalizes training behaviour cloning
+
+PyTorch · CNN · Reinforcement Learning · Simulation · Data Augmentation · Policy Gradient
+
+[See it work →](projects/#robotics)
+
+Multimodal AI · MLOps · Team Project
+
+PitchQuest: Multimodal Pitch Analysis
+
+End-to-end multimodal AI platform analyzing pitch presentations across content, delivery, and visual performance. Integrates 5 foundation models in parallel: Whisper (transcription), Wav2Vec2 (speech emotion), MediaPipe (pose), DeepFace (facial emotion), SmolVLM-500M fine-tuned on 500-1,000 labeled pitch deck slides via LoRA. FastAPI backend with Next.js frontend. Automated MLOps pipeline with Weights & Biases tracking, Evidently AI drift detection, and retraining triggered at 100 feedback corrections.
+
+latency \<2 min agreement 85%+ models 5 presented Google, Cambridge
+
+PyTorch · Whisper · Wav2Vec2 · MediaPipe · DeepFace · SmolVLM · LoRA · FastAPI · Next.js · W&B
+
+[GitHub ↗](https://github.com/harshitashitut/MLOps-Project)[See it work →](projects/#pitchquest)
+
+Distributed ML
+
+Scalable Product Recommendation — PySpark
+
+ALS collaborative filtering on MovieLens 25M — 25M ratings, 162K users, 59K movies. Tuned parallelism, partition strategy, and executor memory across 1-8 cores on HPC cluster. Analyzed scaling behavior to identify shuffle overhead bottlenecks. Designed SQL-style transformations, schema validation, and feature engineering workflows with automated scaling tests confirming reproducibility.
+
+speedup 3.98× time 129s→32s RMSE 0.8131 P@10 0.663
+
+PySpark · Spark MLlib · ALS · Slurm · SQL · HPC · Airflow
+
+[GitHub ↗](https://github.com/Uttaprexa/Scalable-Product-Recommendation-System-using-PySpark)[See it work →](projects/#pyspark)
+
+Work
+
+## Experience
+
+**2025 — now** Feb 2025 – Present\
+In collaboration with\
+Sandia National Laboratories
+
+Research Assistant — HPC Systems & ML Workload Analysis
+
+Northeastern University · Boston, MA
+
+- Deployed and configured **LDMS (Lightweight Distributed Metric Service)** telemetry infrastructure using aggregator-sampler daemon architecture across AWS EC2 and Northeastern's Explorer HPC cluster — collecting system-level metrics (memory bandwidth, CPU utilization, I/O throughput) at **1-second intervals** across distributed compute nodes, in collaboration with Sandia National Laboratories
+- Instrumented HPC workloads (**IOR, VPIC, Darshan**) to capture per-operation I/O traces, bandwidth utilization, and compute-to-memory ratios, built Python analysis pipelines processing **1M+ telemetry records** to identify I/O bottlenecks, temporal anomalies, and performance regressions; identified **8 resource contention events with sub-second precision**
+- Quantified I/O interference through controlled experiments: CPU interference reduced write bandwidth **95%** (477→20 MB/s); memory interference reduced bandwidth **98.9%** (4266→46 MB/s); diagnosed and resolved critical LDMS **buffer overflow failures** through memory allocation tuning, restoring stable metric collection across multi-node environments
+- Deployed containerized ML workloads (miniGAN) via **Docker on AWS EC2**, building monitoring scripts to track performance metrics; improved pipeline reliability by **30%** through automated validation and structured logging
+- Produced workload characterization reports, performance scorecards, and technical documentation communicating bottleneck analysis and infrastructure findings to collaborators at Northeastern and **Sandia National Laboratories**; findings directly informed strategic operational decisions
+
+**2023 — 2024** Dec 2023 – Apr 2024
+
+Python Development Intern
+
+TecUnique Pvt. Ltd. · Vadodara, India
+
+- Built a complete **Python REST API test automation framework** from scratch using Pytest for the Spectra product, automated end-to-end validation across GET, POST, PUT, PATCH, and DELETE endpoints with **93% pass rate across 30 test cases**; implemented bearer token authentication and structured HTML/XML test reports
+- Built **data-driven test suites** reading inputs from Excel and JSON files, enabling parameterized testing across multiple modules including ingest, discovery, and schema validation; implemented regression tracking to catch regressions before each release
+- Reduced manual testing from days to hours; managed source code with Git in an Agile/Scrum environment with JIRA, first production-quality Python codebase built entirely from scratch and relied on by the engineering team
+
+Capabilities
+
+## Technical Stack
+
+Languages
+
+Python (OOP, PEP8)TypeScriptJavaScriptC++ (pybind11)CUDA C++SQLBash
+
+AI / LLMs / Agents
+
+LangChainLangGraphClaude APIOpenAI APILlamaRAGFAISSEmbeddingsVector SearchAgentic PipelinesTool UseAdaptive MemoryGuardrailsFallback LogicPrompt EngineeringFew-ShotChain-of-Thought
+
+ML / Deep Learning / CV
+
+PyTorchTensorFlow / Kerasscikit-learnTransformersFSDPCNNsRNNsComputer VisionNLPFine-TuningLoRAModel EvaluationExperiment TrackingMLflow
+
+Evals / RL / Safety
+
+GRPOPPODPORLHFPolicy GradientKL PenaltyVerifiable RewardsSandboxed RL EnvsLLM-as-JudgeEval Harness DesignBenchmark DesignRegression TestingFailure Mode TaxonomyAblationsControlled Experiments
+
+GPU / CUDA Kernels
+
+CUDA C++FlashAttention-2Tensor Core GEMMldmatrix / mma.synccp.async PipeliningFused Kernels (RMSNorm/RoPE/SwiGLU)Quantized GEMM (W4A16)Mixture-of-Experts KernelsNsight ComputeSASS InspectionDRAM Bandwidth Optimization
+
+Multimodal
+
+VLMsCLIPWinCLIPAnomalyCLIPSmolVLMWhisperWav2Vec2MediaPipeDeepFaceMultimodal Inference
+
+Backend / APIs / Data
+
+FastAPIFlaskReactNext.jsCeleryRedisREST APIsMicroservicesPostgreSQLMySQLSchema ValidationETL PipelinesApache ParquetPandasNumPySciPyAirflowPySparkSpark MLlib
+
+MLOps / Cloud / Infra
+
+DockerDocker ComposeLinux Process IsolationKubernetesAWS EC2AWS S3GitHub ActionsCI/CDMonitoringStructured LoggingDrift DetectionWeights & BiasesEvidently AIGitLinuxPytestReproducible Workflows
+
+HPC / Systems
+
+SlurmLDMSDarshanIORVPICNVIDIA NsightCUDA ProfilingGPU BenchmarkingTrio (async)OpenMPIDistributed TrainingSubprocess IsolationMemory Profiling
+
+Writing
+
+## On Medium
+
+[All articles ↗](https://medium.com/@uttapreksha24)
+
+[Clinical AI · Evals · Latest I Built a Clinical Intake AI Pipeline; Then Found the Blind Spot in My Own Eval Harness Built a 6-step clinical pipeline with an eval harness designed to catch hallucinations. Llama 3.1 8B scored 90.6% extraction accuracy — but inferred a patient's age and gender from their name. The harness missed it. Finding that blind spot was more useful than a clean 100% would have been.](https://medium.com/@uttapreksha24/i-built-a-clinical-intake-ai-pipeline-and-my-eval-harness-caught-a-hallucination-i-didnt-expect-b67ed732eb8b) [RL · Open Source GRPO from Scratch: Engineering Decisions, Reward Sparsity, and What the Ablation Revealed Every engineering decision in the GRPO implementation documented. Why reward sparsity is a failure mode models cannot self-correct. Full AWS logs, reproducible configs.](https://medium.com/@uttapreksha24/grpo-vs-ppo-vs-dpo-on-gsm8k-what-i-learned-building-rl-training-from-scratch-f47701c637b9)
+
+Education
+
+M.S. Electrical & Computer Engineering
+
+Northeastern University · Boston, MA · May 2026
+
+GPA 3.9/4.0 · Concentration: ML, CV, Algorithms\
+Coursework: LLM Dialogue Agents · Advanced ML · MLOps · HPC\
+Presented at Google Office, Cambridge (MLOps)
+
+B.E. Electronics & Communication Engineering
+
+G H Patel College of Engineering · India · May 2024
+
+GPA 3.7/4.0\
+ISTE Documentation Head · IDEA Lab Co-Ambassador\
+TEDx Volunteer
+
+Contact
+
+Let's build something that matters.
+
+Looking for AI engineering · ML engineering · Forward Deployed Engineering · SWE infra roles. Available May 2026. Will relocate anywhere, immediately.
+
+[email patel.utt@northeastern.edu →](mailto:patel.utt@northeastern.edu) phone (617) 961-9251 → [linkedin uttapreksha-patel →](https://linkedin.com/in/uttapreksha-patel) [github Uttaprexa →](https://github.com/Uttaprexa) [writing @uttapreksha24 →](https://medium.com/@uttapreksha24)
+
+Uttapreksha Patel · Boston MA → anywhere · May 2026
+
+[patel.utt@northeastern.edu](mailto:patel.utt@northeastern.edu)
