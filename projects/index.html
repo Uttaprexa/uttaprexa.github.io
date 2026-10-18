@@ -265,7 +265,7 @@ footer { border-top: 1px solid var(--rule); padding: 24px 0 40px; color: var(--g
   </header>
   <section class="intro" style="padding-bottom:16px">
     <h1>Visualize my projects</h1>
-    <p>13 projects. Each one plays an example through the system. Pick any project below.</p>
+    <p>16 projects. Each one plays an example through the system. Pick any project below.</p>
   </section>
 </div>
 
@@ -1832,6 +1832,378 @@ window.PROJECT_STAGES = window.PROJECT_STAGES || {};
 
 </script>
 <script>
+window.PROJECT_STAGES = window.PROJECT_STAGES || {};
+(function () {
+  const { el, seg, ease, show } = PipeHelpers;
+  function bars(b, title, rows, max, fmt) {
+    const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+    if (title) box.appendChild(el("p", "panel-title", title));
+    const rs = rows.map(([n, v, c, note]) => {
+      const r = el("div", "chart-row", `<span>${n}${note ? `<br><span class="muted" style="font-size:13px">${note}</span>` : ""}</span><span class="bar"><i></i></span><span class="mono v"></span>`);
+      box.appendChild(r); const i = r.querySelector("i"); i.style.background = c || "var(--signal)";
+      return { i, v: r.querySelector(".v"), val: v };
+    });
+    b.appendChild(box);
+    return (t, st = 0.1) => rs.forEach((o, k) => { const u = ease(seg(t, k * st, k * st + 0.4)); o.i.style.width = (o.val / max) * 100 * u + "%"; o.v.textContent = fmt(o.val * u, o.val); });
+  }
+  const pct = (v) => v.toFixed(1) + "%";
+  window.PROJECT_STAGES.nanoserve = [
+    {
+      label: "SGEMM", title: "Matrix multiply, rewritten eight times",
+      caption: "Every LLM layer is mostly matrix multiplication. Starting from a naive kernel, each version fixed the bottleneck Nsight Compute pointed to, from 1.8% to 87.5% of NVIDIA's cuBLAS.",
+      duration: 6400,
+      setup(b) {
+        const up = bars(b, "FP32 GEMM, 4096×4096, % of cuBLAS on an NVIDIA L4", [
+          ["1. naive", 1.8, "var(--fail)", "uncoalesced memory reads"], ["2. coalesced", 9.1, null, "8.3× from coalescing alone"], ["3. shared-memory tiles", 12.7],
+          ["4. 1D block tiles", 32.3, null, "8 outputs per thread"], ["5. 2D block tiles", 59.6], ["6. vectorized loads", 76.5, null, "128-bit loads"],
+          ["7. warp tiling", 85.8], ["8. 3 blocks per SM", 87.5, "var(--pass)"]], 100, pct);
+        return { up };
+      },
+      update(s, p) { s.up(seg(p, 0, 0.92), 0.08); },
+    },
+    {
+      label: "Tensor cores", title: "Then the same climb on tensor cores",
+      caption: "BF16 tensor-core GEMM using hand-written PTX: async copies (cp.async), ldmatrix and mma.sync. The best kernel reached 67.5 TFLOP/s, about 90% of cuBLAS.",
+      duration: 5200,
+      setup(b) {
+        const up = bars(b, "BF16 GEMM, 2048×2048, % of cuBLAS", [
+          ["wmma, from global memory", 15.7, "var(--fail)"], ["wmma + shared memory", 67.4], ["cp.async double buffering", 70.8],
+          ["ldmatrix + mma.sync", 87.4], ["64×64 warp tiles", 89.9, "var(--pass)", "67.5 TFLOP/s, 0 register spills"]], 100, pct);
+        return { up };
+      },
+      update(s, p) { s.up(seg(p, 0, 0.9), 0.14); },
+    },
+    {
+      label: "Attention", title: "FlashAttention-2: never write the big matrix to memory",
+      caption: "Standard attention writes and re-reads a huge score matrix (6.4 GB at 8,192 tokens). FlashAttention processes it in small tiles kept in registers. Result: up to 17.9× faster than standard attention, and 0.91–0.95× of the official kernel at real model shapes.",
+      duration: 6000,
+      setup(b) {
+        const cols = el("div", "cols");
+        const mk = (t, note) => { const d = el("div"); d.innerHTML = `<p class="panel-title">${t}</p>`; const g = el("div"); g.style.cssText = "display:grid;grid-template-columns:repeat(12,1fr);gap:2px;aspect-ratio:1/1;max-width:260px"; const cells = []; for (let i = 0; i < 144; i++) { const c = el("i"); c.style.cssText = "background:var(--paper);border-radius:1px"; g.appendChild(c); cells.push(c); } d.appendChild(g); const n = el("p", "muted", note); n.style.fontSize = "14px"; d.appendChild(n); cols.appendChild(d); return cells; };
+        const a = mk("Standard: full score matrix in memory", "Every cell written to and read back from GPU memory");
+        const f = mk("FlashAttention: one tile at a time", "Each tile lives in registers, then is discarded");
+        b.appendChild(cols);
+        return { a, f };
+      },
+      update(s, p) {
+        const t = seg(p, 0.05, 0.9), n = Math.round(t * 144);
+        s.a.forEach((c, i) => (c.style.background = i < n ? "var(--fail)" : "var(--paper)"));
+        const tile = Math.floor(t * 9); // 3x3 tiles of 4x4
+        s.f.forEach((c, i) => { const r = Math.floor(i / 12), q = i % 12; const ti = Math.floor(r / 4) * 3 + Math.floor(q / 4); c.style.background = ti === tile ? "var(--signal)" : ti < tile ? "var(--signal-soft)" : "var(--paper)"; });
+      },
+    },
+    {
+      label: "Fused ops", title: "Fuse small operations to hit the memory limit",
+      caption: "RMSNorm, RoPE and SwiGLU are limited by memory, not math. Fusing each into one kernel cuts memory traffic, and the measured speedups match the byte counts almost exactly. All three run at 98.5–99.7% of the GPU's memory bandwidth.",
+      duration: 5200,
+      setup(b) {
+        const cols = el("div", "cols"); const l = el("div"), r = el("div"); cols.append(l, r); b.appendChild(cols);
+        const a = bars(l, "Speedup over eager PyTorch kernels", [["residual + RMSNorm", 3.70, "var(--pass)", "5 kernels → 1"], ["RoPE on Q and K", 4.55, "var(--pass)", "8 kernels → 1"], ["SwiGLU", 1.66, "var(--pass)", "2 kernels → 1"]], 5, (v) => v.toFixed(2) + "×");
+        const c = bars(r, "Share of memory bandwidth ceiling", [["RMSNorm", 99.7], ["RoPE", 99.4], ["SwiGLU", 98.5]], 100, pct);
+        return { a, c };
+      },
+      update(s, p) { s.a(seg(p, 0, 0.6)); s.c(seg(p, 0.35, 0.95)); },
+    },
+    {
+      label: "4-bit", title: "Store weights in 4 bits to read them 3.7× faster",
+      caption: "Generating one token means reading every weight once, so speed is set by memory. 4-bit weights are 0.516 bytes instead of 2, and the custom kernel unpacks them on the fly: 3.4–3.7× faster than cuBLAS bf16 for one token.",
+      duration: 5000,
+      setup(b) {
+        const cols = el("div", "cols"); const l = el("div"), r = el("div"); cols.append(l, r); b.appendChild(cols);
+        const a = bars(l, "Bytes per weight", [["bf16", 2, "var(--graphite)"], ["4-bit + scales", 0.516, "var(--pass)"]], 2, (v) => v.toFixed(3));
+        const c = bars(r, "Decode speedup vs cuBLAS bf16 (1 token)", [["q/k/v projection", 3.52, "var(--pass)"], ["output projection", 3.43, "var(--pass)"], ["gate + up", 3.71, "var(--pass)"], ["down", 3.62, "var(--pass)"]], 4, (v) => v.toFixed(2) + "×");
+        return { a, c };
+      },
+      update(s, p) { s.a(seg(p, 0, 0.5), 0.2); s.c(seg(p, 0.35, 0.95), 0.08); },
+    },
+    {
+      label: "MoE", title: "Mixture-of-experts: route tokens, then one grouped multiply",
+      caption: "A router sends each token to its top experts, tokens are regrouped on the GPU, and one launch multiplies all experts at once. It wins for many small experts (1.16×) and still trails the per-expert loop for a few large ones, which the README documents openly.",
+      duration: 5600,
+      setup(b) {
+        const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 600 220"); s.setAttribute("width", "100%"); s.style.maxHeight = "240px";
+        let h = "";
+        for (let i = 0; i < 8; i++) h += `<circle class="tk" cx="40" cy="${25 + i * 24}" r="8" style="fill:var(--signal)" opacity="0"/>`;
+        h += `<rect x="150" y="70" width="90" height="80" rx="3" fill="#fff" style="stroke:var(--ink)"/><text x="195" y="115" text-anchor="middle" font-size="15">router</text>`;
+        for (let e = 0; e < 4; e++) h += `<rect class="ex" x="440" y="${15 + e * 50}" width="130" height="38" rx="3" fill="#fff" stroke-width="2" style="stroke:var(--rule)"/><text x="505" y="${39 + e * 50}" text-anchor="middle" font-size="14">expert ${e + 1}</text>`;
+        h += ``;
+        s.innerHTML = h; b.appendChild(s);
+        const n = el("div", "fade", '<span class="tag pass">many small experts (60): 1.16× faster</span> <span class="tag caution">8 large experts: 0.80–0.94×</span>'); n.style.marginTop = "8px"; b.appendChild(n);
+        return { s, n };
+      },
+      update(st, p) {
+        const tks = st.s.querySelectorAll(".tk"), map = [0, 2, 1, 3, 0, 2, 3, 1];
+        tks.forEach((t, i) => { const a = seg(p, 0.05 + i * 0.03, 0.15 + i * 0.03); t.setAttribute("opacity", a); const m = ease(seg(p, 0.35 + i * 0.02, 0.7 + i * 0.02)); const ty = 34 + map[i] * 50; t.setAttribute("cx", 40 + m * 380); t.setAttribute("cy", (25 + i * 24) * (1 - m) + ty * m); });
+        st.s.querySelectorAll(".ex").forEach((e, k) => e.style.stroke = p > 0.7 ? "var(--signal)" : "var(--rule)");
+        show(st.n, p > 0.8);
+      },
+    },
+    {
+      label: "Real model", title: "All the kernels running Qwen2.5-7B",
+      caption: "Plugged into a real 7B model on one L4 GPU: 2.61× faster text generation than Hugging Face with 4-bit weights, and perplexity within 0.02% with bf16 kernels. 4-bit quality is the weak spot (+15.7% perplexity); calibrated quantization is next.",
+      duration: 5600,
+      setup(b) {
+        const up = bars(b, "Qwen2.5-7B generation speed, tokens per second (batch 1, NVIDIA L4)", [["Hugging Face", 17.3, "var(--graphite)"], ["nanoserve bf16", 17.7, "var(--signal)", "already at the memory read limit"], ["nanoserve 4-bit", 45.1, "var(--pass)", "2.61× Hugging Face"]], 50, (v) => v.toFixed(1));
+        return { up };
+      },
+      update(s, p) { s.up(seg(p, 0, 0.85), 0.2); },
+    },
+  ];
+})();
+
+</script>
+<script>
+window.PROJECT_STAGES = window.PROJECT_STAGES || {};
+(function () {
+  const { el, seg, ease, show, type } = PipeHelpers;
+  function bars(b, title, rows, max, fmt) {
+    const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+    if (title) box.appendChild(el("p", "panel-title", title));
+    const rs = rows.map(([n, v, c, note]) => {
+      const r = el("div", "chart-row", `<span>${n}${note ? `<br><span class="muted" style="font-size:13px">${note}</span>` : ""}</span><span class="bar"><i></i></span><span class="mono v"></span>`);
+      box.appendChild(r); const i = r.querySelector("i"); i.style.background = c || "var(--signal)";
+      return { i, v: r.querySelector(".v"), val: v };
+    });
+    b.appendChild(box);
+    return (t, st = 0.1) => rs.forEach((o, k) => { const u = ease(seg(t, k * st, k * st + 0.4)); o.i.style.width = (o.val / max) * 100 * u + "%"; o.v.textContent = fmt(o.val * u, o.val); });
+  }
+  const pct = (v) => v.toFixed(1) + "%";
+  const svgEl = (w, h, inner) => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", `0 0 ${w} ${h}`); s.setAttribute("width", "100%"); s.style.maxHeight = "340px"; s.innerHTML = inner; return s; };
+  const rowsBox = (b, title, items) => { const box = el("div", "doc"); box.style.fontFamily = "var(--sans)"; if (title) box.appendChild(el("p", "panel-title", title)); const rs = items.map((html) => { const r = el("div", "row fade", html); box.appendChild(r); return r; }); b.appendChild(box); return rs; };
+
+  /* ======================= evalsandbox ======================= */
+  window.PROJECT_STAGES.evalsandbox = [
+    {
+      label: "The problem", title: "Most code benchmarks trust the exit code",
+      caption: "A typical harness glues the model's code to the tests and calls exit code 0 a pass. Model-written code can fake that: exit early, or return an object that claims to equal anything.",
+      duration: 5200,
+      setup(b) {
+        const rs = rowsBox(b, "Model output that games a naive harness", [
+          '<code style="flex:1;font-family:var(--mono);font-size:14px">sys.exit(0)  # before the tests run</code><span class="tag fail">naive: PASS</span>',
+          '<code style="flex:1;font-family:var(--mono);font-size:14px">os._exit(0)  # inside the function</code><span class="tag fail">naive: PASS</span>',
+          '<code style="flex:1;font-family:var(--mono);font-size:14px">return AlwaysEqual()  # __eq__ → True</code><span class="tag fail">naive: PASS</span>',
+          '<code style="flex:1;font-family:var(--mono);font-size:14px">print("PASS")  # forged result line</code><span class="tag fail">naive: PASS</span>']);
+        const n = el("div", "note fade", "And in the other direction: a correct but slow solution, or a busy machine, looks exactly like a wrong answer."); n.style.marginTop = "12px"; b.appendChild(n);
+        return { rs, n };
+      },
+      update(s, p) { s.rs.forEach((r, i) => show(r, p > 0.06 + i * 0.16)); show(s.n, p > 0.75); },
+    },
+    {
+      label: "Isolation", title: "Run the tests and the model's code in separate processes",
+      caption: "The trusted harness runs the tests. The model's function runs in a different process, under a different user, inside a locked-down container. Only plain JSON data crosses between them.",
+      duration: 6000,
+      setup(b) {
+        const s = svgEl(640, 290, `
+          <rect x="10" y="10" width="620" height="270" rx="4" fill="none" style="stroke:var(--graphite)" stroke-dasharray="6 5"/>
+          <text x="24" y="34" font-size="14" style="fill:var(--graphite)">Docker container: no network, read-only, resource limits</text>
+          <g class="hz" opacity="0"><rect x="40" y="60" width="240" height="190" rx="4" fill="#fff" style="stroke:var(--signal)" stroke-width="2"/>
+          <text x="160" y="92" text-anchor="middle" font-size="16" font-weight="600">Harness (trusted)</text>
+          <text x="160" y="118" text-anchor="middle" font-size="13" style="fill:var(--graphite)">user 1000</text>
+          <text x="160" y="150" text-anchor="middle" font-size="14">runs the tests</text>
+          <text x="160" y="172" text-anchor="middle" font-size="14">checks exact types</text>
+          <text x="160" y="194" text-anchor="middle" font-size="14">emits PASS only if clean</text></g>
+          <g class="cz" opacity="0"><rect x="380" y="60" width="220" height="190" rx="4" fill="#fff" style="stroke:var(--caution)" stroke-width="2"/>
+          <text x="490" y="92" text-anchor="middle" font-size="16" font-weight="600">Model's code</text>
+          <text x="490" y="118" text-anchor="middle" font-size="13" style="fill:var(--graphite)">user 65534 (nobody)</text>
+          <text x="490" y="150" text-anchor="middle" font-size="14">CPU time limit</text>
+          <text x="490" y="172" text-anchor="middle" font-size="14">cannot write files</text>
+          <text x="490" y="194" text-anchor="middle" font-size="14">only returns values</text></g>
+          <line x1="280" y1="140" x2="380" y2="140" stroke-width="2" style="stroke:var(--rule)"/>
+          <line x1="280" y1="170" x2="380" y2="170" stroke-width="2" style="stroke:var(--rule)"/>
+          <text x="330" y="130" text-anchor="middle" font-size="12" style="fill:var(--graphite)">JSON</text>
+          <circle class="d1" cx="280" cy="140" r="6" style="fill:var(--signal)" opacity="0"/>
+          <circle class="d2" cx="380" cy="170" r="6" style="fill:var(--caution)" opacity="0"/>`);
+        b.appendChild(s); return { s };
+      },
+      update(st, p) {
+        st.s.querySelector(".hz").setAttribute("opacity", seg(p, 0.05, 0.2));
+        st.s.querySelector(".cz").setAttribute("opacity", seg(p, 0.2, 0.35));
+        const cyc = (p * 3) % 1, on = p > 0.4;
+        const d1 = st.s.querySelector(".d1"), d2 = st.s.querySelector(".d2");
+        d1.setAttribute("opacity", on && cyc < 0.5 ? 1 : 0); d1.setAttribute("cx", 280 + 100 * ease(Math.min(1, cyc * 2)));
+        d2.setAttribute("opacity", on && cyc >= 0.5 ? 1 : 0); d2.setAttribute("cx", 380 - 100 * ease(Math.min(1, (cyc - 0.5) * 2)));
+      },
+    },
+    {
+      label: "Exploits", title: "Every trick now fails closed",
+      caption: "The model can't kill the judge, write the result line, or exit its way to a pass. A 24-case red-team test suite checks all of these on every change.",
+      duration: 5200,
+      setup(b) {
+        const rs = rowsBox(b, "Same tricks, new harness", [
+          '<span style="flex:1">Exits before the tests run</span><span class="tag fail">naive: PASS</span><span class="tag pass">oracle: CHILD_EXITED</span>',
+          '<span style="flex:1">Object whose __eq__ is always true</span><span class="tag fail">naive: PASS</span><span class="tag pass">oracle: rejected (not plain data)</span>',
+          '<span style="flex:1">Prints a fake result line</span><span class="tag fail">naive: PASS</span><span class="tag pass">oracle: RESULT_FORGERY</span>',
+          '<span style="flex:1">Catches the timeout with except Exception</span><span class="tag fail">naive: PASS</span><span class="tag pass">oracle: TIMEOUT</span>']);
+        return { rs };
+      },
+      update(s, p) { s.rs.forEach((r, i) => show(r, p > 0.08 + i * 0.18)); },
+    },
+    {
+      label: "Causes", title: "Every failure gets a cause, not just “FAIL”",
+      caption: "3,280 HumanEval completions from Qwen2.5-Coder-1.5B. Of 2,209 failures, 2,201 were genuine logic errors; only 8 hit resource limits, and none were harness faults.",
+      duration: 5000,
+      setup(b) {
+        const up = bars(b, "Outcomes for 3,280 samples (164 problems × 20)", [["Passed", 1071, "var(--pass)"], ["Logic error (model's fault)", 2201, "var(--fail)", "wrong answer, exception, syntax"], ["Resource limit", 8, "var(--caution)", "infinite loops, runaway memory"], ["Integrity or infrastructure", 0, "var(--graphite)", "gaming the harness, or our bug"]], 2300, (v) => Math.round(v).toLocaleString("en-US"));
+        return { up };
+      },
+      update(s, p) { s.up(seg(p, 0, 0.85), 0.15); },
+    },
+    {
+      label: "Recheck", title: "Was the model actually wrong? Test it directly",
+      caption: "Rerunning the 8 resource failures with 2×, 4× and 8× the limits flipped none of them. pass@1 stayed at 32.65% across a 16× range of limits, and correct solutions never flaked, even with 16 containers at once.",
+      duration: 5400,
+      setup(b) {
+        const cols = el("div", "cols"); const l = el("div"), r = el("div"); cols.append(l, r); b.appendChild(cols);
+        const a = bars(l, "pass@1 at different time and memory limits", [["0.25×", 32.65], ["1× (default)", 32.65, "var(--pass)"], ["4×", 32.65]], 40, (v) => v.toFixed(2) + "%");
+        const rs = rowsBox(r, "Other checks", [
+          '<span style="flex:1">Resource failures passing at 8× limits</span><b class="mono">0 of 8</b>',
+          '<span style="flex:1">Canonical solutions flaky at 1 / 4 / 16 parallel</span><b class="mono">0 / 0 / 0</b>',
+          '<span style="flex:1">Agreement with a naive harness on honest samples</span><b class="mono">3,280 / 3,280</b>']);
+        return { a, rs };
+      },
+      update(s, p) { s.a(seg(p, 0, 0.55), 0.15); s.rs.forEach((r, i) => show(r, p > 0.45 + i * 0.15)); },
+    },
+    {
+      label: "Own bugs", title: "The study found bugs in its own harness",
+      caption: "Where misattribution did happen, it came from outside the model. Each harness bug now has a regression test. Together these touched about 0.7% of samples.",
+      duration: 5600,
+      setup(b) {
+        const rs = rowsBox(b, "Misattributions found and fixed", [
+          '<span class="tag fail">bug</span><span style="flex:1"><b>input() reported as a timeout.</b> <span class="muted">The model\'s stdin was the protocol pipe, so it hung. Now gets empty stdin.</span></span>',
+          '<span class="tag fail">bug</span><span style="flex:1"><b>Fractional CPU limits rounded down.</b> <span class="muted">1.5 s became 1 s. Now rounds up.</span></span>',
+          '<span class="tag fail">bug</span><span style="flex:1"><b>CPU timeouts labeled as crashes.</b> <span class="muted">Compared against the requested limit, not the enforced one.</span></span>',
+          '<span class="tag caution">found</span><span style="flex:1"><b>Truncated generations.</b> <span class="muted">30 samples hit the 512-token cap, causing 8 of 35 syntax errors.</span></span>',
+          '<span class="tag caution">found</span><span style="flex:1"><b>Stop rule cut helper functions.</b> <span class="muted">Regenerating cost only 0.3 pass@1 points; most were genuine missing imports.</span></span>']);
+        return { rs };
+      },
+      update(s, p) { s.rs.forEach((r, i) => show(r, p > 0.05 + i * 0.15)); },
+    },
+    {
+      label: "Results", title: "pass@k with confidence intervals",
+      caption: "pass@1 32.7% (95% CI 27.8–37.5%), rising to 71.5% at 10 tries and 79.3% at 20. Greedy pass@1 was 34.1%, about 10 points below the published 43.9%, likely from 4-bit quantization and prompt differences (not yet tested).",
+      duration: 5000,
+      setup(b) {
+        const up = bars(b, "Qwen2.5-Coder-1.5B on HumanEval", [["pass@1", 32.7, "var(--signal)", "CI 27.8–37.5%"], ["pass@10", 71.5, "var(--signal)", "CI 65.4–77.4%"], ["pass@20", 79.3, "var(--pass)"], ["greedy pass@1", 34.1, "var(--graphite)", "published: 43.9%"]], 100, pct);
+        return { up };
+      },
+      update(s, p) { s.up(seg(p, 0, 0.85), 0.15); },
+    },
+  ];
+
+  /* ======================= RLHF QA ======================= */
+  const WEEKS = [[0.095, 0.035], [0.095, 0.045], [0.12, 0.015], [0.125, 0.03], [0.26, 0.17], [0.21, 0.165], [0.2, 0.165], [0.13, 0.015], [0.075, 0.15], [0.095, 0.09], [0.07, 0.115], [0.1, 0.09]];
+  window.PROJECT_STAGES.rlhfqa = [
+    {
+      label: "Data", title: "A preference pair: which answer is better?",
+      caption: "RLHF trains models on pairs where annotators marked one response as better. If those labels are wrong, the model learns the wrong lesson. This pipeline checks pairs from Anthropic's HH-RLHF dataset.",
+      duration: 4800,
+      setup(b) {
+        const d = el("div", "doc"); d.style.fontFamily = "var(--sans)";
+        d.innerHTML = '<p class="panel-title">One pair from HH-RLHF (paraphrased)</p><div class="row"><b style="width:90px">Prompt</b><span class="t0"></span></div><div class="row fade r1"><span class="tag pass" style="width:82px;text-align:center">chosen</span><span>Try cooling the pan first, then soak it in warm soapy water for ten minutes before scrubbing.</span></div><div class="row fade r2"><span class="tag fail" style="width:82px;text-align:center">rejected</span><span>Just buy a new pan.</span></div>';
+        b.appendChild(d); return { t: d.querySelector(".t0"), r1: d.querySelector(".r1"), r2: d.querySelector(".r2") };
+      },
+      update(s, p) { type(s.t, "How do I get burnt food off a pan?", seg(p, 0.05, 0.4)); show(s.r1, p > 0.45); show(s.r2, p > 0.62); },
+    },
+    {
+      label: "Plant defects", title: "Plant known bad pairs, so detection can be measured",
+      caption: "A known share of pairs is corrupted on purpose with five defect types. Because the answers are known, precision and recall can be measured instead of guessed.",
+      duration: 4800,
+      setup(b) {
+        const rs = rowsBox(b, "Five planted defect types", [
+          '<span class="tag fail" style="width:110px;text-align:center">label flip</span><span>chosen and rejected swapped</span>',
+          '<span class="tag fail" style="width:110px;text-align:center">truncated</span><span>chosen answer cut off mid-sentence</span>',
+          '<span class="tag fail" style="width:110px;text-align:center">off-topic</span><span>chosen answer is about something else</span>',
+          '<span class="tag fail" style="width:110px;text-align:center">low effort</span><span>generic filler like “Sure, happy to help.”</span>',
+          '<span class="tag fail" style="width:110px;text-align:center">duplicate</span><span>both responses identical</span>']);
+        return { rs };
+      },
+      update(s, p) { s.rs.forEach((r, i) => show(r, p > 0.06 + i * 0.15)); },
+    },
+    {
+      label: "Heuristics", title: "Cheap rules first, but word overlap failed",
+      caption: "About 35% of good HH-RLHF replies share no keywords with the question (“Are you sure you want that?”). Switching relevance checks from word overlap to sentence embeddings cut false alarms from 36.5% to 10.8%.",
+      duration: 4800,
+      setup(b) {
+        const up = bars(b, "False positive rate of the relevance check (2,995 pairs)", [["Word overlap (TF-IDF)", 36.5, "var(--fail)"], ["Sentence embeddings (MiniLM)", 10.8, "var(--pass)", "still catches 91% of off-topic"]], 40, pct);
+        return { up };
+      },
+      update(s, p) { s.up(seg(p, 0, 0.8), 0.25); },
+    },
+    {
+      label: "Judge", title: "An LLM judge, asked twice with the order swapped",
+      caption: "A local 7B model (Qwen2.5 via Ollama) scores both responses. Swapping which one comes first changed its verdict on 32.7% of pairs, so only verdicts that agree in both orders count.",
+      duration: 6000,
+      setup(b) {
+        const cols = el("div", "cols");
+        const mk = (t, a, c) => { const d = el("div", "doc"); d.style.fontFamily = "var(--sans)"; d.innerHTML = `<p class="panel-title">${t}</p><div class="row"><b>A:</b><span>${a}</span></div><div class="row"><b>B:</b><span>${c}</span></div><div class="row fade v"><span class="tag signal">judge picks A</span></div>`; cols.appendChild(d); return d.querySelector(".v"); };
+        const v1 = mk("Order 1", "soak and scrub answer", "“buy a new pan”");
+        const v2 = mk("Order 2 (swapped)", "“buy a new pan”", "soak and scrub answer");
+        b.appendChild(cols);
+        const n = el("div", "note fade", "Same pair, different verdict? Then the judge is unreliable on it, and the pair goes to a human."); n.style.marginTop = "12px"; b.appendChild(n);
+        return { v1, v2, n };
+      },
+      update(s, p) {
+        show(s.v1, p > 0.2); show(s.v2, p > 0.45);
+        s.v2.innerHTML = p > 0.45 ? '<span class="tag caution">judge picks A again: verdict flipped</span>' : "";
+        show(s.n, p > 0.7);
+      },
+    },
+    {
+      label: "Recall", title: "Rules and the judge catch different defects",
+      caption: "Rules catch surface problems like duplicates and filler. Defects that need understanding, like swapped labels or truncation, needed the judge.",
+      duration: 5400,
+      setup(b) {
+        const box = el("div", "doc"); box.style.fontFamily = "var(--sans)";
+        box.appendChild(el("p", "panel-title", "Recall by defect type (300 pairs)"));
+        const data = [["Label flip", 10, 57], ["Truncated", 29, 88], ["Off-topic", 87, 100], ["Duplicate", 100, 100], ["Low effort", 100, 100]];
+        const rows = data.map(([n, h, j]) => { const r = el("div", "chart-row", `<span>${n}</span><span style="display:flex;flex-direction:column;gap:4px"><span class="bar" style="flex:none;height:10px"><i style="background:var(--graphite)"></i></span><span class="bar" style="flex:none;height:10px"><i style="background:var(--pass)"></i></span></span><span class="mono v" style="font-size:12px;white-space:nowrap"></span>`); box.appendChild(r); return { is: r.querySelectorAll("i"), v: r.querySelector(".v"), h, j }; });
+        const key = el("div", "", '<span class="tag" style="background:var(--paper)">gray: rules only</span> <span class="tag pass">green: rules + judge</span>'); key.style.marginTop = "8px"; box.appendChild(key);
+        b.appendChild(box); return { rows };
+      },
+      update(s, p) { s.rows.forEach((o, k) => { const u = ease(seg(p, k * 0.1, k * 0.1 + 0.45)); o.is[0].style.width = o.h * u + "%"; o.is[1].style.width = o.j * u + "%"; o.v.textContent = `${Math.round(o.h * u)} → ${Math.round(o.j * u)}%`; }); },
+    },
+    {
+      label: "Calibrate", title: "Tune the rules on saved scores, no extra model calls",
+      caption: "Dropping a misfiring tag, raising a threshold, and sending uncertain label-flip verdicts to a human review queue cut false alarms from 42.9% to 16.6%, at the cost of reviewing about 16% of pairs.",
+      duration: 5400,
+      setup(b) {
+        const cols = el("div", "cols"); const l = el("div"), r = el("div"); cols.append(l, r); b.appendChild(cols);
+        const a = bars(l, "False positive rate", [["A: initial rules", 42.9, "var(--fail)"], ["B: drop “identical” tag", 35.9], ["C: B + stricter threshold", 32.7], ["D: C + human review queue", 16.6, "var(--pass)"]], 50, pct);
+        const c = bars(r, "Precision", [["A", 0.44, "var(--graphite)"], ["B", 0.48, "var(--graphite)"], ["C", 0.49, "var(--graphite)"], ["D (current default)", 0.60, "var(--pass)"]], 1, (v) => v.toFixed(2));
+        return { a, c };
+      },
+      update(s, p) { s.a(seg(p, 0, 0.7), 0.12); s.c(seg(p, 0.3, 0.95), 0.12); },
+    },
+    {
+      label: "Drift", title: "Watching quality week by week",
+      caption: "A simulated 12-week campaign. A sloppy annotator in weeks 5–7 pushed the flagged rate over the control limit and was caught. Guideline confusion in weeks 9–12 raised real defects but not flags, because rules alone miss label flips. Putting the judge in the drift loop is next.",
+      duration: 6400,
+      setup(b) {
+        const W = 600, H = 220, X = (i) => 40 + i * 47, Y = (v) => H - 20 - v * 600;
+        let g = `<line x1="40" y1="${Y(0.1748)}" x2="${X(11)}" y2="${Y(0.1748)}" stroke-dasharray="6 5" style="stroke:var(--fail)"/><text x="${X(11) - 4}" y="${Y(0.1748) - 6}" font-size="12" text-anchor="end" style="fill:var(--fail)">control limit</text>`;
+        g += `<rect x="${X(4) - 20}" y="10" width="${47 * 3 - 6}" height="${H - 30}" style="fill:var(--fail-soft)" opacity=".5"/><text x="${X(5)}" y="24" font-size="12" text-anchor="middle">sloppy annotator</text>`;
+        g += `<rect x="${X(8) - 20}" y="10" width="${47 * 4 - 6}" height="${H - 30}" style="fill:var(--caution-soft)" opacity=".6"/><text x="${X(9.5)}" y="24" font-size="12" text-anchor="middle">guideline confusion</text>`;
+        const fl = WEEKS.map((w, i) => `${i ? "L" : "M"}${X(i)},${Y(w[0])}`).join(" "), tr = WEEKS.map((w, i) => `${i ? "L" : "M"}${X(i)},${Y(w[1])}`).join(" ");
+        g += `<path class="tr" d="${tr}" fill="none" stroke-width="2" stroke-dasharray="4 4" style="stroke:var(--graphite)"/><path class="fl" d="${fl}" fill="none" stroke-width="2.5" style="stroke:var(--signal)"/>`;
+        WEEKS.forEach((w, i) => { g += `<circle class="pt" data-i="${i}" cx="${X(i)}" cy="${Y(w[0])}" r="5" style="fill:${w[0] > 0.1748 ? "var(--fail)" : "var(--signal)"}" opacity="0"/><text x="${X(i)}" y="${H - 4}" font-size="11" text-anchor="middle" style="fill:var(--graphite)">w${i + 1}</text>`; });
+        const p = el("p", "panel-title", 'Weekly flagged rate (solid) vs true defect rate (dashed)'); b.appendChild(p);
+        const s = svgEl(W, H, g); b.appendChild(s);
+        const fl2 = s.querySelector(".fl"), tr2 = s.querySelector(".tr"); const L1 = fl2.getTotalLength(), L2 = tr2.getTotalLength();
+        fl2.style.strokeDasharray = L1; tr2.style.opacity = 0;
+        return { s, fl2, tr2, L1 };
+      },
+      update(st, p) {
+        const t = seg(p, 0.05, 0.75);
+        st.fl2.style.strokeDashoffset = st.L1 * (1 - t);
+        st.s.querySelectorAll(".pt").forEach((c) => c.setAttribute("opacity", +c.dataset.i / 11 <= t ? 1 : 0));
+        st.tr2.style.opacity = p > 0.8 ? 1 : 0;
+      },
+    },
+  ];
+})();
+
+</script>
+<script>
 /* Content for the "Visualize my projects" page.
    To edit a project, change its entry here. Projects with kind "flow" use the
    generic before → after animation built from their `stages`. */
@@ -1888,6 +2260,39 @@ window.PROJECT_STAGES = window.PROJECT_STAGES || {};
       flow: ["Sample 8 answers per problem with async workers", "Score each final answer: 1 if correct, 0 if not", "Compare each score with its group's average", "Update the model with a clipped step and a pull back toward the original", "Evaluate on 200 held-out problems"],
       future: ["Repeat with several random seeds before ranking algorithms", "Denser, step-level rewards to fix all-wrong groups", "Faster generation for rollouts", "Scale beyond 0.5B parameters across multiple GPUs"],
       links: [["Code", "https://github.com/Uttaprexa/grpo-llm"], ["Write-up", "https://medium.com/@uttapreksha24/grpo-vs-ppo-vs-dpo-on-gsm8k-what-i-learned-building-rl-training-from-scratch-f47701c637b9"]],
+    },
+    {
+      id: "nanoserve", name: "nanoserve: CUDA Inference Engine", kind: "bespoke",
+      tagline: "An LLM inference engine where every performance-critical kernel is hand-written in CUDA C++, benchmarked against NVIDIA's libraries and explained with the profiler.",
+      stack: ["CUDA C++", "PTX (mma.sync, ldmatrix, cp.async)", "Tensor cores", "NVIDIA Nsight Compute", "cuBLAS (baseline)", "PyTorch (correctness reference)", "Python ctypes", "Hugging Face Transformers", "AWS g6.xlarge (NVIDIA L4)"],
+      input: { label: "Input", text: "A Hugging Face model (Qwen2.5-1.5B or 7B) and a prompt, run on one NVIDIA L4 GPU." },
+      output: { label: "Output", text: "Generated text from custom kernels, plus per-kernel benchmarks against cuBLAS and PyTorch, roofline positions and Nsight Compute explanations of where the time goes." },
+      numbers: [["2.61×", "faster 7B generation than Hugging Face (4-bit)"], ["90%", "of cuBLAS for BF16 tensor-core GEMM"], ["17.9×", "FlashAttention-2 vs standard attention"], ["99.7%", "of memory bandwidth for fused RMSNorm"]],
+      flow: ["Write GEMM from naive to warp-tiled, then on tensor cores with PTX", "Build FlashAttention-2 forward on the same primitives", "Fuse RMSNorm, RoPE and SwiGLU into single memory-bound kernels", "Add 4-bit weight kernels for fast decoding", "Add mixture-of-experts routing and a grouped GEMM", "Run everything inside Qwen2.5 and compare speed and perplexity with Hugging Face"],
+      future: ["Port the best GEMM and attention kernels to Hopper (TMA + WGMMA)", "CUDA graphs to remove launch overhead in decoding", "Calibrated 4-bit quantization (AWQ/GPTQ) to fix quality", "Paged attention for decoding"],
+      links: [["Code", "https://github.com/Uttaprexa/nanoserve"]],
+    },
+    {
+      id: "evalsandbox", name: "evalsandbox: Trustworthy Code Evals", kind: "bespoke",
+      tagline: "A sandbox for running model-generated code in HumanEval-style benchmarks, built to answer one question: when a sample fails, was the model actually wrong?",
+      stack: ["Python", "Docker (no network, read-only, cgroup limits)", "Process isolation with separate users", "RLIMIT_CPU / RLIMIT_FSIZE", "Ollama", "Qwen2.5-Coder-1.5B", "NumPy (bootstrap CIs)", "Pytest red-team suite"],
+      input: { label: "Input", text: "HumanEval problems and 3,280 model completions (164 problems × 20 samples) from Qwen2.5-Coder-1.5B." },
+      output: { label: "Output", text: "A verdict with a cause for every sample (logic, resource, integrity or infrastructure), pass@k with confidence intervals, and studies of how much the infrastructure itself distorts scores." },
+      numbers: [["32.7%", "pass@1 (95% CI 27.8–37.5%)"], ["99.6%", "of failures were genuine logic errors"], ["0 of 8", "resource failures passed at 8× limits"], ["24", "red-team exploit tests"]],
+      flow: ["Start a fresh locked-down container for each sample", "Trusted harness runs the tests; the model's code runs as a different user", "Only plain JSON values cross between them, with exact type checks", "Label every outcome with a cause from a 4-category taxonomy", "Rerun resource failures at 2×, 4× and 8× limits to check they were real", "Compare against a naive exit-code harness and measure flakiness under load"],
+      future: ["Full-precision run to explain the gap to the published score", "An efficiency-sensitive benchmark where limits should matter", "MBPP (loader already supports it)", "Adversarial completions to measure how often naive harnesses are fooled by real model output"],
+      links: [["Code", "https://github.com/Uttaprexa/evalsandbox"]],
+    },
+    {
+      id: "rlhfqa", name: "RLHF Preference Data QA", kind: "bespoke",
+      tagline: "An automated pipeline that scores annotation quality in RLHF preference data, measures how well it catches planted bad examples, and monitors quality drift across annotation campaigns.",
+      stack: ["Python", "Anthropic HH-RLHF dataset", "sentence-transformers (MiniLM)", "Ollama (Qwen2.5 7B judge)", "Anthropic API (optional judge)", "SQLite cache", "Wilson CIs, Cohen's kappa", "p-charts, PSI, KS tests", "Pytest"],
+      input: { label: "Input", text: "Preference pairs from HH-RLHF (prompt, chosen, rejected), with a known share deliberately corrupted." },
+      output: { label: "Output", text: "Per-pair accept, reject or human-review decisions, detection metrics per defect type with confidence intervals, and weekly drift alerts." },
+      numbers: [["36.5 → 10.8%", "false alarms after switching to embeddings"], ["10 → 57%", "label-flip detection with the LLM judge"], ["32.7%", "of verdicts flipped when answer order was swapped"], ["$0", "runs locally on a laptop"]],
+      flow: ["Load HH-RLHF and split each transcript into prompt, chosen and rejected", "Plant five defect types in a known share of pairs", "Run cheap rules: length, filler, duplicates, embedding relevance", "Ask a local LLM judge in both answer orders; keep only consistent verdicts", "Measure precision, recall and F1 per defect with confidence intervals", "Track weekly flagged rates with control charts to catch drift"],
+      future: ["Hand-label 100 pairs to measure judge-vs-human agreement", "Add a second judge (Llama 3.1) for inter-judge agreement", "Context-aware low-effort check (short replies to chit-chat are fine)", "Put the LLM judge in the drift loop", "Harder defects: plausible but subtly worse answers"],
+      links: [["Code", "https://github.com/Uttaprexa/RLHF-Preference-Data-QA-Pipeline"]],
     },
     {
       id: "memory", name: "Adaptive Agent Memory", kind: "bespoke", page: "memory.html",
