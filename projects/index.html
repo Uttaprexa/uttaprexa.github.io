@@ -279,6 +279,7 @@ footer { border-top: 1px solid var(--rule); padding: 24px 0 40px; color: var(--g
   </header>
   <div id="pipeline"></div>
   <p class="muted" id="p-detail" style="font-size:15px;margin:10px 0 0"></p>
+  <section class="sec" id="p-demo-sec" hidden><h3>Try it yourself</h3><div id="p-demo"></div><div style="height:18px"></div></section>
 
   <section class="sec"><h3>Stack</h3><div class="pills" id="p-stack"></div><div style="height:18px"></div></section>
   <section class="sec two">
@@ -2204,6 +2205,149 @@ window.PROJECT_STAGES = window.PROJECT_STAGES || {};
 
 </script>
 <script>
+window.PROJECT_DEMOS = window.PROJECT_DEMOS || {};
+window.PROJECT_DEMOS.realtime = function (root) {
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  root.innerHTML = `
+    <p class="muted" style="font-size:15px;margin:0 0 12px">A simulated camera feed and detector, so you can see how the confidence threshold, duplicate removal and pipeline latency change what comes out. It illustrates the pipeline's behavior; it isn't the YOLOv5 model itself.</p>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px">
+      <canvas class="rt-cv" style="width:100%;border:1px solid var(--rule);border-radius:3px;background:#fff" aria-label="Simulated camera feed with detection boxes"></canvas>
+      <div class="rt-stats" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px"></div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px;align-items:center">
+        <label style="display:flex;flex-direction:column;gap:4px;font-size:15px">
+          <span>Confidence threshold: <b class="rt-tho mono">0.50</b></span>
+          <input type="range" class="rt-th" min="0.05" max="0.95" step="0.05" value="0.5">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:4px;font-size:15px">
+          <span>Pipeline latency: <b class="rt-lto mono">45 ms</b> <span class="muted rt-ltn" style="font-size:13px"></span></span>
+          <input type="range" class="rt-lt" min="15" max="300" step="5" value="45">
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:15px"><input type="checkbox" class="rt-nms" checked> Remove duplicate boxes (NMS)</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="ctrl rt-pause">Pause</button>
+          <button type="button" class="ctrl rt-input">Show model input</button>
+          <button type="button" class="ctrl rt-reset">Reset to my pipeline</button>
+        </div>
+      </div>
+      <p class="rt-note" style="margin:0;font-size:15px;min-height:24px"></p>
+    </div>`;
+  const q = (s) => root.querySelector(s);
+  const cv = q(".rt-cv"), th = q(".rt-th"), lt = q(".rt-lt"), nms = q(".rt-nms");
+  const stats = q(".rt-stats"), note = q(".rt-note");
+  let paused = window.matchMedia("(prefers-reduced-motion: reduce)").matches, showInput = false, alive = true;
+  q(".rt-pause").textContent = paused ? "Play" : "Pause";
+  const statBox = (k) => { const d = document.createElement("div"); d.className = "doc"; d.style.cssText = "padding:10px 12px;font-family:var(--sans)"; d.innerHTML = `<span class="muted" style="font-size:13px">${k}</span><b class="mono" style="display:block;font-size:20px;font-weight:500"></b>`; stats.appendChild(d); return d.querySelector("b"); };
+  const sFps = statBox("Frames per second"), sLat = statBox("Camera → boxes"), sFound = statBox("Objects found"), sFalse = statBox("False or duplicate boxes");
+
+  // Scene, in logical 640×360 coordinates
+  const W0 = 640, H0 = 360;
+  const OBJ = [
+    { n: "person", base: 0.91, w: 42, h: 118, pos: (t) => ({ x: 320 + 210 * Math.sin(t * 0.55), y: 300 }) },
+    { n: "car", base: 0.88, w: 132, h: 56, pos: (t) => ({ x: ((t * 140) % 900) - 130, y: 330 }) },
+    { n: "dog", base: 0.72, w: 58, h: 40, pos: (t) => ({ x: 320 + 210 * Math.sin((t - 0.7) * 0.55) - 60, y: 312 }) },
+    { n: "bicycle", base: 0.63, w: 84, h: 56, pos: () => ({ x: 92, y: 300 }) },
+    { n: "cup", base: 0.41, w: 20, h: 24, pos: () => ({ x: 560, y: 222 }) },
+  ];
+  const FALSE = [{ n: "person", s: 0.27, x: 469, y: 158, w: 40, h: 76 }, { n: "fire hydrant", s: 0.18, x: 200, y: 302, w: 22, h: 36 }];
+
+  function drawScene(ctx, t) {
+    ctx.fillStyle = "#e4e7ea"; ctx.fillRect(0, 0, W0, H0);              // sky / wall
+    ctx.fillStyle = "#d3d6d9"; ctx.fillRect(0, 60, 260, 200); ctx.fillRect(400, 40, 240, 220); // buildings
+    ctx.fillStyle = "#c3c7cb"; for (let i = 0; i < 4; i++) { ctx.fillRect(420 + i * 55, 70, 30, 40); ctx.fillRect(20 + i * 60, 90, 30, 40); }
+    ctx.fillStyle = "#bfc3c6"; ctx.fillRect(452, 86, 34, 68);              // poster that looks a bit like a person
+    ctx.fillStyle = "#b5b8bb"; ctx.fillRect(0, 300, W0, 60);               // road
+    ctx.strokeStyle = "#e9e9e6"; ctx.setLineDash([18, 14]); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, 344); ctx.lineTo(W0, 344); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = "#a9adb1"; ctx.fillRect(530, 222, 70, 8); ctx.fillRect(560, 230, 8, 70); // table
+    ctx.fillStyle = "#f4f4f4"; ctx.fillRect(552, 200, 16, 22);             // cup
+    ctx.fillStyle = "#9aa0a6"; ctx.fillRect(194, 270, 12, 30);             // hydrant-ish post
+    // bicycle
+    ctx.strokeStyle = "#4a4f55"; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(68, 288, 16, 0, 7); ctx.arc(116, 288, 16, 0, 7); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(68, 288); ctx.lineTo(88, 262); ctx.lineTo(116, 288); ctx.moveTo(88, 262); ctx.lineTo(104, 262); ctx.stroke();
+    // person
+    const p = OBJ[0].pos(t), step = Math.sin(t * 6) * 6;
+    ctx.fillStyle = "#3c4148"; ctx.beginPath(); ctx.arc(p.x, p.y - 104, 12, 0, 7); ctx.fill();
+    ctx.fillRect(p.x - 13, p.y - 90, 26, 52); ctx.fillRect(p.x - 11 + step, p.y - 40, 9, 40); ctx.fillRect(p.x + 2 - step, p.y - 40, 9, 40);
+    // dog
+    const d = OBJ[2].pos(t); ctx.fillStyle = "#8a6a4a"; ctx.fillRect(d.x - 24, d.y - 30, 44, 18); ctx.fillRect(d.x + 14, d.y - 40, 14, 14);
+    ctx.fillRect(d.x - 22, d.y - 12, 6, 12); ctx.fillRect(d.x + 10, d.y - 12, 6, 12);
+    // car
+    const c = OBJ[1].pos(t); ctx.fillStyle = "#2457d6"; ctx.fillRect(c.x - 64, c.y - 40, 128, 28); ctx.fillRect(c.x - 36, c.y - 58, 70, 20);
+    ctx.fillStyle = "#222"; ctx.beginPath(); ctx.arc(c.x - 38, c.y - 10, 10, 0, 7); ctx.arc(c.x + 38, c.y - 10, 10, 0, 7); ctx.fill();
+  }
+  const noise = (t, k) => 0.04 * Math.sin(t * 3.1 + k * 1.7) + 0.02 * Math.sin(t * 7.3 + k);
+
+  function detect(t) {
+    const out = [];
+    OBJ.forEach((o, k) => {
+      const p = o.pos(t); if (p.x < -60 || p.x > W0 + 60) return;
+      const s = Math.max(0.05, Math.min(0.99, o.base + noise(t, k)));
+      const box = { n: o.n, s, x: p.x - o.w / 2, y: p.y - o.h, w: o.w, h: o.h, real: true };
+      out.push(box);
+      if (o.n === "person" || o.n === "car") out.push({ ...box, s: s - 0.33, x: box.x + 6, y: box.y + 8, w: box.w - 8, h: box.h - 10, dup: true });
+    });
+    FALSE.forEach((f, k) => out.push({ ...f, s: Math.max(0.05, f.s + noise(t, k + 9)), x: f.x - f.w / 2, y: f.y - f.h, real: false }));
+    return out;
+  }
+
+  let dpr = 1, W = 0, H = 0, ctx = null;
+  function size() { dpr = window.devicePixelRatio || 1; W = cv.clientWidth || 640; H = Math.round(W * 9 / 16); cv.width = W * dpr; cv.height = H * dpr; cv.style.height = H + "px"; ctx = cv.getContext("2d"); }
+  size(); window.addEventListener("resize", size);
+
+  let t = 0, last = null, frameTimes = [];
+  function frame(now) {
+    if (!alive) return;
+    if (last == null) last = now;
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    if (!paused) { t += dt; frameTimes.push(now); while (frameTimes.length && now - frameTimes[0] > 1000) frameTimes.shift(); }
+    const thr = +th.value, lat = +lt.value / 1000;
+    ctx.setTransform(dpr * W / W0, 0, 0, dpr * H / H0, 0, 0);
+    drawScene(ctx, t);
+    if (showInput) {
+      // inset: the frame resized to 640 wide and padded to a 640x640 square (letterboxing)
+      const S = 150, X = 12, Y = 12;
+      ctx.save(); ctx.translate(X, Y); ctx.scale(S / W0, S / W0);
+      ctx.fillStyle = "#727272"; ctx.fillRect(0, 0, W0, W0);
+      ctx.translate(0, (W0 - H0) / 2); drawScene(ctx, t); ctx.restore();
+      ctx.strokeStyle = css("--signal"); ctx.lineWidth = 2; ctx.strokeRect(X, Y, S, S);
+      ctx.fillStyle = "rgba(14,14,14,.82)"; ctx.fillRect(X, Y + S + 4, S, 34);
+      ctx.fillStyle = "#fff"; ctx.font = "11px sans-serif"; ctx.fillText("What YOLOv5 receives:", X + 6, Y + S + 17); ctx.fillText("640×640, padded top/bottom", X + 6, Y + S + 31);
+    }
+    // detections come from the frame captured `lat` seconds ago
+    let boxes = detect(t - lat).filter((b) => b.s >= thr);
+    if (nms.checked) boxes = boxes.filter((b) => !b.dup);
+    let found = 0, bad = 0;
+    boxes.forEach((b) => {
+      const col = !b.real ? css("--fail") : b.dup ? css("--caution") : css("--signal");
+      if (b.real && !b.dup) found++; else bad++;
+      ctx.strokeStyle = col; ctx.lineWidth = 2.5; ctx.strokeRect(b.x, b.y, b.w, b.h);
+      ctx.font = "600 12px sans-serif"; const label = `${b.n} ${b.s.toFixed(2)}`, tw = ctx.measureText(label).width + 8;
+      ctx.fillStyle = col; ctx.fillRect(b.x, b.y - 17, tw, 17); ctx.fillStyle = "#fff"; ctx.fillText(label, b.x + 4, b.y - 5);
+    });
+    const visible = OBJ.filter((o) => { const p = o.pos(t); return p.x > -60 && p.x < W0 + 60; }).length;
+    sFps.textContent = paused ? "paused" : String(Math.min(30, frameTimes.length));
+    sLat.textContent = `${lt.value} ms`;
+    sFound.textContent = `${found} of ${visible}`;
+    sFalse.textContent = String(bad);
+    const l = +lt.value;
+    q(".rt-tho").textContent = thr.toFixed(2);
+    q(".rt-lto").textContent = `${l} ms`;
+    q(".rt-ltn").textContent = l === 45 ? "(my optimized pipeline)" : l > 120 ? "(boxes lag behind moving objects)" : "";
+    note.innerHTML = thr < 0.3 ? '<span style="color:var(--fail)">Threshold very low:</span> the poster and the post get labeled as objects.'
+      : thr > 0.7 ? '<span style="color:var(--caution)">Threshold very high:</span> real objects like the cup and bicycle disappear.'
+      : !nms.checked ? '<span style="color:var(--caution)">Duplicates on:</span> the same person and car get two boxes each.'
+      : l > 120 ? "At this latency the boxes trail the car and the person. Cutting latency is what keeps boxes on moving objects."
+      : "Balanced: real objects found, false boxes filtered, duplicates merged.";
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  q(".rt-pause").onclick = (e) => { paused = !paused; e.target.textContent = paused ? "Play" : "Pause"; };
+  q(".rt-input").onclick = (e) => { showInput = !showInput; e.target.textContent = showInput ? "Hide model input" : "Show model input"; };
+  q(".rt-reset").onclick = () => { th.value = 0.5; lt.value = 45; nms.checked = true; };
+  return { stop() { alive = false; window.removeEventListener("resize", size); root.innerHTML = ""; } };
+};
+
+</script>
+<script>
 /* Content for the "Visualize my projects" page.
    To edit a project, change its entry here. Projects with kind "flow" use the
    generic before → after animation built from their `stages`. */
@@ -2511,6 +2655,10 @@ window.PROJECT_STAGES = window.PROJECT_STAGES || {};
 
     if (ctrl) ctrl.stop();
     ctrl = Pipeline("#pipeline", p.makeStages());
+    if (window.__demoCtrl) { window.__demoCtrl.stop(); window.__demoCtrl = null; }
+    const demoFn = (window.PROJECT_DEMOS || {})[p.id];
+    $("p-demo-sec").hidden = !demoFn;
+    if (demoFn) window.__demoCtrl = demoFn($("p-demo"));
     $("p-detail").innerHTML = p.page ? `Prefer one long page? <a href="${p.page}">Open the full walkthrough</a>.` : "";
 
     $("p-stack").innerHTML = "";
