@@ -22,7 +22,7 @@
   --teal-ink: #00796B;      /* darker teal for text and buttons (readable on white) */
   --teal-dim: #E0F5F3;
   --gray: #5F5F5B;
-  --muted: #8A8A85;
+  --muted: #6B6B66;
   --rule: #E2E2DE;
   --sans: 'Inter', system-ui, -apple-system, sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
@@ -34,6 +34,9 @@ a { color: inherit; }
 a:focus-visible, button:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; border-radius: 4px; }
 ::selection { background: var(--teal); color: #fff; }
 .wrap { max-width: 1120px; margin: 0 auto; padding: 0 40px; }
+
+.skip { position: absolute; left: 12px; top: -48px; z-index: 100; background: var(--ink); color: #fff; padding: 10px 14px; border-radius: 6px; text-decoration: none; font-weight: 500; }
+.skip:focus { top: 12px; }
 
 /* NAV */
 nav.top { position: sticky; top: 0; z-index: 50; background: rgba(248,248,246,.94); backdrop-filter: blur(10px); border-bottom: 1px solid var(--rule); }
@@ -195,6 +198,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 
 <nav class="top" aria-label="Main">
   <div class="wrap">
@@ -211,6 +215,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
   </div>
 </nav>
 
+<main id="main">
 <header class="hero">
   <div class="wrap hero-grid">
     <div>
@@ -275,14 +280,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
           <div><b>99.7%</b><span>of memory bandwidth</span></div>
         </div>
         <div class="flinks">
-          <a href="projects/#nanoserve">See it work →</a>
-          <a href="https://github.com/Uttaprexa/nanoserve" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="projects/#nanoserve" aria-label="See nanoserve work">See it work →</a>
+          <a href="https://github.com/Uttaprexa/nanoserve" target="_blank" rel="noopener" aria-label="nanoserve on GitHub (opens in a new tab)">GitHub ↗</a>
         </div>
       </div>
-      <div class="chart" aria-label="Animated chart: matrix multiply speed rising from 1.8% to 89.9% of NVIDIA cuBLAS across eight kernel versions">
+      <div class="chart" role="img" aria-label="Animated chart: matrix multiply speed rising from 1.8% to 89.9% of NVIDIA cuBLAS across eight kernel versions">
         <small>Matrix multiply, % of NVIDIA cuBLAS</small>
-        <div id="kbars"></div>
-        <p class="cap" id="kcap"></p>
+        <div id="kbars" aria-hidden="true"></div>
+        <p class="cap" id="kcap" aria-hidden="true"></p>
       </div>
     </div>
   </div>
@@ -397,7 +402,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
       <p>Looking for AI engineering, ML engineering, forward deployed and ML infra roles. Available May 2026, and happy to relocate.</p>
     </div>
     <div>
-      <div class="crow"><span>email</span><span>patel.utt@northeastern.edu &nbsp;<button class="copy" id="copyBtn">Copy</button></span></div>
+      <div class="crow"><span>email</span><span>patel.utt@northeastern.edu &nbsp;<button class="copy" id="copyBtn" aria-live="polite">Copy</button></span></div>
       <a class="crow" href="tel:+16179619251"><span>phone</span><span>(617) 961-9251</span></a>
       <a class="crow" href="https://linkedin.com/in/uttapreksha-patel" target="_blank" rel="noopener"><span>linkedin</span><span>uttapreksha-patel ↗</span></a>
       <a class="crow" href="https://github.com/Uttaprexa" target="_blank" rel="noopener"><span>github</span><span>Uttaprexa ↗</span></a>
@@ -405,6 +410,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
     </div>
   </div>
 </section>
+
+</main>
 
 <footer>
   <div class="wrap">
@@ -450,8 +457,8 @@ function renderProjects(filter) {
       <p>${p.d}</p>
       <div class="metric"><b>${p.v}</b><span>${p.vl}</span></div>
       <div class="clinks">
-        <a href="projects/#${p.id}">See it work →</a>
-        ${p.code ? `<a href="${p.code}" target="_blank" rel="noopener">${p.codeLabel || "Code"} ↗</a>` : ""}
+        <a href="projects/#${p.id}" aria-label="See ${p.t} work">See it work →</a>
+        ${p.code ? `<a href="${p.code}" target="_blank" rel="noopener" aria-label="${p.codeLabel || "Code"} for ${p.t} (opens in a new tab)">${p.codeLabel || "Code"} ↗</a>` : ""}
       </div>`;
     grid.appendChild(el);
   });
@@ -508,6 +515,7 @@ resumeBtn.addEventListener("click", e => {
   resumeBtn.setAttribute("aria-expanded", open);
 });
 document.addEventListener("click", () => { resumeMenu.classList.remove("open"); resumeBtn.setAttribute("aria-expanded", false); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && resumeMenu.classList.contains("open")) { resumeMenu.classList.remove("open"); resumeBtn.setAttribute("aria-expanded", false); resumeBtn.focus(); } });
 
 /* ---------- Copy email ---------- */
 document.getElementById("copyBtn").addEventListener("click", async e => {
