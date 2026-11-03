@@ -16,15 +16,15 @@
   --paper: #F8F8F6;
   --bench: #FFFFFF;
   --ink: #0E0E0E;
-  --graphite: #6A6A6A;
+  --graphite: #5F5F5B;
   --rule: #E2E2DE;
-  --signal: #00B4A0;
+  --signal: #00796B;
   --signal-soft: #E0F5F3;
-  --pass: #2E7D32;
+  --pass: #2B6B2F;
   --pass-soft: #E4F2E5;
-  --fail: #c8372d;
+  --fail: #B42318;
   --fail-soft: #f8dfdc;
-  --caution: #b57a06;
+  --caution: #8A5A00;
   --caution-soft: #f8ecd2;
   --sans: "Inter", system-ui, sans-serif;
   --display: "Syne", "Inter", sans-serif;
@@ -222,7 +222,7 @@ footer { border-top: 1px solid var(--rule); padding: 24px 0 40px; color: var(--g
 /* match portfolio: Syne headings, square-ish corners */
 .intro h1, .head h2, .caption h2, .item h2 { font-family: var(--display); letter-spacing: -0.03em; }
 .pipeline, .doc, .link, .card, .ans, .turn, .ctrl, .chip, .pill, .note, .scene canvas, .overlay { border-radius: 3px !important; }
-.chip[aria-current="true"] { background: var(--teal, #00B4A0); border-color: #00B4A0; }
+.chip[aria-current="true"] { background: #00796B; border-color: #00796B; }
 .topbar a:first-child::before { content: ""; }
 </style>
 <style>
@@ -325,7 +325,6 @@ footer { border-top: 1px solid var(--rule); padding: 24px 0 40px; color: var(--g
     root.innerHTML = "";
 
     const rail = H.el("div", "rail");
-    rail.setAttribute("role", "tablist");
     rail.setAttribute("aria-label", "Pipeline steps");
     const btns = [], wires = [];
     stages.forEach((s, i) => {
@@ -361,12 +360,13 @@ footer { border-top: 1px solid var(--rule); padding: 24px 0 40px; color: var(--g
       const s = stages[idx];
       bench.innerHTML = "";
       state = s.setup(bench) || {};
+      bench.querySelectorAll("canvas, svg").forEach((c) => c.setAttribute("aria-hidden", "true"));
       cap.querySelector("h2").textContent = `${idx + 1}. ${s.title}`;
       cap.querySelector("p").textContent = s.caption;
       btns.forEach((b, j) => {
         b.classList.toggle("active", j === idx);
         b.classList.toggle("done", j < idx);
-        b.setAttribute("aria-selected", j === idx ? "true" : "false");
+        if (j === idx) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
       });
       wires.forEach((w, j) => { w.style.transform = `scaleX(${j < idx ? 1 : 0})`; });
       const bl = btns[idx].parentNode.offsetLeft - rail.clientWidth / 2 + 60; rail.scrollTo({ left: Math.max(0, bl), behavior: reduce ? "auto" : "smooth" });
@@ -478,7 +478,7 @@ window.PROJECT_STAGES.clinical = [
     update(s, p) {
       s.phis.forEach((v, i) => {
         const t = seg(p, 0.15 + i * 0.22, 0.3 + i * 0.22);
-        v.classList.toggle("redact", t >= 1);
+        v.classList.toggle("redact", t >= 1); if (t >= 1) v.setAttribute("aria-hidden", "true"); else v.removeAttribute("aria-hidden");
         show(s.tags[i], t >= 1);
       });
     }
@@ -2211,7 +2211,7 @@ window.PROJECT_DEMOS.realtime = function (root) {
   root.innerHTML = `
     <p class="muted" style="font-size:15px;margin:0 0 12px">A simulated camera feed and detector, so you can see how the confidence threshold, duplicate removal and pipeline latency change what comes out. It illustrates the pipeline's behavior; it isn't the YOLOv5 model itself.</p>
     <div style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px">
-      <canvas class="rt-cv" style="width:100%;border:1px solid var(--rule);border-radius:3px;background:#fff" aria-label="Simulated camera feed with detection boxes"></canvas>
+      <canvas class="rt-cv" role="img" style="width:100%;border:1px solid var(--rule);border-radius:3px;background:#fff" aria-label="Simulated camera feed with detection boxes"></canvas>
       <div class="rt-stats" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px"></div>
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px;align-items:center">
         <label style="display:flex;flex-direction:column;gap:4px;font-size:15px">
