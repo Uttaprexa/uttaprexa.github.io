@@ -301,7 +301,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
       <button class="tab" data-f="rl" aria-pressed="false">RL and post-training</button>
       <button class="tab" data-f="gpu" aria-pressed="false">GPU and systems</button>
       <button class="tab" data-f="vision" aria-pressed="false">Vision and robotics</button>
-      <button class="tab" data-f="data" aria-pressed="false">Data engineering</button>
+      <button class="tab" data-f="data" aria-pressed="false">Data and backend</button>
     </div>
     <p class="count" id="count" aria-live="polite"></p>
     <div class="grid" id="grid" style="margin-top:10px">
@@ -432,9 +432,10 @@ const PROJECTS = [
   { t: "Robot pick-and-place", d: "Camera image to robot action, learned by copying an expert, tested on objects it never saw.", v: "58 → 80%", vl: "on unseen objects", th: ["vision", "rl"], id: "robotics", code: null },
   { t: "GPU benchmarking", d: "ResNet-50 on P100, V100 and H100, profiled to see where time actually goes. Team project.", v: "~70%", vl: "lower epoch time on H100", th: ["gpu"], id: "gpu", code: null },
   { t: "PySpark recommender", d: "ALS on 25M ratings on an HPC cluster, with a scaling study from 1 to 8 cores.", v: "3.98×", vl: "speedup on 8 cores", th: ["data", "gpu"], id: "pyspark", code: "https://github.com/Uttaprexa/Scalable-Product-Recommendation-System-using-PySpark" },
+  { t: "Ad billing and reconciliation", d: "Backend that bills ad campaigns and reconciles payments: maker-checker approvals, exact Decimal money, and an audit trail.", v: "82", vl: "automated tests", th: ["data"], id: "adbilling", code: "https://github.com/Uttaprexa/ad-billing-reconciliation" },
   { t: "Climate data pipeline", d: "Two weather APIs to Parquet, with an hourly monitor checking completeness, schema and value drift.", v: "4", vl: "automated checks", th: ["data"], id: "climate", code: "https://github.com/Uttaprexa/climate-data-pipeline" },
 ];
-const THEME_NAMES = { evals: "Evals", llm: "LLMs", rl: "RL", gpu: "GPU", vision: "Vision", data: "Data" };
+const THEME_NAMES = { evals: "Evals", llm: "LLMs", rl: "RL", gpu: "GPU", vision: "Vision", data: "Backend and data" };
 
 const grid = document.getElementById("grid"), count = document.getElementById("count");
 function renderProjects(filter) {
